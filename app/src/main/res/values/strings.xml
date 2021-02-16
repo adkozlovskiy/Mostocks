@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Mostocks</string>
+    <string name="search_hint">Find company or ticker</string>
 </resources>
