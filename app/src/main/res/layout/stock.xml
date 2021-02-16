@@ -4,8 +4,12 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="68dp"
-    android:orientation="horizontal"
-    app:cardCornerRadius="5dp">
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="16dp"
+    app:cardBackgroundColor="@color/backgroundColor"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -29,21 +33,21 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/symbol"
+                android:id="@+id/tv_symbol"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawablePadding="5dp"
-                android:text="YNDX"
+                android:fontFamily="@font/montserrat_medium"
                 android:textColor="#272727"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:drawableEndCompat="@drawable/ic_gray_star" />
 
             <TextView
-                android:id="@+id/company"
+                android:id="@+id/tv_company"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Yandex company"
+                android:fontFamily="@font/montserrat_medium"
                 android:textColor="#272727"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -58,18 +62,19 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/cost"
+                android:id="@+id/tv_cost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="4 756, 00Р"
+                android:fontFamily="@font/montserrat_medium"
                 android:textColor="#272727"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/last_cost_change"
+                android:id="@+id/tv_change"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_medium"
                 android:text="+55Р (0,1%)"
                 android:textColor="#4CAF50"
                 android:textSize="12sp" />
