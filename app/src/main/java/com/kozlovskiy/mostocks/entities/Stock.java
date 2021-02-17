@@ -5,12 +5,10 @@ import com.kozlovskiy.mostocks.Currency;
 public class Stock {
 
     private int id;
-    private String symbol;
-    private String company;
+    private String symbol, company;
     private Currency currency;
     private String src;
-    private double cost;
-    private double change;
+    private double cost, change;
 
     public Stock(int id, String symbol, String company, Currency currency, String src, double cost, double change) {
         this.id = id;

@@ -1,6 +1,7 @@
 package com.kozlovskiy.mostocks;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,6 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.stock, parent, false);
         return new StocksAdapter.ViewHolder(view);
@@ -39,22 +39,28 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
         holder.symbolView.setText(stock.getSymbol());
         holder.companyView.setText(stock.getCompany());
-        holder.costView.setText(Utils.convertCost(stock.getCost(), stock.getCurrency()));
+
+        int color = context.getResources().getColor(R.color.textColor);
+        String text = Utils.convertCost(stock.getChange());
+        holder.costView.setText(text);
+
+        if (stock.getId() % 2 == 1)
+            holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.cardColor));
 
         if (stock.getChange() > 0) {
-            holder.changeView.setText("+" + Utils.convertCost(stock.getChange(), stock.getCurrency()));
-            holder.changeView.setTextColor(context.getResources().getColor(R.color.positiveCost));
-        } else if (stock.getChange() == 0) {
-            holder.changeView.setText(Utils.convertCost(stock.getChange(), stock.getCurrency()));
-            holder.changeView.setTextColor(context.getResources().getColor(R.color.textColor));
-        } else {
-            holder.changeView.setText(Utils.convertCost(stock.getChange(), stock.getCurrency()));
-            holder.changeView.setTextColor(context.getResources().getColor(R.color.negativeCost));
-        }
+            color = context.getResources().getColor(R.color.positiveCost);
+            text = "+" + text;
+        } else if (stock.getChange() < 0)
+            color = context.getResources().getColor(R.color.negativeCost);
 
-        if (holder.getAdapterPosition() % 2 == 0) {
-            holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.cardColor));
-        }
+        holder.changeView.setText(text);
+        holder.changeView.setTextColor(color);
+
+        holder.cardView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, StockInfoActivity.class);
+            intent.putExtra("id", stock.getId());
+            context.startActivity(intent);
+        });
     }
 
     @Override

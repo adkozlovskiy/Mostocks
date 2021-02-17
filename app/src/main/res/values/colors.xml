@@ -2,12 +2,12 @@
 <resources>
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorAccent">#1A1A1A</color>
 
     <color name="textColor">#BABABA</color>
     <color name="textAccentColor">#1A1A1A</color>
     <color name="cardColor">#F0F4F7</color>
-    <color name="backgroundColor">#fbfbfb</color>
+    <color name="backgroundColor">#fff</color>
     <color name="negativeCost">#F44336</color>
     <color name="positiveCost">#4CAF50</color>
 </resources>
