@@ -8,6 +8,7 @@ public class StockCostUtils {
         NumberFormat formatter = NumberFormat.getCurrencyInstance();
         formatter.setMinimumFractionDigits(2);
         formatter.setMaximumFractionDigits(2);
+
         return formatter.format(cost);
     }
 }

@@ -1,6 +1,7 @@
 package com.kozlovskiy.mostocks.ui.stocks;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -66,7 +67,9 @@ public class StocksActivity extends AppCompatActivity {
         StocksRepository stocksRepository = new StocksRepository(this);
         List<Stock> stocks = stocksRepository.getStocks().getValue();
 
-        if (stocks.isEmpty()) {
+        if (stocks == null || stocks.isEmpty()) {
+            // TODO: Если список пустой.
+            Log.e(TAG, "initializeStocks: ", new NullPointerException());
 
         } else {
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);

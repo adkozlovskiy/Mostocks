@@ -85,7 +85,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_medium"
-                android:text="+55Р (0,1%)"
                 android:textColor="@color/positiveCost"
                 android:textSize="12sp" />
         </LinearLayout>

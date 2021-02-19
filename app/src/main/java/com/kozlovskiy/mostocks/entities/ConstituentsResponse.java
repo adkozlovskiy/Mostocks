@@ -11,24 +11,8 @@ public class ConstituentsResponse {
     @Expose
     private List<String> constituents = null;
 
-    @SerializedName("symbol")
-    @Expose
-    private String symbol;
-
     public List<String> getConstituents() {
         return constituents;
-    }
-
-    public void setConstituents(List<String> constituents) {
-        this.constituents = constituents;
-    }
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
     }
 
 }
