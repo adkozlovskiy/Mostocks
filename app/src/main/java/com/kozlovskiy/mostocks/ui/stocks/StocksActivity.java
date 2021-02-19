@@ -66,10 +66,14 @@ public class StocksActivity extends AppCompatActivity {
         StocksRepository stocksRepository = new StocksRepository(this);
         List<Stock> stocks = stocksRepository.getStocks().getValue();
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(new StocksAdapter(this, stocks));
-        swipeRefreshLayout.setRefreshing(false);
+        if (stocks.isEmpty()) {
 
+        } else {
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+            recyclerView.setLayoutManager(linearLayoutManager);
+            recyclerView.setAdapter(new StocksAdapter(this, stocks));
+            swipeRefreshLayout.setRefreshing(false);
+
+        }
     }
 }

@@ -13,9 +13,9 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.utils.StockCostUtils;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.ui.stockInfo.StockInfoActivity;
+import com.kozlovskiy.mostocks.utils.StockCostUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class StockService {
 
-    public static final String TOKEN = "sandbox_c0l8c7748v6orbr0u01g";
+    public static final String TOKEN = "c0l8c7748v6orbr0u010";
     private static final String BASE_URL = "https://finnhub.io/api/v1/";
     private static StockService instance;
     private final Retrofit mRetrofit;

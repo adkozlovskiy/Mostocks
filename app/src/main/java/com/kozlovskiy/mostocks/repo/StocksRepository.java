@@ -24,7 +24,7 @@ import retrofit2.Response;
 public class StocksRepository {
 
     public static final String TAG = StocksRepository.class.getSimpleName();
-    private StocksDao stocksDao;
+    private final StocksDao stocksDao;
 
     public StocksRepository(Context context) {
         stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
@@ -39,14 +39,16 @@ public class StocksRepository {
     }
 
     public void updateStocksFromServer() {
+        // TODO: добавить проверку на время обновления данных.
+        // TODO: обновлять с сервера раз в минуту.
+
         MutableLiveData<List<Stock>> data = new MutableLiveData<>();
-        StockService.getInstance().getApi().getStocks("^DJI", StockService.TOKEN)
+        StockService.getInstance().getApi().getTickers("^DJI", StockService.TOKEN)
                 .enqueue(new Callback<ConstituentsResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<ConstituentsResponse> call, @NonNull Response<ConstituentsResponse> response) {
                         if (response.body() != null) {
                             List<String> tickers = response.body().getConstituents();
-
                             List<Stock> stocks = new ArrayList<>();
 
                             for (int i = 0; i < tickers.size(); i++) {

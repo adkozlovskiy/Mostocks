@@ -4,11 +4,7 @@ import android.app.Application;
 
 import androidx.room.Room;
 
-import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.room.StocksDatabase;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AppDelegate extends Application {
 
