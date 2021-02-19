@@ -1,23 +1,49 @@
 package com.kozlovskiy.mostocks.entities;
 
-import com.kozlovskiy.mostocks.Currency;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
+@Entity
 public class Stock {
 
+    @PrimaryKey
+    @ColumnInfo(name = "id")
     private int id;
-    private String symbol, company;
-    private Currency currency;
-    private String src;
-    private double cost, change;
 
-    public Stock(int id, String symbol, String company, Currency currency, String src, double cost, double change) {
+    @ColumnInfo(name = "symbol")
+    private String symbol;
+
+    @ColumnInfo(name = "company")
+    private String company;
+
+    @ColumnInfo(name = "currency")
+    private String currency;
+
+    @ColumnInfo(name = "src")
+    private String src;
+
+    @ColumnInfo(name = "cc")
+    private double currentCost;
+
+    @ColumnInfo(name = "pc")
+    private double previousCost;
+
+    @ColumnInfo(name = "oc")
+    private double openCost;
+
+    @ColumnInfo(name = "lc")
+    private double lowDailyCost;
+
+    @ColumnInfo(name = "hc")
+    private double highDailyCost;
+
+    public Stock(int id, String symbol, String company, String currency, String src) {
         this.id = id;
         this.symbol = symbol;
         this.company = company;
         this.currency = currency;
         this.src = src;
-        this.cost = cost;
-        this.change = change;
     }
 
     public int getId() {
@@ -44,11 +70,11 @@ public class Stock {
         this.company = company;
     }
 
-    public Currency getCurrency() {
+    public String getCurrency() {
         return currency;
     }
 
-    public void setCurrency(Currency currency) {
+    public void setCurrency(String currency) {
         this.currency = currency;
     }
 
@@ -60,19 +86,43 @@ public class Stock {
         this.src = src;
     }
 
-    public double getCost() {
-        return cost;
+    public double getCurrentCost() {
+        return currentCost;
     }
 
-    public void setCost(double cost) {
-        this.cost = cost;
+    public void setCurrentCost(double currentCost) {
+        this.currentCost = currentCost;
     }
 
-    public double getChange() {
-        return change;
+    public double getPreviousCost() {
+        return previousCost;
     }
 
-    public void setChange(double change) {
-        this.change = change;
+    public void setPreviousCost(double previousCost) {
+        this.previousCost = previousCost;
+    }
+
+    public double getOpenCost() {
+        return openCost;
+    }
+
+    public void setOpenCost(double openCost) {
+        this.openCost = openCost;
+    }
+
+    public double getLowDailyCost() {
+        return lowDailyCost;
+    }
+
+    public void setLowDailyCost(double lowDailyCost) {
+        this.lowDailyCost = lowDailyCost;
+    }
+
+    public double getHighDailyCost() {
+        return highDailyCost;
+    }
+
+    public void setHighDailyCost(double highDailyCost) {
+        this.highDailyCost = highDailyCost;
     }
 }

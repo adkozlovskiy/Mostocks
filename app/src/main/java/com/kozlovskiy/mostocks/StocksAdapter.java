@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kozlovskiy.mostocks.entities.Stock;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -41,16 +43,17 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         holder.companyView.setText(stock.getCompany());
 
         int color = context.getResources().getColor(R.color.textColor);
-        String text = Utils.convertCost(stock.getChange());
+        String text = Utils.convertCost(stock.getCurrentCost());
         holder.costView.setText(text);
 
+        Picasso.get().load("https://i.imgur.com/" + stock.getSrc()).into(holder.imageView);
         if (stock.getId() % 2 == 1)
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.cardColor));
 
-        if (stock.getChange() > 0) {
+        if (stock.getCurrentCost() > 0) {
             color = context.getResources().getColor(R.color.positiveCost);
             text = "+" + text;
-        } else if (stock.getChange() < 0)
+        } else if (stock.getCurrentCost() < 0)
             color = context.getResources().getColor(R.color.negativeCost);
 
         holder.changeView.setText(text);
@@ -72,6 +75,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
         final CardView cardView;
         final TextView symbolView, companyView, costView, changeView;
+        final ImageView imageView;
 
         ViewHolder(View view) {
             super(view);
@@ -81,6 +85,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             companyView = view.findViewById(R.id.tv_company);
             costView = view.findViewById(R.id.tv_cost);
             changeView = view.findViewById(R.id.tv_change);
+            imageView = view.findViewById(R.id.image);
         }
     }
 }
