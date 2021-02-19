@@ -4,6 +4,9 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 @Entity
 public class Stock {
 
@@ -11,17 +14,25 @@ public class Stock {
     @ColumnInfo(name = "id")
     private int id;
 
-    @ColumnInfo(name = "symbol")
-    private String symbol;
+    @ColumnInfo(name = "ticker")
+    @SerializedName("ticker")
+    @Expose
+    private String ticker;
 
-    @ColumnInfo(name = "company")
-    private String company;
+    @ColumnInfo(name = "name")
+    @SerializedName("name")
+    @Expose
+    private String name;
 
     @ColumnInfo(name = "currency")
+    @SerializedName("currency")
+    @Expose
     private String currency;
 
-    @ColumnInfo(name = "src")
-    private String src;
+    @ColumnInfo(name = "logo")
+    @SerializedName("logo")
+    @Expose
+    private String logo;
 
     @ColumnInfo(name = "cc")
     private double currentCost;
@@ -38,12 +49,12 @@ public class Stock {
     @ColumnInfo(name = "hc")
     private double highDailyCost;
 
-    public Stock(int id, String symbol, String company, String currency, String src) {
+    public Stock(int id, String ticker, String name, String currency, String logo) {
         this.id = id;
-        this.symbol = symbol;
-        this.company = company;
+        this.ticker = ticker;
+        this.name = name;
         this.currency = currency;
-        this.src = src;
+        this.logo = logo;
     }
 
     public int getId() {
@@ -54,20 +65,20 @@ public class Stock {
         this.id = id;
     }
 
-    public String getSymbol() {
-        return symbol;
+    public String getTicker() {
+        return ticker;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
+    public void getTicker(String ticker) {
+        this.ticker = ticker;
     }
 
-    public String getCompany() {
-        return company;
+    public String getName() {
+        return name;
     }
 
-    public void setCompany(String company) {
-        this.company = company;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getCurrency() {
@@ -78,12 +89,12 @@ public class Stock {
         this.currency = currency;
     }
 
-    public String getSrc() {
-        return src;
+    public String getLogo() {
+        return logo;
     }
 
-    public void setSrc(String src) {
-        this.src = src;
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 
     public double getCurrentCost() {

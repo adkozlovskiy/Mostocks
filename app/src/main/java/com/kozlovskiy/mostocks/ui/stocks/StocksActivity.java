@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks;
+package com.kozlovskiy.mostocks.ui.stocks;
 
 import android.os.Bundle;
 import android.view.View;
@@ -9,17 +9,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Stock;
-import com.kozlovskiy.mostocks.room.StocksDao;
+import com.kozlovskiy.mostocks.repo.StocksRepository;
 
 import java.util.List;
 
 public class StocksActivity extends AppCompatActivity {
 
     public static final String TAG = StocksActivity.class.getSimpleName();
-    public static final String BASE_URL = "https://finnhub.io/api/v1/";
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private RecyclerView recyclerView;
     private TextView tvFavorites;
     private TextView tvStocks;
+
     View.OnClickListener onMenuItemClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -37,27 +40,36 @@ public class StocksActivity extends AppCompatActivity {
             }
         }
     };
-    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stocks);
 
-        RecyclerView recyclerView = findViewById(R.id.recycler);
+        recyclerView = findViewById(R.id.recycler);
         tvStocks = findViewById(R.id.tv_stocks);
         tvFavorites = findViewById(R.id.tv_favorites);
         tvStocks.setOnClickListener(onMenuItemClickListener);
         tvFavorites.setOnClickListener(onMenuItemClickListener);
-        swipeRefreshLayout = findViewById(R.id.refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(() -> swipeRefreshLayout.setRefreshing(false));
 
-        StocksDao stocksDao = ((AppDelegate) getApplicationContext()).getDatabase().getDao();
-        List<Stock> stocks = stocksDao.getStocks();
+        swipeRefreshLayout = findViewById(R.id.refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this::initializeStocks);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initializeStocks();
+    }
+
+    private void initializeStocks() {
+        StocksRepository stocksRepository = new StocksRepository(this);
+        List<Stock> stocks = stocksRepository.getStocks().getValue();
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        StocksAdapter adapter = new StocksAdapter(this, stocks);
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(new StocksAdapter(this, stocks));
+        swipeRefreshLayout.setRefreshing(false);
+
     }
 }

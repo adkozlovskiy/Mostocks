@@ -18,5 +18,5 @@ public interface StocksDao {
     Stock getStockById(int id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void initializeStocks(List<Stock> stockList);
+    void cacheStocks(List<Stock> stockList);
 }

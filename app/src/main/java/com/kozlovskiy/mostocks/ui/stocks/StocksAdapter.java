@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks;
+package com.kozlovskiy.mostocks.ui.stocks;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kozlovskiy.mostocks.R;
+import com.kozlovskiy.mostocks.utils.StockCostUtils;
 import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.ui.stockInfo.StockInfoActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -39,14 +42,14 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Stock stock = stocks.get(holder.getAdapterPosition());
 
-        holder.symbolView.setText(stock.getSymbol());
-        holder.companyView.setText(stock.getCompany());
+        holder.symbolView.setText(stock.getTicker());
+        holder.companyView.setText(stock.getName());
 
         int color = context.getResources().getColor(R.color.textColor);
-        String text = Utils.convertCost(stock.getCurrentCost());
+        String text = StockCostUtils.convertCost(stock.getCurrentCost());
         holder.costView.setText(text);
 
-        Picasso.get().load("https://i.imgur.com/" + stock.getSrc()).into(holder.imageView);
+        Picasso.get().load("https://i.imgur.com/" + stock.getLogo()).into(holder.imageView);
         if (stock.getId() % 2 == 1)
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.cardColor));
 

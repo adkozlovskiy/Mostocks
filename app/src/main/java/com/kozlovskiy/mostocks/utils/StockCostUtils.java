@@ -1,8 +1,8 @@
-package com.kozlovskiy.mostocks;
+package com.kozlovskiy.mostocks.utils;
 
 import java.text.NumberFormat;
 
-public class Utils {
+public class StockCostUtils {
 
     public static String convertCost(double cost) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance();
