@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.entities.Ticker;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 
 import java.util.List;
@@ -65,18 +65,23 @@ public class StocksActivity extends AppCompatActivity {
 
     private void initializeStocks() {
         StocksRepository stocksRepository = new StocksRepository(this);
-        List<Stock> stocks = stocksRepository.getStocks().getValue();
+        List<Ticker> tickers = stocksRepository.getActualTickers().getValue();
 
-        if (stocks == null || stocks.isEmpty()) {
+        if (tickers == null || tickers.isEmpty()) {
             // TODO: Если список пустой.
             Log.e(TAG, "initializeStocks: ", new NullPointerException());
 
         } else {
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(linearLayoutManager);
-            recyclerView.setAdapter(new StocksAdapter(this, stocks));
+            recyclerView.setAdapter(new StocksAdapter(this, tickers));
             swipeRefreshLayout.setRefreshing(false);
 
         }
     }
+
+    private void refreshCostData() {
+
+    }
+
 }

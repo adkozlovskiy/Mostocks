@@ -19,10 +19,8 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO: Проверка стабильного соединения.
-
         StocksRepository stocksRepository = new StocksRepository(this);
-        stocksRepository.updateStocksFromServer()
+        stocksRepository.updateTickersFromServer()
                 .subscribeOn(Schedulers.io())
                 .doOnComplete(() -> startActivity(new Intent(SplashActivity.this, StocksActivity.class)))
                 .doOnError(this::showErrorAlertDialog)
