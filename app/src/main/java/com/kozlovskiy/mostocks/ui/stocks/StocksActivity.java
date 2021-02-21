@@ -1,5 +1,6 @@
 package com.kozlovskiy.mostocks.ui.stocks;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,27 +9,22 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.entities.StockProfile;
 import com.kozlovskiy.mostocks.entities.Ticker;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.room.StocksDao;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import io.reactivex.Observer;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class StocksActivity extends AppCompatActivity {
 
     public static final String TAG = StocksActivity.class.getSimpleName();
-    private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
     private TextView tvFavorites;
     private TextView tvStocks;
@@ -62,8 +58,6 @@ public class StocksActivity extends AppCompatActivity {
         tvStocks.setOnClickListener(onMenuItemClickListener);
         tvFavorites.setOnClickListener(onMenuItemClickListener);
 
-        swipeRefreshLayout = findViewById(R.id.refresh_layout);
-
     }
 
     @Override
@@ -73,50 +67,29 @@ public class StocksActivity extends AppCompatActivity {
     }
 
     private void initializeStocks() {
+        StocksDao stocksDao = ((AppDelegate) getApplicationContext()).getDatabase().getDao();
         StocksRepository stocksRepository = new StocksRepository(this);
         List<Ticker> tickers = stocksRepository.getActualTickers().getValue();
-        List<StockProfile> stockProfiles = new ArrayList<>();
 
         if (tickers == null || tickers.isEmpty()) {
             Log.e(TAG, "initializeStocks: ", new NullPointerException());
 
         } else {
-
             stocksRepository.updateProfilesFromServer(tickers)
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(new Observer<StockProfile>() {
-                        @Override
-                        public void onSubscribe(@NonNull Disposable d) {
-                            // TODO: 21.02.2021 refreshing true.
-                            Log.d(TAG, "onSubscribe: ");
-                        }
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSuccess(stockProfiles -> {
 
-                        @Override
-                        public void onNext(@NonNull StockProfile stockProfile) {
-                            stockProfiles.add(stockProfile);
+                        SharedPreferences sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putLong("profilesLastUpdateTime", new Date().getTime());
+                        editor.apply();
 
-                            if (stockProfiles.size() == 30) {
-                                onComplete();
-                            }
-                        }
-
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-                            e.printStackTrace();
-                        }
-
-                        @Override
-                        public void onComplete() {
-                            // TODO: 21.02.2021 refreshing false.
-                            StocksDao stocksDao = ((AppDelegate) getApplicationContext()).getDatabase().getDao();
-                            stocksDao.cacheStockProfiles(stockProfiles);
-
-                            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(StocksActivity.this);
-                            recyclerView.setLayoutManager(linearLayoutManager);
-                            recyclerView.setAdapter(new StocksAdapter(StocksActivity.this, tickers, stockProfiles));
-                            swipeRefreshLayout.setRefreshing(false);
-                        }
-                    });
+                        Log.d(TAG, "initializeStocks: ");
+                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(StocksActivity.this);
+                        recyclerView.setLayoutManager(linearLayoutManager);
+                        recyclerView.setAdapter(new StocksAdapter(StocksActivity.this, tickers));
+                    }).subscribe();
 
 
         }

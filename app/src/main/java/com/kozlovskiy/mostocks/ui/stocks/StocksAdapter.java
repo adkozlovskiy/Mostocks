@@ -17,7 +17,6 @@ import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.StockCost;
 import com.kozlovskiy.mostocks.entities.StockProfile;
 import com.kozlovskiy.mostocks.entities.Ticker;
-import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.ui.stockInfo.StockInfoActivity;
 import com.kozlovskiy.mostocks.utils.StockCostUtils;
@@ -30,14 +29,10 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     public static final String TAG = StocksAdapter.class.getSimpleName();
     private final List<Ticker> tickers;
     private final Context context;
-    private final List<StockProfile> stockProfiles;
 
-    public StocksAdapter(Context context, List<Ticker> tickers, List<StockProfile> stockProfiles) {
+    public StocksAdapter(Context context, List<Ticker> tickers) {
         this.context = context;
         this.tickers = tickers;
-        this.stockProfiles = stockProfiles;
-
-        StocksRepository stocksRepository = new StocksRepository(context);
     }
 
     @NonNull
@@ -58,7 +53,9 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         holder.symbolView.setText(ticker.getTicker());
         if (stockProfile != null) {
             holder.companyView.setText(stockProfile.getName());
-            Picasso.get().load(stockProfile.getLogo()).into(holder.imageView);
+            if (stockProfile.getLogo() != null && !stockProfile.getLogo().isEmpty()) {
+                Picasso.get().load(stockProfile.getLogo()).into(holder.imageView);
+            }
         }
 
         if (stockCost != null) {

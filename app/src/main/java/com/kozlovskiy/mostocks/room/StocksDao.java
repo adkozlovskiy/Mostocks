@@ -26,6 +26,9 @@ public interface StocksDao {
     StockProfile getStockProfile(String ticker);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void cacheStockProfile(StockProfile stockProfiles);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void cacheStockProfiles(List<StockProfile> stockProfiles);
 
     @Query("SELECT * FROM Ticker")

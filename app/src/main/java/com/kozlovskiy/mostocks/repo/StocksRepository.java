@@ -3,7 +3,6 @@ package com.kozlovskiy.mostocks.repo;
 import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -23,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Completable;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,14 +59,6 @@ public class StocksRepository {
         return data;
     }
 
-    public LiveData<List<StockProfile>> getActualProfiles() {
-        // TODO: 20.02.2021 Обновление с сервера.
-
-        MutableLiveData<List<StockProfile>> data = new MutableLiveData<>();
-        data.setValue(stocksDao.getStockProfiles());
-        return data;
-    }
-
     public LiveData<StockCost> getActualCost(String ticker) {
         // TODO: 20.02.2021 Обновление с сервера.
 
@@ -77,25 +68,26 @@ public class StocksRepository {
     }
 
 
-    public Observable<StockProfile> updateProfilesFromServer(List<Ticker> tickers) {
-        return Observable.create(emitter -> {
+    public Single<List<StockProfile>> updateProfilesFromServer(List<Ticker> tickers) {
+        return Single.create(emitter -> {
             if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
                 emitter.onError(new NetworkErrorException());
 
             } else if (new Date().getTime() - profilesLastUpdateTime > UPDATE_INTERVAL) {
-
+                List<StockProfile> stockProfiles = new ArrayList<>();
                 for (Ticker ticker : tickers) {
-                    Log.d(TAG, "updateProfilesFromServer for: " + ticker.getTicker());
                     StockService.getInstance().getApi().getStockProfile(ticker.getTicker(), StockService.TOKEN)
                             .enqueue(new Callback<StockProfile>() {
                                 @Override
                                 public void onResponse(@NonNull Call<StockProfile> call, @NonNull Response<StockProfile> response) {
+                                    if (response.body() != null) {
+                                        stockProfiles.add(response.body());
 
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putLong("profilesLastUpdateTime", new Date().getTime());
-                                    editor.apply();
-
-                                    emitter.onNext(response.body());
+                                        if (stockProfiles.size() == tickers.size()) {
+                                            stocksDao.cacheStockProfiles(stockProfiles);
+                                            emitter.onSuccess(stockProfiles);
+                                        }
+                                    }
                                 }
 
                                 @Override
@@ -104,10 +96,8 @@ public class StocksRepository {
                                 }
                             });
                 }
-            }
-
+            } else emitter.onSuccess(stocksDao.getStockProfiles());
         });
-
     }
 
     public Completable updateTickersFromServer() {
@@ -116,7 +106,6 @@ public class StocksRepository {
                 emitter.onError(new NetworkErrorException());
 
             } else if (new Date().getTime() - tickersLastUpdateTime > UPDATE_INTERVAL) {
-                Log.d(TAG, "updateStocksFromServer: ");
                 StockService.getInstance().getApi().getTickers("^DJI", StockService.TOKEN)
                         .enqueue(new Callback<ConstituentsResponse>() {
                             @Override
@@ -144,7 +133,7 @@ public class StocksRepository {
                                 t.printStackTrace();
                             }
                         });
-            }
+            } else emitter.onComplete();
         });
     }
 }

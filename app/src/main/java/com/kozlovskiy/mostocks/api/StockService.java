@@ -17,6 +17,9 @@ public class StockService {
                 .build();
     }
 
+    /**
+     * @return {@link StockService} instance.
+     */
     public static StockService getInstance() {
         if (instance == null)
             instance = new StockService();
@@ -24,6 +27,9 @@ public class StockService {
         return instance;
     }
 
+    /**
+     * @return API instance.
+     */
     public StockApi getApi() {
         return mRetrofit.create(StockApi.class);
     }

@@ -30,6 +30,13 @@ public interface StockApi {
     @GET("stock/profile2?")
     Call<StockProfile> getStockProfile(@Query("symbol") String symbol, @Query("token") String token);
 
+    /**
+     * Requests the costs of the stock that owns the transmitted ticker.
+     *
+     * @param symbol is ticker.
+     * @param token  is auth token.
+     * @return callable object of {@link StockCost}.
+     */
     @GET("quote?")
     Call<StockCost> getStockCost(@Query("symbol") String symbol, @Query("token") String token);
 }
