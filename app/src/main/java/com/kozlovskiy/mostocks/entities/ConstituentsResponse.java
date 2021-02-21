@@ -15,4 +15,7 @@ public class ConstituentsResponse {
         return constituents;
     }
 
+    public void setConstituents(List<String> constituents) {
+        this.constituents = constituents;
+    }
 }

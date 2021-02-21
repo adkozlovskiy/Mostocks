@@ -33,18 +33,19 @@ public class StockProfile {
     @Expose
     private String logo;
 
-    public StockProfile(String ticker, String name, String currency, String logo) {
+    public StockProfile(@NonNull String ticker, String name, String currency, String logo) {
         this.ticker = ticker;
         this.name = name;
         this.currency = currency;
         this.logo = logo;
     }
 
+    @NonNull
     public String getTicker() {
         return ticker;
     }
 
-    public void setTicker(String ticker) {
+    public void setTicker(@NonNull String ticker) {
         this.ticker = ticker;
     }
 

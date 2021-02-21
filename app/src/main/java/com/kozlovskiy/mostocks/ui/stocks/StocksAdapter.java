@@ -30,10 +30,12 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     public static final String TAG = StocksAdapter.class.getSimpleName();
     private final List<Ticker> tickers;
     private final Context context;
+    private final List<StockProfile> stockProfiles;
 
-    public StocksAdapter(Context context, List<Ticker> tickers) {
+    public StocksAdapter(Context context, List<Ticker> tickers, List<StockProfile> stockProfiles) {
         this.context = context;
         this.tickers = tickers;
+        this.stockProfiles = stockProfiles;
 
         StocksRepository stocksRepository = new StocksRepository(context);
     }
@@ -56,7 +58,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         holder.symbolView.setText(ticker.getTicker());
         if (stockProfile != null) {
             holder.companyView.setText(stockProfile.getName());
-            Picasso.get().load("https://i.imgur.com/" + stockProfile.getLogo()).into(holder.imageView);
+            Picasso.get().load(stockProfile.getLogo()).into(holder.imageView);
         }
 
         if (stockCost != null) {

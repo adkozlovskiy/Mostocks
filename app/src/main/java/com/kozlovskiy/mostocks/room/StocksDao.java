@@ -19,6 +19,9 @@ public interface StocksDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void cacheStockCosts(List<StockCost> stockCosts);
 
+    @Query("SELECT * FROM StockProfile ")
+    List<StockProfile> getStockProfiles();
+
     @Query("SELECT * FROM StockProfile WHERE ticker = :ticker")
     StockProfile getStockProfile(String ticker);
 

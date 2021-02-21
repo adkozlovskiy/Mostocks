@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,17 +34,19 @@ public class StocksRepository {
     public static final String TAG = StocksRepository.class.getSimpleName();
     private static final long UPDATE_INTERVAL = 60 * 1000; // 60 * 60 * 24 * 1000
 
-    private SharedPreferences sharedPreferences;
+    private final SharedPreferences sharedPreferences;
     private final StocksDao stocksDao;
-    private long lastUpdateTime;
-    private Context context;
+    private final long tickersLastUpdateTime;
+    private final long profilesLastUpdateTime;
+    private final Context context;
 
     public StocksRepository(Context context) {
         this.context = context;
         stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
 
         sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-        lastUpdateTime = sharedPreferences.getLong("last_update", 0);
+        tickersLastUpdateTime = sharedPreferences.getLong("tickersLastUpdateTime", 0);
+        profilesLastUpdateTime = sharedPreferences.getLong("profilesLastUpdateTime", 0);
     }
 
     public LiveData<List<Ticker>> getActualTickers() {
@@ -57,11 +60,11 @@ public class StocksRepository {
         return data;
     }
 
-    public LiveData<StockProfile> getActualProfile(String ticker) {
+    public LiveData<List<StockProfile>> getActualProfiles() {
         // TODO: 20.02.2021 Обновление с сервера.
 
-        MutableLiveData<StockProfile> data = new MutableLiveData<>();
-        data.setValue(stocksDao.getStockProfile(ticker));
+        MutableLiveData<List<StockProfile>> data = new MutableLiveData<>();
+        data.setValue(stocksDao.getStockProfiles());
         return data;
     }
 
@@ -74,12 +77,45 @@ public class StocksRepository {
     }
 
 
-    public Completable updateTickersFromServer() {
-        return Completable.create(emitter -> {
-            if (!NetworkUtils.isNetworkConnectionGranted(context)) {
+    public Observable<StockProfile> updateProfilesFromServer(List<Ticker> tickers) {
+        return Observable.create(emitter -> {
+            if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
                 emitter.onError(new NetworkErrorException());
 
-            } else if (new Date().getTime() - lastUpdateTime > UPDATE_INTERVAL) {
+            } else if (new Date().getTime() - profilesLastUpdateTime > UPDATE_INTERVAL) {
+
+                for (Ticker ticker : tickers) {
+                    Log.d(TAG, "updateProfilesFromServer for: " + ticker.getTicker());
+                    StockService.getInstance().getApi().getStockProfile(ticker.getTicker(), StockService.TOKEN)
+                            .enqueue(new Callback<StockProfile>() {
+                                @Override
+                                public void onResponse(@NonNull Call<StockProfile> call, @NonNull Response<StockProfile> response) {
+
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putLong("profilesLastUpdateTime", new Date().getTime());
+                                    editor.apply();
+
+                                    emitter.onNext(response.body());
+                                }
+
+                                @Override
+                                public void onFailure(@NonNull Call<StockProfile> call, @NonNull Throwable t) {
+                                    emitter.onError(t);
+                                }
+                            });
+                }
+            }
+
+        });
+
+    }
+
+    public Completable updateTickersFromServer() {
+        return Completable.create(emitter -> {
+            if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
+                emitter.onError(new NetworkErrorException());
+
+            } else if (new Date().getTime() - tickersLastUpdateTime > UPDATE_INTERVAL) {
                 Log.d(TAG, "updateStocksFromServer: ");
                 StockService.getInstance().getApi().getTickers("^DJI", StockService.TOKEN)
                         .enqueue(new Callback<ConstituentsResponse>() {
@@ -96,7 +132,7 @@ public class StocksRepository {
                                     stocksDao.cacheTickers(oTickers);
 
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putLong("last_update", new Date().getTime());
+                                    editor.putLong("tickersLastUpdateTime", new Date().getTime());
                                     editor.apply();
 
                                     emitter.onComplete();

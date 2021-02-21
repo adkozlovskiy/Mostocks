@@ -43,7 +43,7 @@ public class StockCost {
     @Expose
     private double highDailyCost;
 
-    public StockCost(String ticker, double currentCost, double previousCost, double openCost, double lowDailyCost, double highDailyCost) {
+    public StockCost(@NonNull String ticker, double currentCost, double previousCost, double openCost, double lowDailyCost, double highDailyCost) {
         this.ticker = ticker;
         this.currentCost = currentCost;
         this.previousCost = previousCost;
@@ -52,11 +52,12 @@ public class StockCost {
         this.highDailyCost = highDailyCost;
     }
 
+    @NonNull
     public String getTicker() {
         return ticker;
     }
 
-    public void setTicker(String ticker) {
+    public void setTicker(@NonNull String ticker) {
         this.ticker = ticker;
     }
 

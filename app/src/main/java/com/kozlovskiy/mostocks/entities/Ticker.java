@@ -13,15 +13,16 @@ public class Ticker {
     @ColumnInfo(name = "ticker")
     private String ticker;
 
-    public Ticker(String ticker) {
+    public Ticker(@NonNull String ticker) {
         this.ticker = ticker;
     }
 
+    @NonNull
     public String getTicker() {
         return ticker;
     }
 
-    public void setTicker(String ticker) {
+    public void setTicker(@NonNull String ticker) {
         this.ticker = ticker;
     }
 }
