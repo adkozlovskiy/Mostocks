@@ -6,6 +6,10 @@ import android.net.NetworkInfo;
 
 public class NetworkUtils {
 
+    /**
+     * @param context context.
+     * @return true if client's network is not good, else false.
+     */
     public static boolean isNetworkConnectionNotGranted(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

@@ -1,22 +1,20 @@
 package com.kozlovskiy.mostocks.ui.stocks;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Ticker;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
-import com.kozlovskiy.mostocks.room.StocksDao;
+import com.kozlovskiy.mostocks.utils.SettingsUtils;
 
-import java.util.Date;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -26,6 +24,7 @@ public class StocksActivity extends AppCompatActivity {
 
     public static final String TAG = StocksActivity.class.getSimpleName();
     private RecyclerView recyclerView;
+    private ProgressBar progressBar;
     private TextView tvFavorites;
     private TextView tvStocks;
 
@@ -52,6 +51,7 @@ public class StocksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stocks);
 
+        progressBar = findViewById(R.id.progress_bar);
         recyclerView = findViewById(R.id.recycler);
         tvStocks = findViewById(R.id.tv_stocks);
         tvFavorites = findViewById(R.id.tv_favorites);
@@ -67,11 +67,11 @@ public class StocksActivity extends AppCompatActivity {
     }
 
     private void initializeStocks() {
-        StocksDao stocksDao = ((AppDelegate) getApplicationContext()).getDatabase().getDao();
         StocksRepository stocksRepository = new StocksRepository(this);
         List<Ticker> tickers = stocksRepository.getActualTickers().getValue();
 
         if (tickers == null || tickers.isEmpty()) {
+            // TODO: 22.02.2021 alertDialog
             Log.e(TAG, "initializeStocks: ", new NullPointerException());
 
         } else {
@@ -80,10 +80,9 @@ public class StocksActivity extends AppCompatActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSuccess(stockProfiles -> {
 
-                        SharedPreferences sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putLong("profilesLastUpdateTime", new Date().getTime());
-                        editor.apply();
+                        SettingsUtils.setUptime(this, SettingsUtils.KEY_PROFILES_UPTIME);
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
 
                         Log.d(TAG, "initializeStocks: ");
                         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(StocksActivity.this);

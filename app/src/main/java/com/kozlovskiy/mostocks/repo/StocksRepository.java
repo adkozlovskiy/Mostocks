@@ -2,7 +2,7 @@ package com.kozlovskiy.mostocks.repo;
 
 import android.accounts.NetworkErrorException;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -16,10 +16,13 @@ import com.kozlovskiy.mostocks.entities.StockProfile;
 import com.kozlovskiy.mostocks.entities.Ticker;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.utils.NetworkUtils;
+import com.kozlovskiy.mostocks.utils.SettingsUtils;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -33,24 +36,19 @@ public class StocksRepository {
     public static final String TAG = StocksRepository.class.getSimpleName();
     private static final long UPDATE_INTERVAL = 60 * 1000; // 60 * 60 * 24 * 1000
 
-    private final SharedPreferences sharedPreferences;
     private final StocksDao stocksDao;
-    private final long tickersLastUpdateTime;
-    private final long profilesLastUpdateTime;
     private final Context context;
 
     public StocksRepository(Context context) {
         this.context = context;
-        stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
-
-        sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-        tickersLastUpdateTime = sharedPreferences.getLong("tickersLastUpdateTime", 0);
-        profilesLastUpdateTime = sharedPreferences.getLong("profilesLastUpdateTime", 0);
+        stocksDao = ((AppDelegate) context.getApplicationContext())
+                .getDatabase().getDao();
     }
 
     public LiveData<List<Ticker>> getActualTickers() {
         updateTickersFromServer()
                 .subscribeOn(Schedulers.io())
+                .timeout(1, TimeUnit.MINUTES)
                 .doOnError(Throwable::printStackTrace)
                 .subscribe();
 
@@ -73,7 +71,7 @@ public class StocksRepository {
             if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
                 emitter.onError(new NetworkErrorException());
 
-            } else if (new Date().getTime() - profilesLastUpdateTime > UPDATE_INTERVAL) {
+            } else if (new Date().getTime() - SettingsUtils.getProfilesUptime(context) > UPDATE_INTERVAL) {
                 List<StockProfile> stockProfiles = new ArrayList<>();
                 for (Ticker ticker : tickers) {
                     StockService.getInstance().getApi().getStockProfile(ticker.getTicker(), StockService.TOKEN)
@@ -105,7 +103,7 @@ public class StocksRepository {
             if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
                 emitter.onError(new NetworkErrorException());
 
-            } else if (new Date().getTime() - tickersLastUpdateTime > UPDATE_INTERVAL) {
+            } else if (new Date().getTime() - SettingsUtils.getTickersUptime(context) > UPDATE_INTERVAL) {
                 StockService.getInstance().getApi().getTickers("^DJI", StockService.TOKEN)
                         .enqueue(new Callback<ConstituentsResponse>() {
                             @Override
@@ -119,17 +117,16 @@ public class StocksRepository {
                                     }
 
                                     stocksDao.cacheTickers(oTickers);
-
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putLong("tickersLastUpdateTime", new Date().getTime());
-                                    editor.apply();
-
+                                    SettingsUtils.setUptime(context, SettingsUtils.KEY_TICKERS_UPTIME);
                                     emitter.onComplete();
                                 }
                             }
 
                             @Override
                             public void onFailure(@NonNull Call<ConstituentsResponse> call, @NonNull Throwable t) {
+                                if (t instanceof SocketTimeoutException)
+                                    Log.e(TAG, "onFailure: время ожидания превышено.");
+
                                 t.printStackTrace();
                             }
                         });
