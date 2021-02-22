@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
-import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -66,8 +65,8 @@ public class StocksRepository {
     }
 
 
-    public Single<List<StockProfile>> updateProfilesFromServer(List<Ticker> tickers) {
-        return Single.create(emitter -> {
+    public Completable updateProfilesFromServer(List<Ticker> tickers) {
+        return Completable.create(emitter -> {
             if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
                 emitter.onError(new NetworkErrorException());
 
@@ -83,7 +82,7 @@ public class StocksRepository {
 
                                         if (stockProfiles.size() == tickers.size()) {
                                             stocksDao.cacheStockProfiles(stockProfiles);
-                                            emitter.onSuccess(stockProfiles);
+                                            emitter.onComplete();
                                         }
                                     }
                                 }
@@ -94,7 +93,7 @@ public class StocksRepository {
                                 }
                             });
                 }
-            } else emitter.onSuccess(stocksDao.getStockProfiles());
+            } else emitter.onComplete();
         });
     }
 

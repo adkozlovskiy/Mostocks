@@ -72,26 +72,29 @@ public class StocksActivity extends AppCompatActivity {
 
         if (tickers == null || tickers.isEmpty()) {
             // TODO: 22.02.2021 alertDialog
-            Log.e(TAG, "initializeStocks: ", new NullPointerException());
+            Log.e(TAG, "initializeStocks: Error! ", new NullPointerException());
 
         } else {
             stocksRepository.updateProfilesFromServer(tickers)
-                    .subscribeOn(Schedulers.computation())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnSuccess(stockProfiles -> {
-
-                        SettingsUtils.setUptime(this, SettingsUtils.KEY_PROFILES_UPTIME);
-                        progressBar.setVisibility(View.GONE);
-                        recyclerView.setVisibility(View.VISIBLE);
-
-                        Log.d(TAG, "initializeStocks: ");
-                        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(StocksActivity.this);
-                        recyclerView.setLayoutManager(linearLayoutManager);
-                        recyclerView.setAdapter(new StocksAdapter(StocksActivity.this, tickers));
-                    }).subscribe();
-
+                    .doOnError(Throwable::printStackTrace) // TODO: 23.02.2021
+                    .doOnComplete(() -> onProfilesUpdatingSuccess(tickers))
+                    .subscribe();
 
         }
+    }
+
+    private void onProfilesUpdatingSuccess(List<Ticker> tickers) {
+        SettingsUtils.setUptime(this, SettingsUtils.KEY_PROFILES_UPTIME);
+
+        progressBar.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
+
+        Log.d(TAG, "initializeStocks: done!");
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(StocksActivity.this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(new StocksAdapter(StocksActivity.this, tickers));
     }
 
 }

@@ -57,7 +57,6 @@
                 android:id="@+id/tv_company"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="null"
                 android:fontFamily="@font/montserrat_medium"
                 android:textColor="#272727"
                 android:textSize="12sp" />
