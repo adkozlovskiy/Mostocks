@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks.ui.stocks;
+package com.kozlovskiy.mostocks.ui.stocks.adapter;
 
 import android.content.Context;
 import android.content.Intent;

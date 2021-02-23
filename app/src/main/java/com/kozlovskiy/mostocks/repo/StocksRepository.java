@@ -48,7 +48,6 @@ public class StocksRepository {
     public LiveData<List<Ticker>> getActualTickers() {
         updateTickersFromServer()
                 .subscribeOn(Schedulers.io())
-                .timeout(1, TimeUnit.MINUTES)
                 .doOnError(Throwable::printStackTrace)
                 .subscribe();
 
@@ -90,6 +89,10 @@ public class StocksRepository {
 
                                 @Override
                                 public void onFailure(@NonNull Call<StockProfile> call, @NonNull Throwable t) {
+
+                                    if (t instanceof SocketTimeoutException)
+                                        Toast.makeText(context, "Время вышло", Toast.LENGTH_SHORT).show();
+
                                     emitter.onError(t);
                                 }
                             });

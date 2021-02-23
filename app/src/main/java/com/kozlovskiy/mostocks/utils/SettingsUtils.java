@@ -25,11 +25,17 @@ public class SettingsUtils {
 
     }
 
+    /**
+     * @return time in millis when profiles was loaded last time.
+     */
     public static long getProfilesUptime(Context context) {
         return context.getSharedPreferences(KEY_SETTINGS, MODE_PRIVATE)
                 .getLong(KEY_PROFILES_UPTIME, 0);
     }
 
+    /**
+     * @return time in millis when tickers was loaded last time.
+     */
     public static long getTickersUptime(Context context) {
         return context.getSharedPreferences(KEY_SETTINGS, MODE_PRIVATE)
                 .getLong(KEY_TICKERS_UPTIME, 0);
