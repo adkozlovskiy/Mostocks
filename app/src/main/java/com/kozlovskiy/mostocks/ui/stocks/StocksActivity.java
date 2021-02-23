@@ -97,4 +97,11 @@ public class StocksActivity extends AppCompatActivity {
         recyclerView.setAdapter(new StocksAdapter(StocksActivity.this, tickers));
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        moveTaskToBack(true);
+        finish();
+    }
 }

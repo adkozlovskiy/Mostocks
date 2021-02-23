@@ -1,8 +1,9 @@
+
 package com.kozlovskiy.mostocks.repo;
 
 import android.accounts.NetworkErrorException;
 import android.content.Context;
-import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -124,7 +125,7 @@ public class StocksRepository {
                             @Override
                             public void onFailure(@NonNull Call<ConstituentsResponse> call, @NonNull Throwable t) {
                                 if (t instanceof SocketTimeoutException)
-                                    Log.e(TAG, "onFailure: время ожидания превышено.");
+                                    Toast.makeText(context, "Время вышло", Toast.LENGTH_SHORT).show();
 
                                 t.printStackTrace();
                             }
