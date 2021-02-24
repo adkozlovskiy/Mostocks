@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.ui.stocks.StocksActivity;
 
@@ -22,7 +23,7 @@ public class SplashActivity extends AppCompatActivity {
         StocksRepository stocksRepository = new StocksRepository(this);
         stocksRepository.updateTickersFromServer()
                 .subscribeOn(Schedulers.io())
-                .doOnComplete(() -> startActivity(new Intent(SplashActivity.this, StocksActivity.class)))
+                .doOnComplete(this::startStocksActivity)
                 .doOnError(this::showErrorAlertDialog)
                 .subscribe();
     }
@@ -30,5 +31,10 @@ public class SplashActivity extends AppCompatActivity {
     private void showErrorAlertDialog(Throwable throwable) {
         // TODO: 19.02.2021
         Log.d(TAG, "showErrorAlertDialog: ");
+    }
+
+    private void startStocksActivity() {
+        startActivity(new Intent(SplashActivity.this, StocksActivity.class));
+        overridePendingTransition(R.anim.alpha_in, R.anim.alpha_out);
     }
 }
