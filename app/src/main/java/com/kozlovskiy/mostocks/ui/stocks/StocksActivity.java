@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.tabs.TabItem;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Ticker;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
@@ -26,8 +27,6 @@ public class StocksActivity extends AppCompatActivity
     private StocksPresenter stocksPresenter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
-    private TextView tvFavorites;
-    private TextView tvStocks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +35,6 @@ public class StocksActivity extends AppCompatActivity
 
         progressBar = findViewById(R.id.progress_bar);
         recyclerView = findViewById(R.id.recycler);
-        tvStocks = findViewById(R.id.tv_stocks);
-        tvFavorites = findViewById(R.id.tv_favorites);
-        tvStocks.setOnClickListener(onMenuItemClickListener);
-        tvFavorites.setOnClickListener(onMenuItemClickListener);
     }
 
     @Override
@@ -80,22 +75,4 @@ public class StocksActivity extends AppCompatActivity
         moveTaskToBack(true);
         finish();
     }
-
-    View.OnClickListener onMenuItemClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (v.getId() == R.id.tv_stocks) {
-                tvStocks.setTextSize(28);
-                tvFavorites.setTextSize(16);
-                tvStocks.setTextColor(getResources().getColor(R.color.textAccentColor));
-                tvFavorites.setTextColor(getResources().getColor(R.color.textColor));
-
-            } else if (v.getId() == R.id.tv_favorites) {
-                tvFavorites.setTextSize(28);
-                tvStocks.setTextSize(16);
-                tvFavorites.setTextColor(getResources().getColor(R.color.textAccentColor));
-                tvStocks.setTextColor(getResources().getColor(R.color.textColor));
-            }
-        }
-    };
 }
