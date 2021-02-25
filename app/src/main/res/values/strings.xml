@@ -3,4 +3,7 @@
     <string name="search_hint">Find company or ticker</string>
     <string name="stocks">Stocks</string>
     <string name="favorites">Favorites</string>
+    <string name="retry">Retry</string>
+    <string name="timed_out">Timed out waiting for a response from the server.</string>
+    <string name="loading_error">Loading error!</string>
 </resources>

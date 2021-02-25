@@ -10,5 +10,7 @@ public interface StocksView {
 
     void showStocks(List<Ticker> tickers);
 
-    void showAlertDialog(Dialog dialog);
+    void showRetryDialog(Dialog dialog);
+
+    void setFilteredTickers(List<Ticker> tickers);
 }

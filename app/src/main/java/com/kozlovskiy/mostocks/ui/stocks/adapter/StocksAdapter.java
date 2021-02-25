@@ -27,7 +27,8 @@ import java.util.List;
 public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder> {
 
     public static final String TAG = StocksAdapter.class.getSimpleName();
-    private final List<Ticker> tickers;
+    public static final String KEY_TICKER = "TICKER";
+    private List<Ticker> tickers;
     private final Context context;
 
     public StocksAdapter(Context context, List<Ticker> tickers) {
@@ -81,7 +82,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
         holder.cardView.setOnClickListener(v -> {
             Intent intent = new Intent(context, StockInfoActivity.class);
-            intent.putExtra("ticker", ticker.getTicker());
+            intent.putExtra(KEY_TICKER, ticker.getTicker());
             context.startActivity(intent);
         });
     }
@@ -107,5 +108,10 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             changeView = view.findViewById(R.id.tv_change);
             imageView = view.findViewById(R.id.image);
         }
+    }
+
+    public void setFilteredTickers(List<Ticker> tickers) {
+        this.tickers = tickers;
+        notifyDataSetChanged();
     }
 }

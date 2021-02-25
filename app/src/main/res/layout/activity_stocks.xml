@@ -12,28 +12,20 @@
         android:layout_height="wrap_content"
         android:background="@color/backgroundColor">
 
-        <RelativeLayout
-            android:id="@+id/search"
+        <EditText
+            android:id="@+id/et_search"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:layout_marginStart="16dp"
-            android:elevation="0dp"
-            app:layout_scrollFlags="scroll|enterAlways">
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="15dp"
-                android:background="@android:color/transparent"
-                android:drawableStart="@drawable/ic_search"
-                android:drawablePadding="13dp"
-                android:fontFamily="@font/montserrat_semibold"
-                android:hint="@string/search_hint"
-                android:importantForAutofill="no"
-                android:inputType="text"
-                android:textColorHint="@color/textAccentColor"
-                android:textSize="16sp" />
-        </RelativeLayout>
+            android:layout_marginStart="32dp"
+            android:background="@android:color/transparent"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="13dp"
+            android:hint="@string/search_hint"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:textColorHint="@color/textAccentColor"
+            android:textSize="16sp"
+            app:layout_scrollFlags="scroll|enterAlways" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"

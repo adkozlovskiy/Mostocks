@@ -3,6 +3,7 @@ package com.kozlovskiy.mostocks.repo;
 
 import android.accounts.NetworkErrorException;
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -69,9 +70,11 @@ public class StocksRepository {
         return Completable.create(emitter -> {
             if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
                 emitter.onError(new NetworkErrorException());
+                Log.d(TAG, "updateProfilesFromServer: no network");
 
             } else if (new Date().getTime() - SettingsUtils.getProfilesUptime(context) > UPDATE_INTERVAL) {
                 List<StockProfile> stockProfiles = new ArrayList<>();
+                Log.d(TAG, "updateProfilesFromServer: from server");
                 for (Ticker ticker : tickers) {
                     StockService.getInstance().getApi().getStockProfile(ticker.getTicker(), StockService.TOKEN)
                             .enqueue(new Callback<StockProfile>() {
@@ -97,7 +100,10 @@ public class StocksRepository {
                                 }
                             });
                 }
-            } else emitter.onComplete();
+            } else {
+                emitter.onComplete();
+                Log.d(TAG, "updateProfilesFromServer: from cache");
+            }
         });
     }
 
