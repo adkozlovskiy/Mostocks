@@ -9,14 +9,14 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Entity
-public class StockProfile {
+public class Stock {
 
     @PrimaryKey
     @ColumnInfo(name = "ticker")
     @SerializedName("ticker")
     @Expose
     @NonNull
-    private String ticker;
+    private final String ticker;
 
     @ColumnInfo(name = "name")
     @SerializedName("name")
@@ -33,20 +33,13 @@ public class StockProfile {
     @Expose
     private String logo;
 
-    public StockProfile(@NonNull String ticker, String name, String currency, String logo) {
+    public Stock(@NonNull String ticker) {
         this.ticker = ticker;
-        this.name = name;
-        this.currency = currency;
-        this.logo = logo;
     }
 
     @NonNull
     public String getTicker() {
         return ticker;
-    }
-
-    public void setTicker(@NonNull String ticker) {
-        this.ticker = ticker;
     }
 
     public String getName() {

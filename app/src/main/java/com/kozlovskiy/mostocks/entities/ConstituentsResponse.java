@@ -9,13 +9,9 @@ public class ConstituentsResponse {
 
     @SerializedName("constituents")
     @Expose
-    private List<String> constituents = null;
+    private final List<String> constituents = null;
 
     public List<String> getConstituents() {
         return constituents;
-    }
-
-    public void setConstituents(List<String> constituents) {
-        this.constituents = constituents;
     }
 }

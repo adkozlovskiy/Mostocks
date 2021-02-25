@@ -5,7 +5,7 @@ import android.app.Dialog;
 import android.util.Log;
 
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.entities.Ticker;
+import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 
 import java.net.SocketTimeoutException;
@@ -13,16 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class StocksPresenter {
 
     private StocksView stocksView;
-    private StocksRepository stocksRepository;
-    private AlertDialog.Builder builder;
+    private final StocksRepository stocksRepository;
+    private final AlertDialog.Builder builder;
     public static final String TAG = StocksPresenter.class.getSimpleName();
-    private List<Ticker> tickers;
+    private List<Stock> stocks;
 
     public StocksPresenter(StocksView stocksView, StocksRepository stocksRepository, AlertDialog.Builder builder) {
         this.stocksView = stocksView;
@@ -31,25 +32,27 @@ public class StocksPresenter {
     }
 
     public void initializeStocks() {
-        tickers = stocksRepository.getActualTickers().getValue();
+        stocks = stocksRepository.getActualStocks().getValue();
 
-        if (tickers == null || tickers.isEmpty()) {
+        if (stocks == null || stocks.isEmpty()) {
             // TODO: 22.02.2021 alertDialog
             stocksView.showRetryDialog(getRetryDialog(new NullPointerException()));
 
         } else {
             Log.d(TAG, "initializeStocks: ");
-            stocksRepository.updateProfilesFromServer(tickers)
+            stocksRepository.updateProfilesFromServer(stocks)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new DisposableCompletableObserver() {
+                    .doOnSuccess(s -> this.stocks = s)
+                    .subscribe(new DisposableSingleObserver<List<Stock>>() {
+
                         @Override
-                        public void onComplete() {
-                            stocksView.showStocks(tickers);
+                        public void onSuccess(@NonNull List<Stock> stocks) {
+                            stocksView.showStocks(stocks);
                         }
 
                         @Override
-                        public void onError(Throwable throwable) {
+                        public void onError(@NonNull Throwable throwable) {
                             stocksView.showRetryDialog(getRetryDialog(throwable));
                         }
                     });
@@ -67,16 +70,16 @@ public class StocksPresenter {
         return builder.create();
     }
 
-    public void filter(String s) {
-        ArrayList<Ticker> filteredTickers = new ArrayList<>();
-        for (Ticker ticker : tickers) {
-            if (ticker.getTicker().contains(s.toUpperCase())) {
-                filteredTickers.add(ticker);
+    public void filterStocks(String s) {
+        ArrayList<Stock> filteredStocks = new ArrayList<>();
+        for (Stock stock : stocks) {
+            if (stock.getTicker().startsWith(s.toUpperCase())
+                    || stock.getName().toUpperCase().startsWith(s.toUpperCase())) {
+                filteredStocks.add(stock);
             }
         }
 
-        stocksView.setFilteredTickers(filteredTickers);
-
+        stocksView.setFilteredStocks(filteredStocks);
     }
 
     public void unsubscribe() {

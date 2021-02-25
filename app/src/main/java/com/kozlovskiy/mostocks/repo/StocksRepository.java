@@ -1,4 +1,3 @@
-
 package com.kozlovskiy.mostocks.repo;
 
 import android.accounts.NetworkErrorException;
@@ -13,9 +12,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.api.StockService;
 import com.kozlovskiy.mostocks.entities.ConstituentsResponse;
+import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.entities.StockCost;
-import com.kozlovskiy.mostocks.entities.StockProfile;
-import com.kozlovskiy.mostocks.entities.Ticker;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.utils.NetworkUtils;
 import com.kozlovskiy.mostocks.utils.SettingsUtils;
@@ -24,9 +22,9 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,14 +44,14 @@ public class StocksRepository {
                 .getDatabase().getDao();
     }
 
-    public LiveData<List<Ticker>> getActualTickers() {
-        updateTickersFromServer()
+    public LiveData<List<Stock>> getActualStocks() {
+        updateStocksFromServer()
                 .subscribeOn(Schedulers.io())
                 .doOnError(Throwable::printStackTrace)
                 .subscribe();
 
-        MutableLiveData<List<Ticker>> data = new MutableLiveData<>();
-        data.setValue(stocksDao.getTickers());
+        MutableLiveData<List<Stock>> data = new MutableLiveData<>();
+        data.setValue(stocksDao.getStocks());
         return data;
     }
 
@@ -66,32 +64,32 @@ public class StocksRepository {
     }
 
 
-    public Completable updateProfilesFromServer(List<Ticker> tickers) {
-        return Completable.create(emitter -> {
+    public Single<List<Stock>> updateProfilesFromServer(List<Stock> stocks) {
+        return Single.create(emitter -> {
             if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
                 emitter.onError(new NetworkErrorException());
                 Log.d(TAG, "updateProfilesFromServer: no network");
 
-            } else if (new Date().getTime() - SettingsUtils.getProfilesUptime(context) > UPDATE_INTERVAL) {
-                List<StockProfile> stockProfiles = new ArrayList<>();
+            } else if (new Date().getTime() - SettingsUtils.getStocksUptime(context) > UPDATE_INTERVAL) {
+                List<Stock> stockProfiles = new ArrayList<>();
                 Log.d(TAG, "updateProfilesFromServer: from server");
-                for (Ticker ticker : tickers) {
-                    StockService.getInstance().getApi().getStockProfile(ticker.getTicker(), StockService.TOKEN)
-                            .enqueue(new Callback<StockProfile>() {
+                for (Stock stock : stocks) {
+                    StockService.getInstance().getApi().getStockProfile(stock.getTicker(), StockService.TOKEN)
+                            .enqueue(new Callback<Stock>() {
                                 @Override
-                                public void onResponse(@NonNull Call<StockProfile> call, @NonNull Response<StockProfile> response) {
+                                public void onResponse(@NonNull Call<Stock> call, @NonNull Response<Stock> response) {
                                     if (response.body() != null) {
                                         stockProfiles.add(response.body());
 
-                                        if (stockProfiles.size() == tickers.size()) {
-                                            stocksDao.cacheStockProfiles(stockProfiles);
-                                            emitter.onComplete();
+                                        if (stockProfiles.size() == stocks.size()) {
+                                            stocksDao.cacheStocks(stockProfiles);
+                                            emitter.onSuccess(stockProfiles);
                                         }
                                     }
                                 }
 
                                 @Override
-                                public void onFailure(@NonNull Call<StockProfile> call, @NonNull Throwable t) {
+                                public void onFailure(@NonNull Call<Stock> call, @NonNull Throwable t) {
 
                                     if (t instanceof SocketTimeoutException)
                                         Toast.makeText(context, "Время вышло", Toast.LENGTH_SHORT).show();
@@ -101,32 +99,31 @@ public class StocksRepository {
                             });
                 }
             } else {
-                emitter.onComplete();
+                emitter.onSuccess(stocksDao.getStocks());
                 Log.d(TAG, "updateProfilesFromServer: from cache");
             }
         });
     }
 
-    public Completable updateTickersFromServer() {
+    public Completable updateStocksFromServer() {
         return Completable.create(emitter -> {
             if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
                 emitter.onError(new NetworkErrorException());
 
-            } else if (new Date().getTime() - SettingsUtils.getTickersUptime(context) > UPDATE_INTERVAL) {
+            } else if (new Date().getTime() - SettingsUtils.getStocksUptime(context) > UPDATE_INTERVAL) {
                 StockService.getInstance().getApi().getTickers("^DJI", StockService.TOKEN)
                         .enqueue(new Callback<ConstituentsResponse>() {
                             @Override
                             public void onResponse(@NonNull Call<ConstituentsResponse> call, @NonNull Response<ConstituentsResponse> response) {
                                 if (response.body() != null) {
                                     List<String> tickers = response.body().getConstituents();
-                                    List<Ticker> oTickers = new ArrayList<>();
+                                    List<Stock> stocks = new ArrayList<>();
 
                                     for (int i = 0; i < tickers.size(); i++) {
-                                        oTickers.add(new Ticker(tickers.get(i)));
+                                        stocks.add(new Stock(tickers.get(i)));
                                     }
 
-                                    stocksDao.cacheTickers(oTickers);
-                                    SettingsUtils.setUptime(context, SettingsUtils.KEY_TICKERS_UPTIME);
+                                    stocksDao.cacheStocks(stocks);
                                     emitter.onComplete();
                                 }
                             }

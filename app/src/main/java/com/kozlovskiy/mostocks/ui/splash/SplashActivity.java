@@ -22,7 +22,7 @@ public class SplashActivity extends AppCompatActivity
 
         StocksRepository stocksRepository = new StocksRepository(this);
         splashPresenter = new SplashPresenter(this, stocksRepository);
-        splashPresenter.updateTickersFromServer();
+        splashPresenter.updateStocksFromServer();
     }
 
     @Override

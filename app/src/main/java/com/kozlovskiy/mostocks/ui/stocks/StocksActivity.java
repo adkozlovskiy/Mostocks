@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.entities.Ticker;
+import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.ui.stocks.adapter.StocksAdapter;
 import com.kozlovskiy.mostocks.utils.SettingsUtils;
@@ -55,18 +55,18 @@ public class StocksActivity extends AppCompatActivity
     }
 
     @Override
-    public void showStocks(List<Ticker> tickers) {
+    public void showStocks(List<Stock> stocks) {
 
         Log.d(TAG, "showStocks: ");
         LinearLayoutManager llm = new LinearLayoutManager(StocksActivity.this);
-        stocksAdapter = new StocksAdapter(StocksActivity.this, tickers);
+        stocksAdapter = new StocksAdapter(StocksActivity.this, stocks);
         recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(stocksAdapter);
 
         progressBar.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
 
-        SettingsUtils.setUptime(this, SettingsUtils.KEY_PROFILES_UPTIME);
+        SettingsUtils.updateStocksUptime(this);
     }
 
     @Override
@@ -75,14 +75,13 @@ public class StocksActivity extends AppCompatActivity
     }
 
     @Override
-    public void setFilteredTickers(List<Ticker> tickers) {
-        stocksAdapter.setFilteredTickers(tickers);
+    public void setFilteredStocks(List<Stock> stocks) {
+        stocksAdapter.setFilteredStocks(stocks);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy: ");
         stocksPresenter.unsubscribe();
     }
 
@@ -106,6 +105,6 @@ public class StocksActivity extends AppCompatActivity
 
     @Override
     public void afterTextChanged(Editable s) {
-        stocksPresenter.filter(s.toString());
+        stocksPresenter.filterStocks(s.toString());
     }
 }

@@ -9,15 +9,15 @@ import io.reactivex.schedulers.Schedulers;
 public class SplashPresenter {
 
     private SplashView splashView;
-    private StocksRepository stocksRepository;
+    private final StocksRepository stocksRepository;
 
     public SplashPresenter(SplashView splashView, StocksRepository stocksRepository) {
         this.splashView = splashView;
         this.stocksRepository = stocksRepository;
     }
 
-    public void updateTickersFromServer() {
-        stocksRepository.updateTickersFromServer()
+    public void updateStocksFromServer() {
+        stocksRepository.updateStocksFromServer()
                 .subscribeOn(Schedulers.io())
                 .doOnComplete(splashView::startStocksActivity)
                 .doOnError(throwable -> splashView.showAlertDialog(getErrorAlertDialog(throwable)))
