@@ -23,7 +23,7 @@ public class SettingsUtils {
     }
 
     /**
-     * @return time in millis when profiles was loaded last time.
+     * @return time in millis when stocks was loaded last time.
      */
     public static long getStocksUptime(Context context) {
         return context.getSharedPreferences(KEY_SETTINGS, MODE_PRIVATE)

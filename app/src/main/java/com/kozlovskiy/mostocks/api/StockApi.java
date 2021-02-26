@@ -38,5 +38,5 @@ public interface StockApi {
      * @return callable object of {@link StockCost}.
      */
     @GET("quote?")
-    Call<StockCost> getStockCost(@Query("symbol") String symbol, @Query("token") String token);
+    Call<Stock> getStockCost(@Query("symbol") String symbol, @Query("token") String token);
 }

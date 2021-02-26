@@ -42,16 +42,16 @@ public class StocksActivity extends AppCompatActivity
 
         EditText searchEditText = findViewById(R.id.et_search);
         searchEditText.addTextChangedListener(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
 
         StocksRepository stocksRepository = new StocksRepository(this);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         stocksPresenter = new StocksPresenter(this, stocksRepository, builder);
         stocksPresenter.initializeStocks();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -91,6 +91,7 @@ public class StocksActivity extends AppCompatActivity
 
         moveTaskToBack(true);
         finish();
+
     }
 
     @Override

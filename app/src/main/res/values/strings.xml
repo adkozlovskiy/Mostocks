@@ -6,4 +6,8 @@
     <string name="retry">Retry</string>
     <string name="timed_out">Timed out waiting for a response from the server.</string>
     <string name="loading_error">Loading error!</string>
+    <string name="chart">Chart</string>
+    <string name="summary">Summary</string>
+    <string name="news">News</string>
+    <string name="forecasts">Forecasts</string>
 </resources>
