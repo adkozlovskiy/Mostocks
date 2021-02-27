@@ -21,8 +21,9 @@ public class StockService {
      * @return {@link StockService} instance.
      */
     public static StockService getInstance() {
-        if (instance == null)
+        if (instance == null) {
             instance = new StockService();
+        }
 
         return instance;
     }
