@@ -13,7 +13,6 @@ import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.api.StockService;
 import com.kozlovskiy.mostocks.entities.ConstituentsResponse;
 import com.kozlovskiy.mostocks.entities.Stock;
-import com.kozlovskiy.mostocks.entities.StockCost;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.utils.NetworkUtils;
 import com.kozlovskiy.mostocks.utils.SettingsUtils;
@@ -54,15 +53,6 @@ public class StocksRepository {
         data.setValue(stocksDao.getStocks());
         return data;
     }
-
-    public LiveData<StockCost> getActualCost(String ticker) {
-        // TODO: 20.02.2021 Обновление с сервера.
-
-        MutableLiveData<StockCost> data = new MutableLiveData<>();
-        data.setValue(stocksDao.getStockCost(ticker));
-        return data;
-    }
-
 
     public Single<List<Stock>> updateProfilesFromServer(List<Stock> stocks) {
         return Single.create(emitter -> {
