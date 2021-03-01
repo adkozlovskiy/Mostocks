@@ -1,6 +1,5 @@
 package com.kozlovskiy.mostocks.ui.stocks;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
@@ -14,16 +13,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.tabs.TabLayout;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Stock;
-import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.ui.stocks.adapter.StocksAdapter;
-import com.kozlovskiy.mostocks.utils.SettingsUtils;
 
 import java.util.List;
 
 public class StocksActivity extends AppCompatActivity
-        implements StocksView, TextWatcher {
+        implements StocksView, TextWatcher, TabLayout.OnTabSelectedListener {
 
     public static final String TAG = StocksActivity.class.getSimpleName();
 
@@ -31,6 +29,7 @@ public class StocksActivity extends AppCompatActivity
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private StocksAdapter stocksAdapter;
+    private LinearLayoutManager llm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,12 +39,13 @@ public class StocksActivity extends AppCompatActivity
         progressBar = findViewById(R.id.progress_bar);
         recyclerView = findViewById(R.id.recycler);
 
+        TabLayout navigationTabs = findViewById(R.id.tabs);
+        navigationTabs.addOnTabSelectedListener(this);
+
         EditText searchEditText = findViewById(R.id.et_search);
         searchEditText.addTextChangedListener(this);
 
-        StocksRepository stocksRepository = new StocksRepository(this);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        stocksPresenter = new StocksPresenter(this, stocksRepository, builder);
+        stocksPresenter = new StocksPresenter(this, this);
         stocksPresenter.initializeStocks();
     }
 
@@ -58,15 +58,13 @@ public class StocksActivity extends AppCompatActivity
     public void showStocks(List<Stock> stocks) {
 
         Log.d(TAG, "showStocks: ");
-        LinearLayoutManager llm = new LinearLayoutManager(StocksActivity.this);
+        llm = new LinearLayoutManager(StocksActivity.this);
         stocksAdapter = new StocksAdapter(StocksActivity.this, stocks);
         recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(stocksAdapter);
 
         progressBar.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
-
-        SettingsUtils.updateStocksUptime(this);
     }
 
     @Override
@@ -76,6 +74,12 @@ public class StocksActivity extends AppCompatActivity
 
     @Override
     public void setFilteredStocks(List<Stock> stocks) {
+        if (stocksAdapter == null) {
+            stocksAdapter = new StocksAdapter(this, stocks);
+            recyclerView.setLayoutManager(llm);
+            recyclerView.setAdapter(stocksAdapter);
+        }
+
         stocksAdapter.setFilteredStocks(stocks);
     }
 
@@ -91,7 +95,6 @@ public class StocksActivity extends AppCompatActivity
 
         moveTaskToBack(true);
         finish();
-
     }
 
     @Override
@@ -106,6 +109,26 @@ public class StocksActivity extends AppCompatActivity
 
     @Override
     public void afterTextChanged(Editable s) {
+        Log.d(TAG, "afterTextChanged: " + s.toString());
         stocksPresenter.filterStocks(s.toString());
+    }
+
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
+        if (tab.getPosition() == 1) {
+            stocksPresenter.filterFavorites();
+        } else {
+            stocksPresenter.removeFilter();
+        }
+    }
+
+    @Override
+    public void onTabUnselected(TabLayout.Tab tab) {
+
+    }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {
+
     }
 }

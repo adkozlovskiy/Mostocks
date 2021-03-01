@@ -2,11 +2,15 @@ package com.kozlovskiy.mostocks.ui.stocks;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.util.Log;
 
+import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
+import com.kozlovskiy.mostocks.room.StocksDao;
+import com.kozlovskiy.mostocks.utils.SettingsUtils;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -20,15 +24,28 @@ import io.reactivex.schedulers.Schedulers;
 public class StocksPresenter {
 
     private StocksView stocksView;
-    private final StocksRepository stocksRepository;
-    private final AlertDialog.Builder builder;
     public static final String TAG = StocksPresenter.class.getSimpleName();
     private List<Stock> stocks;
 
-    public StocksPresenter(StocksView stocksView, StocksRepository stocksRepository, AlertDialog.Builder builder) {
+    private final Context context;
+    private final StocksRepository stocksRepository;
+    private final AlertDialog.Builder builder;
+
+    public StocksPresenter(StocksView stocksView, Context context) {
         this.stocksView = stocksView;
-        this.stocksRepository = stocksRepository;
-        this.builder = builder;
+        this.context = context;
+        stocksRepository = new StocksRepository(context);
+        builder = new AlertDialog.Builder(context);
+
+        StocksDao stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
+
+        if (stocks == null) {
+            stocks = stocksDao.getStocks();
+        }
+    }
+
+    public void removeFilter() {
+        stocksView.setFilteredStocks(stocks);
     }
 
     public void initializeStocks() {
@@ -48,6 +65,7 @@ public class StocksPresenter {
 
                         @Override
                         public void onSuccess(@NonNull List<Stock> stocks) {
+                            SettingsUtils.updateStocksUptime(context);
                             stocksView.showStocks(stocks);
                         }
 
@@ -80,6 +98,14 @@ public class StocksPresenter {
         }
 
         stocksView.setFilteredStocks(filteredStocks);
+    }
+
+    public void filterFavorites() {
+        ArrayList<Stock> favorites = new ArrayList<>();
+
+        // todo: filter algorithm
+
+        stocksView.setFilteredStocks(favorites);
     }
 
     public void unsubscribe() {

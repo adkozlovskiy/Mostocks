@@ -22,6 +22,9 @@ public interface StocksDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateStocks(List<Stock> stocks);
 
+    @Update()
+    void updateStock(Stock stock);
+
     @Query("SELECT * FROM Stock")
     List<Stock> getStocks();
 }

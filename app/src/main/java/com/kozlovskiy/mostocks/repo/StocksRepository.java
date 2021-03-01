@@ -82,7 +82,7 @@ public class StocksRepository {
                                         stockProfiles.add(response.body());
 
                                         if (stockProfiles.size() == stocks.size()) {
-                                            stocksDao.cacheStocks(stockProfiles);
+                                            stocksDao.updateStocks(stockProfiles);
                                             emitter.onSuccess(stockProfiles);
                                         }
                                     }
@@ -123,7 +123,14 @@ public class StocksRepository {
                                         stocks.add(new Stock(tickers.get(i)));
                                     }
 
-                                    stocksDao.cacheStocks(stocks);
+                                    if (stocksDao.getStocks().size() == 0) {
+                                        stocksDao.cacheStocks(stocks);
+                                        Log.d(TAG, "onResponse: first caching");
+                                    } else {
+                                        Log.d(TAG, "onResponse: not first caching.");
+                                        stocksDao.updateStocks(stocks);
+                                    }
+
                                     emitter.onComplete();
                                 }
                             }
