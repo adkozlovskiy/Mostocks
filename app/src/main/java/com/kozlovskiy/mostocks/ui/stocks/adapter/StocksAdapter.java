@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kozlovskiy.mostocks.AppDelegate;
@@ -51,9 +52,19 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
         holder.symbolView.setText(stock.getTicker());
         holder.companyView.setText(stock.getName());
+
         if (stock.getLogo() != null && !stock.getLogo().isEmpty()) {
-            Picasso.get().load(stock.getLogo()).into(holder.imageView);
-        }
+            Picasso.get().load(stock.getLogo())
+                    .placeholder(R.drawable.icon)
+                    .error(R.drawable.icon)
+                    .into(holder.imageView);
+
+        } else holder.imageView.setImageDrawable(
+                ResourcesCompat.getDrawable(context.getResources(),
+                        R.drawable.icon,
+                        null
+                )
+        );
 
         if (stockCost != null) {
             String text = StockCostUtils.convertCost(stockCost.getCurrentCost());
