@@ -15,11 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
+import com.kozlovskiy.mostocks.entities.Favorite;
 import com.kozlovskiy.mostocks.entities.Stock;
-import com.kozlovskiy.mostocks.entities.StockCost;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.ui.stockInfo.StockInfoActivity;
-import com.kozlovskiy.mostocks.utils.StockCostUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -28,12 +27,17 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
     public static final String TAG = StocksAdapter.class.getSimpleName();
     public static final String KEY_TICKER = "TICKER";
-    private List<Stock> stocks;
     private final Context context;
+    private final StocksDao stocksDao;
+    private List<Stock> stocks;
 
     public StocksAdapter(Context context, List<Stock> stocks) {
         this.context = context;
         this.stocks = stocks;
+        this.stocksDao = ((AppDelegate) context
+                .getApplicationContext())
+                .getDatabase()
+                .getDao();
     }
 
     @NonNull
@@ -47,39 +51,22 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Stock stock = stocks.get(holder.getAdapterPosition());
-        StocksDao stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
-        StockCost stockCost = stocksDao.getStockCost(stock.getTicker());
 
         holder.symbolView.setText(stock.getTicker());
         holder.companyView.setText(stock.getName());
 
         if (stock.getLogo() != null && !stock.getLogo().isEmpty()) {
             Picasso.get().load(stock.getLogo())
-                    .placeholder(R.drawable.icon)
-                    .error(R.drawable.icon)
+                    .placeholder(R.drawable.no_image)
+                    .error(R.drawable.no_image)
                     .into(holder.imageView);
 
         } else holder.imageView.setImageDrawable(
                 ResourcesCompat.getDrawable(context.getResources(),
-                        R.drawable.icon,
+                        R.drawable.no_image,
                         null
                 )
         );
-
-        if (stockCost != null) {
-            String text = StockCostUtils.convertCost(stockCost.getCurrentCost());
-            int color = context.getResources().getColor(R.color.textColor);
-            holder.costView.setText(text);
-
-            if (stockCost.getCurrentCost() > 0) {
-                color = context.getResources().getColor(R.color.positiveCost);
-                text = "+" + text;
-            } else if (stockCost.getCurrentCost() < 0)
-                color = context.getResources().getColor(R.color.negativeCost);
-
-            holder.changeView.setText(text);
-            holder.changeView.setTextColor(color);
-        }
 
         if (position % 2 == 0) {
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.cardColor));
@@ -92,6 +79,14 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             intent.putExtra(KEY_TICKER, stock.getTicker());
             context.startActivity(intent);
         });
+
+        holder.symbolView.setOnClickListener(
+                v -> stocksDao.addFavorite(
+                        new Favorite(
+                                stock.getTicker()
+                        )
+                )
+        );
     }
 
     @Override
@@ -115,6 +110,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             changeView = view.findViewById(R.id.tv_change);
             imageView = view.findViewById(R.id.image);
         }
+
     }
 
     public void setFilteredStocks(List<Stock> stocks) {

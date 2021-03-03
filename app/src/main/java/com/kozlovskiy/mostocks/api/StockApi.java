@@ -2,7 +2,6 @@ package com.kozlovskiy.mostocks.api;
 
 import com.kozlovskiy.mostocks.entities.ConstituentsResponse;
 import com.kozlovskiy.mostocks.entities.Stock;
-import com.kozlovskiy.mostocks.entities.StockCost;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -35,7 +34,7 @@ public interface StockApi {
      *
      * @param symbol is ticker.
      * @param token  is auth token.
-     * @return callable object of {@link StockCost}.
+     * @return callable object of {@link Stock}.
      */
     @GET("quote?")
     Call<Stock> getStockCost(@Query("symbol") String symbol, @Query("token") String token);

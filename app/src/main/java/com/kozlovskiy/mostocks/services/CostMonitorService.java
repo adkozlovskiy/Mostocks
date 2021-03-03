@@ -7,7 +7,6 @@ import android.os.IBinder;
 public class CostMonitorService extends Service {
     public CostMonitorService() {
 
-
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
+import com.kozlovskiy.mostocks.entities.Favorite;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.room.StocksDao;
@@ -30,17 +31,21 @@ public class StocksPresenter {
     private final Context context;
     private final StocksRepository stocksRepository;
     private final AlertDialog.Builder builder;
+    private final StocksDao stocksDao;
 
     public StocksPresenter(StocksView stocksView, Context context) {
         this.stocksView = stocksView;
         this.context = context;
-        stocksRepository = new StocksRepository(context);
-        builder = new AlertDialog.Builder(context);
+        this.stocksRepository = new StocksRepository(context);
+        this.builder = new AlertDialog.Builder(context);
 
-        StocksDao stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
+        this.stocksDao = ((AppDelegate) context
+                .getApplicationContext())
+                .getDatabase()
+                .getDao();
 
-        if (stocks == null) {
-            stocks = stocksDao.getStocks();
+        if (this.stocks == null) {
+            this.stocks = this.stocksDao.getStocks();
         }
     }
 
@@ -101,11 +106,21 @@ public class StocksPresenter {
     }
 
     public void filterFavorites() {
-        ArrayList<Stock> favorites = new ArrayList<>();
+        ArrayList<Stock> filteredStocks = new ArrayList<>();
+        List<Favorite> favorites = stocksDao.getFavorites();
+        List<String> favoritesStrings = new ArrayList<>();
 
-        // todo: filter algorithm
+        for (Favorite favorite : favorites) {
+            favoritesStrings.add(favorite.getTicker());
+        }
 
-        stocksView.setFilteredStocks(favorites);
+        for (Stock stock : stocks) {
+            if (favoritesStrings.contains(stock.getTicker())) {
+                filteredStocks.add(stock);
+            }
+        }
+
+        stocksView.setFilteredStocks(filteredStocks);
     }
 
     public void unsubscribe() {
