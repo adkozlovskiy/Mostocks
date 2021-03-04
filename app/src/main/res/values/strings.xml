@@ -10,4 +10,7 @@
     <string name="summary">Summary</string>
     <string name="news">News</string>
     <string name="forecasts">Forecasts</string>
+    <string name="no_network">No network connection!</string>
+    <string name="turn_on_network">Enable</string>
+    <string name="cancel">Cancel</string>
 </resources>

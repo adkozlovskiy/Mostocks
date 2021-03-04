@@ -15,10 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
+import com.kozlovskiy.mostocks.entities.Cost;
 import com.kozlovskiy.mostocks.entities.Favorite;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.ui.stockInfo.StockInfoActivity;
+import com.kozlovskiy.mostocks.utils.StockCostUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -51,9 +53,14 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Stock stock = stocks.get(holder.getAdapterPosition());
+        Cost stockCost = stocksDao.getCost(stock.getTicker());
 
         holder.symbolView.setText(stock.getTicker());
-        holder.companyView.setText(stock.getName());
+
+        if (stock.getName() != null && !stock.getName().isEmpty()) {
+            String nameCropped = stock.getName().length() > 21 ? stock.getName().substring(0, 19).trim() + "\u2026" : stock.getName();
+            holder.companyView.setText(nameCropped);
+        }
 
         if (stock.getLogo() != null && !stock.getLogo().isEmpty()) {
             Picasso.get().load(stock.getLogo())
@@ -73,6 +80,24 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         } else {
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.backgroundColor));
         }
+
+        if (stockCost != null) {
+            String costString = StockCostUtils.convertCost(stockCost.getCurrentCost());
+            int color = context.getResources().getColor(R.color.textColor);
+            holder.costView.setText(costString);
+
+            String changeString = StockCostUtils.convertCost(stockCost.getCurrentCost() - stockCost.getPreviousCost());
+
+            if (stockCost.getCurrentCost() - stockCost.getPreviousCost() > 0) {
+                color = context.getResources().getColor(R.color.positiveCost);
+                changeString = "+" + changeString;
+            } else if (stockCost.getCurrentCost() - stockCost.getPreviousCost() < 0)
+                color = context.getResources().getColor(R.color.negativeCost);
+
+            holder.changeView.setText(changeString);
+            holder.changeView.setTextColor(color);
+        }
+
 
         holder.cardView.setOnClickListener(v -> {
             Intent intent = new Intent(context, StockInfoActivity.class);

@@ -33,16 +33,6 @@ public class Stock {
     @Expose
     private String logo;
 
-    @ColumnInfo(name = "c")
-    @SerializedName("c")
-    @Expose
-    private double currentCost;
-
-    @ColumnInfo(name = "pc")
-    @SerializedName("pc")
-    @Expose
-    private double previousCost;
-
     public Stock(@NonNull String ticker) {
         this.ticker = ticker;
     }
@@ -74,21 +64,5 @@ public class Stock {
 
     public void setLogo(String logo) {
         this.logo = logo;
-    }
-
-    public double getCurrentCost() {
-        return currentCost;
-    }
-
-    public void setCurrentCost(double currentCost) {
-        this.currentCost = currentCost;
-    }
-
-    public double getPreviousCost() {
-        return previousCost;
-    }
-
-    public void setPreviousCost(double previousCost) {
-        this.previousCost = previousCost;
     }
 }

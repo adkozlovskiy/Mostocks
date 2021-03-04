@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -56,8 +55,6 @@ public class StocksActivity extends AppCompatActivity
 
     @Override
     public void showStocks(List<Stock> stocks) {
-
-        Log.d(TAG, "showStocks: ");
         llm = new LinearLayoutManager(StocksActivity.this);
         stocksAdapter = new StocksAdapter(StocksActivity.this, stocks);
         recyclerView.setLayoutManager(llm);
@@ -109,7 +106,6 @@ public class StocksActivity extends AppCompatActivity
 
     @Override
     public void afterTextChanged(Editable s) {
-        Log.d(TAG, "afterTextChanged: " + s.toString());
         stocksPresenter.filterStocks(s.toString());
     }
 

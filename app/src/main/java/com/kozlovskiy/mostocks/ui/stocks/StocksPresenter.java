@@ -1,9 +1,9 @@
 package com.kozlovskiy.mostocks.ui.stocks;
 
+import android.accounts.NetworkErrorException;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
@@ -11,15 +11,17 @@ import com.kozlovskiy.mostocks.entities.Favorite;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.room.StocksDao;
+import com.kozlovskiy.mostocks.utils.NetworkUtils;
 import com.kozlovskiy.mostocks.utils.SettingsUtils;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class StocksPresenter {
@@ -54,40 +56,50 @@ public class StocksPresenter {
     }
 
     public void initializeStocks() {
-        stocks = stocksRepository.getActualStocks().getValue();
+        if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
+            stocksView.showRetryDialog(getRetryDialog(new NetworkErrorException()));
 
-        if (stocks == null || stocks.isEmpty()) {
-            // TODO: 22.02.2021 alertDialog
-            stocksView.showRetryDialog(getRetryDialog(new NullPointerException()));
+        } else if (SettingsUtils.cacheIsUpToDate(context)) {
+            stocksView.showStocks(stocksDao.getStocks());
 
         } else {
-            Log.d(TAG, "initializeStocks: ");
-            stocksRepository.updateProfilesFromServer(stocks)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnSuccess(s -> this.stocks = s)
-                    .subscribe(new DisposableSingleObserver<List<Stock>>() {
+            stocksRepository.updateTickers()
+                    .flatMapCompletable(stocks -> Completable.mergeArray(
+                            stocksRepository.updateProfiles(stocks),
+                            stocksRepository.updateCost(stocks)
 
+                    ))
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new DisposableCompletableObserver() {
                         @Override
-                        public void onSuccess(@NonNull List<Stock> stocks) {
-                            SettingsUtils.updateStocksUptime(context);
+                        public void onComplete() {
+                            stocks = stocksDao.getStocks();
                             stocksView.showStocks(stocks);
+                            SettingsUtils.updateStocksUptime(context);
                         }
 
                         @Override
-                        public void onError(@NonNull Throwable throwable) {
-                            stocksView.showRetryDialog(getRetryDialog(throwable));
+                        public void onError(@NonNull Throwable e) {
+                            stocksView.showRetryDialog(getRetryDialog(e));
                         }
                     });
         }
     }
 
+    // TODO: 04.03.2021 positive buttons
     private Dialog getRetryDialog(Throwable throwable) {
         builder.setTitle(R.string.loading_error);
 
         if (throwable instanceof SocketTimeoutException) {
             builder.setMessage(R.string.timed_out)
-                    .setPositiveButton(R.string.retry, (dialog, id) -> dialog.cancel());
+                    .setPositiveButton(R.string.retry, (dialog, id) -> initializeStocks())
+                    .setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
+
+        } else if (throwable instanceof NetworkErrorException) {
+            builder.setMessage(R.string.no_network)
+                    .setPositiveButton(R.string.turn_on_network, (dialog, id) -> dialog.cancel())
+                    .setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
         }
 
         return builder.create();
