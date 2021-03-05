@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.kozlovskiy.mostocks.ui.stocks.StocksActivity;
+import com.kozlovskiy.mostocks.ui.main.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -14,7 +14,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         startActivity(new Intent(
                 SplashActivity.this,
-                StocksActivity.class)
+                MainActivity.class)
         );
     }
 }

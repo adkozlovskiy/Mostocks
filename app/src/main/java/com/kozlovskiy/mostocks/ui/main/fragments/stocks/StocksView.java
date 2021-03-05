@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks.ui.stocks;
+package com.kozlovskiy.mostocks.ui.main.fragments.stocks;
 
 import android.app.Dialog;
 
@@ -8,9 +8,7 @@ import java.util.List;
 
 public interface StocksView {
 
-    void showStocks(List<Stock> stocks);
-
     void showRetryDialog(Dialog dialog);
 
-    void setFilteredStocks(List<Stock> stocks);
+    void updateStocks(List<Stock> stocks);
 }

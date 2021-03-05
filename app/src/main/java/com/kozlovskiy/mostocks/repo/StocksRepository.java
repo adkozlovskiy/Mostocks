@@ -78,7 +78,7 @@ public class StocksRepository {
                             List<String> tickers = response.body().getConstituents();
                             List<Stock> stocks = new ArrayList<>();
 
-                            for (int i = 0; i < 16; i++) {
+                            for (int i = 0; i < 14; i++) {
                                 stocks.add(new Stock(tickers.get(i)));
                             }
 

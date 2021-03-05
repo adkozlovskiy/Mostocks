@@ -8,11 +8,11 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.tabs.TabLayout;
 import com.kozlovskiy.mostocks.R;
+import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart.ChartFragment;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts.ForecastsFragment;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.news.NewsFragment;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.summary.SummaryFragment;
-import com.kozlovskiy.mostocks.ui.stocks.adapter.StocksAdapter;
 
 public class StockInfoActivity extends AppCompatActivity
         implements StockInfoView, TabLayout.OnTabSelectedListener {

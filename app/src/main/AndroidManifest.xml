@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.stockInfo.StockInfoActivity" />
-        <activity android:name=".ui.stocks.StocksActivity" />
+        <activity android:name=".ui.main.MainActivity" />
     </application>
 
 </manifest>

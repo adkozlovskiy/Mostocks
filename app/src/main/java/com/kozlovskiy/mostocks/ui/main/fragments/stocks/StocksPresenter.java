@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks.ui.stocks;
+package com.kozlovskiy.mostocks.ui.main.fragments.stocks;
 
 import android.accounts.NetworkErrorException;
 import android.app.AlertDialog;
@@ -7,7 +7,6 @@ import android.content.Context;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.entities.Favorite;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.room.StocksDao;
@@ -15,7 +14,6 @@ import com.kozlovskiy.mostocks.utils.NetworkUtils;
 import com.kozlovskiy.mostocks.utils.SettingsUtils;
 
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -26,14 +24,13 @@ import io.reactivex.schedulers.Schedulers;
 
 public class StocksPresenter {
 
-    private StocksView stocksView;
-    public static final String TAG = StocksPresenter.class.getSimpleName();
-    private List<Stock> stocks;
-
     private final Context context;
     private final StocksRepository stocksRepository;
     private final AlertDialog.Builder builder;
     private final StocksDao stocksDao;
+
+    private StocksView stocksView;
+    private List<Stock> stocks;
 
     public StocksPresenter(StocksView stocksView, Context context) {
         this.stocksView = stocksView;
@@ -46,13 +43,6 @@ public class StocksPresenter {
                 .getDatabase()
                 .getDao();
 
-        if (this.stocks == null) {
-            this.stocks = this.stocksDao.getStocks();
-        }
-    }
-
-    public void removeFilter() {
-        stocksView.setFilteredStocks(stocks);
     }
 
     public void initializeStocks() {
@@ -60,7 +50,7 @@ public class StocksPresenter {
             stocksView.showRetryDialog(getRetryDialog(new NetworkErrorException()));
 
         } else if (SettingsUtils.cacheIsUpToDate(context)) {
-            stocksView.showStocks(stocksDao.getStocks());
+            stocksView.updateStocks(stocksDao.getStocks());
 
         } else {
             stocksRepository.updateTickers()
@@ -75,7 +65,7 @@ public class StocksPresenter {
                         @Override
                         public void onComplete() {
                             stocks = stocksDao.getStocks();
-                            stocksView.showStocks(stocks);
+                            stocksView.updateStocks(stocks);
                             SettingsUtils.updateStocksUptime(context);
                         }
 
@@ -87,7 +77,6 @@ public class StocksPresenter {
         }
     }
 
-    // TODO: 04.03.2021 positive buttons
     private Dialog getRetryDialog(Throwable throwable) {
         builder.setTitle(R.string.loading_error);
 
@@ -105,37 +94,8 @@ public class StocksPresenter {
         return builder.create();
     }
 
-    public void filterStocks(String s) {
-        ArrayList<Stock> filteredStocks = new ArrayList<>();
-        for (Stock stock : stocks) {
-            if (stock.getTicker().startsWith(s.toUpperCase())
-                    || stock.getName().toUpperCase().startsWith(s.toUpperCase())) {
-                filteredStocks.add(stock);
-            }
-        }
-
-        stocksView.setFilteredStocks(filteredStocks);
-    }
-
-    public void filterFavorites() {
-        ArrayList<Stock> filteredStocks = new ArrayList<>();
-        List<Favorite> favorites = stocksDao.getFavorites();
-        List<String> favoritesStrings = new ArrayList<>();
-
-        for (Favorite favorite : favorites) {
-            favoritesStrings.add(favorite.getTicker());
-        }
-
-        for (Stock stock : stocks) {
-            if (favoritesStrings.contains(stock.getTicker())) {
-                filteredStocks.add(stock);
-            }
-        }
-
-        stocksView.setFilteredStocks(filteredStocks);
-    }
-
     public void unsubscribe() {
         stocksView = null;
     }
+
 }

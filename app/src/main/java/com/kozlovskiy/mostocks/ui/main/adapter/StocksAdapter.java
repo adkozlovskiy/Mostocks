@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks.ui.stocks.adapter;
+package com.kozlovskiy.mostocks.ui.main.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -138,7 +138,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
     }
 
-    public void setFilteredStocks(List<Stock> stocks) {
+    public void updateStocks(List<Stock> stocks) {
         this.stocks = stocks;
         notifyDataSetChanged();
     }
