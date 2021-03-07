@@ -2,6 +2,7 @@ package com.kozlovskiy.mostocks.ui.main.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     private final Context context;
     private final StocksDao stocksDao;
     private List<Stock> stocks;
+    private boolean isFavorite;
 
     public StocksAdapter(Context context, List<Stock> stocks) {
         this.context = context;
@@ -52,8 +54,10 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Stock stock = stocks.get(holder.getAdapterPosition());
+        Stock stock = stocks.get(position);
         Cost stockCost = stocksDao.getCost(stock.getTicker());
+
+        isFavorite = isFavorite(stock);
 
         holder.symbolView.setText(stock.getTicker());
 
@@ -62,13 +66,17 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             holder.companyView.setText(nameCropped);
         }
 
+        holder.ivStar.setImageResource(isFavorite
+                ? R.drawable.ic_star_gold
+                : R.drawable.ic_star);
+
         if (stock.getLogo() != null && !stock.getLogo().isEmpty()) {
             Picasso.get().load(stock.getLogo())
-                    .placeholder(R.drawable.no_image)
+                    .placeholder(R.drawable.white)
                     .error(R.drawable.no_image)
-                    .into(holder.imageView);
+                    .into(holder.ivLogo);
 
-        } else holder.imageView.setImageDrawable(
+        } else holder.ivLogo.setImageDrawable(
                 ResourcesCompat.getDrawable(context.getResources(),
                         R.drawable.no_image,
                         null
@@ -87,13 +95,17 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             holder.costView.setText(costString);
 
             String changeString = StockCostUtils.convertCost(stockCost.getCurrentCost() - stockCost.getPreviousCost());
+            String percentString = StockCostUtils.convertPercents(stockCost.getCurrentCost() / stockCost.getPreviousCost());
 
             if (stockCost.getCurrentCost() - stockCost.getPreviousCost() > 0) {
                 color = context.getResources().getColor(R.color.positiveCost);
                 changeString = "+" + changeString;
-            } else if (stockCost.getCurrentCost() - stockCost.getPreviousCost() < 0)
+            } else if (stockCost.getCurrentCost() - stockCost.getPreviousCost() < 0) {
                 color = context.getResources().getColor(R.color.negativeCost);
+                percentString = StockCostUtils.convertPercents(stockCost.getPreviousCost() / stockCost.getCurrentCost());
+            }
 
+            changeString += " (" + percentString + "%)";
             holder.changeView.setText(changeString);
             holder.changeView.setTextColor(color);
         }
@@ -105,13 +117,17 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             context.startActivity(intent);
         });
 
-        holder.symbolView.setOnClickListener(
-                v -> stocksDao.addFavorite(
-                        new Favorite(
-                                stock.getTicker()
-                        )
-                )
-        );
+        holder.ivStar.setOnClickListener(v -> {
+
+            Log.d(TAG, "isFavorite: clicked");
+            if (isFavorite) {
+                Log.d(TAG, "isFavorite: добавляем" + stock.getTicker());
+                stocksDao.addFavorite(new Favorite(stock.getTicker()));
+            } else {
+                Log.d(TAG, "isFavorite: убираем");
+                stocksDao.removeFavorite(new Favorite(stock.getTicker()));
+            }
+        });
     }
 
     @Override
@@ -123,7 +139,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
         final CardView cardView;
         final TextView symbolView, companyView, costView, changeView;
-        final ImageView imageView;
+        final ImageView ivLogo, ivStar;
 
         ViewHolder(View view) {
             super(view);
@@ -133,7 +149,8 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             companyView = view.findViewById(R.id.tv_company);
             costView = view.findViewById(R.id.tv_cost);
             changeView = view.findViewById(R.id.tv_change);
-            imageView = view.findViewById(R.id.image);
+            ivLogo = view.findViewById(R.id.iv_logo);
+            ivStar = view.findViewById(R.id.iv_star);
         }
 
     }
@@ -141,5 +158,15 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     public void updateStocks(List<Stock> stocks) {
         this.stocks = stocks;
         notifyDataSetChanged();
+    }
+
+    private boolean isFavorite(Stock stock) {
+        Favorite favorite = stocksDao.getFavorite(stock.getTicker());
+        if (favorite == null) {
+            Log.d(TAG, "isFavorite: no" + stock.getTicker());
+        } else {
+            Log.d(TAG, "isFavorite: yes" + stock.getTicker());
+        }
+        return favorite != null;
     }
 }

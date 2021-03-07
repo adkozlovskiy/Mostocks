@@ -12,4 +12,12 @@ public class StockCostUtils {
 
         return formatter.format(cost);
     }
+
+    public static String convertPercents(double cost) {
+        NumberFormat formatter = NumberFormat.getInstance();
+        formatter.setMinimumFractionDigits(2);
+        formatter.setMaximumFractionDigits(2);
+
+        return formatter.format(cost);
+    }
 }

@@ -1,5 +1,6 @@
 package com.kozlovskiy.mostocks.room;
 
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -40,4 +41,10 @@ public interface StocksDao {
 
     @Query("SELECT * FROM Cost WHERE ticker = :ticker")
     Cost getCost(String ticker);
+
+    @Query("SELECT * FROM Favorite WHERE ticker = :ticker")
+    Favorite getFavorite(String ticker);
+
+    @Delete()
+    void removeFavorite(Favorite favorite);
 }

@@ -24,8 +24,6 @@ import retrofit2.Response;
 
 public class StocksRepository {
 
-    public static final String TAG = StocksRepository.class.getSimpleName();
-
     private final StocksDao stocksDao;
     private final Context context;
 

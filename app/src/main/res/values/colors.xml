@@ -8,6 +8,6 @@
     <color name="textAccentColor">#1A1A1A</color>
     <color name="cardColor">#F0F4F7</color>
     <color name="backgroundColor">#fff</color>
-    <color name="negativeCost">#F44336</color>
-    <color name="positiveCost">#4CAF50</color>
+    <color name="negativeCost">#B22424</color>
+    <color name="positiveCost">#24B25D</color>
 </resources>
