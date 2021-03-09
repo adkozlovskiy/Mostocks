@@ -2,7 +2,6 @@ package com.kozlovskiy.mostocks.ui.main.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,6 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     private final Context context;
     private final StocksDao stocksDao;
     private List<Stock> stocks;
-    private boolean isFavorite;
 
     public StocksAdapter(Context context, List<Stock> stocks) {
         this.context = context;
@@ -57,7 +55,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         Stock stock = stocks.get(position);
         Cost stockCost = stocksDao.getCost(stock.getTicker());
 
-        isFavorite = isFavorite(stock);
+        stock.setFavorite(isFavorite(stock));
 
         holder.symbolView.setText(stock.getTicker());
 
@@ -66,7 +64,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             holder.companyView.setText(nameCropped);
         }
 
-        holder.ivStar.setImageResource(isFavorite
+        holder.ivStar.setImageResource(stock.isFavorite()
                 ? R.drawable.ic_star_gold
                 : R.drawable.ic_star);
 
@@ -94,15 +92,16 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             int color = context.getResources().getColor(R.color.textColor);
             holder.costView.setText(costString);
 
-            String changeString = StockCostUtils.convertCost(stockCost.getCurrentCost() - stockCost.getPreviousCost());
-            String percentString = StockCostUtils.convertPercents(stockCost.getCurrentCost() / stockCost.getPreviousCost());
+            double difference = stockCost.getCurrentCost() - stockCost.getPreviousCost();
+            String changeString = StockCostUtils.convertCost(difference);
+            String percentString = StockCostUtils.convertPercents(difference / stockCost.getPreviousCost() * 100);
 
             if (stockCost.getCurrentCost() - stockCost.getPreviousCost() > 0) {
                 color = context.getResources().getColor(R.color.positiveCost);
                 changeString = "+" + changeString;
             } else if (stockCost.getCurrentCost() - stockCost.getPreviousCost() < 0) {
                 color = context.getResources().getColor(R.color.negativeCost);
-                percentString = StockCostUtils.convertPercents(stockCost.getPreviousCost() / stockCost.getCurrentCost());
+                percentString = StockCostUtils.convertPercents(difference / stockCost.getPreviousCost() * -100);
             }
 
             changeString += " (" + percentString + "%)";
@@ -118,15 +117,15 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         });
 
         holder.ivStar.setOnClickListener(v -> {
-
-            Log.d(TAG, "isFavorite: clicked");
-            if (isFavorite) {
-                Log.d(TAG, "isFavorite: добавляем" + stock.getTicker());
+            if (!stock.isFavorite()) {
                 stocksDao.addFavorite(new Favorite(stock.getTicker()));
+                holder.ivStar.setImageResource(R.drawable.ic_star_gold);
             } else {
-                Log.d(TAG, "isFavorite: убираем");
                 stocksDao.removeFavorite(new Favorite(stock.getTicker()));
+                holder.ivStar.setImageResource(R.drawable.ic_star);
             }
+
+            stock.setFavorite(!stock.isFavorite());
         });
     }
 
@@ -162,11 +161,6 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
     private boolean isFavorite(Stock stock) {
         Favorite favorite = stocksDao.getFavorite(stock.getTicker());
-        if (favorite == null) {
-            Log.d(TAG, "isFavorite: no" + stock.getTicker());
-        } else {
-            Log.d(TAG, "isFavorite: yes" + stock.getTicker());
-        }
         return favorite != null;
     }
 }

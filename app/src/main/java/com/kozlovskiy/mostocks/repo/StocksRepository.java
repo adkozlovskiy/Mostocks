@@ -9,6 +9,7 @@ import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.api.StockService;
 import com.kozlovskiy.mostocks.entities.ConstituentsResponse;
 import com.kozlovskiy.mostocks.entities.Cost;
+import com.kozlovskiy.mostocks.entities.News;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.room.StocksDao;
 
@@ -138,5 +139,30 @@ public class StocksRepository {
                         });
             }
         });
+    }
+
+    public Single<List<News>> updateNews(String ticker) {
+        return Single.create(emitter -> StockService.getInstance().getApi()
+                .getCompanyNews(ticker, "2021-01-01", "2021-03-01", StockService.TOKEN)
+                .enqueue(new Callback<List<News>>() {
+                    @Override
+                    public void onResponse(@NonNull Call<List<News>> call, @NonNull Response<List<News>> response) {
+                        if (response.body() != null) {
+                            List<News> newsList = response.body();
+
+                            for (News news : newsList) {
+                                news.setTicker(ticker);
+                            }
+
+                            stocksDao.cacheNews(newsList);
+                            emitter.onSuccess(newsList);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<List<News>> call, @NonNull Throwable t) {
+                        emitter.onError(t);
+                    }
+                }));
     }
 }

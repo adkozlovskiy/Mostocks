@@ -8,6 +8,7 @@ import androidx.room.Update;
 
 import com.kozlovskiy.mostocks.entities.Cost;
 import com.kozlovskiy.mostocks.entities.Favorite;
+import com.kozlovskiy.mostocks.entities.News;
 import com.kozlovskiy.mostocks.entities.Stock;
 
 import java.util.List;
@@ -33,6 +34,9 @@ public interface StocksDao {
     @Query("SELECT * FROM Stock")
     List<Stock> getStocks();
 
+    @Query("SELECT * FROM Stock WHERE ticker = :ticker")
+    Stock getStockByTicker(String ticker);
+
     @Query("SELECT * FROM Favorite")
     List<Favorite> getFavorites();
 
@@ -47,4 +51,7 @@ public interface StocksDao {
 
     @Delete()
     void removeFavorite(Favorite favorite);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void cacheNews(List<News> newsList);
 }

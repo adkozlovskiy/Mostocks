@@ -12,18 +12,19 @@ import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart.ChartFragment;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts.ForecastsFragment;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.news.NewsFragment;
-import com.kozlovskiy.mostocks.ui.stockInfo.fragments.summary.SummaryFragment;
 
 public class StockInfoActivity extends AppCompatActivity
         implements StockInfoView, TabLayout.OnTabSelectedListener {
 
     private StockInfoPresenter stockInfoPresenter;
+    private String ticker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock_info);
         stockInfoPresenter = new StockInfoPresenter(this);
+        ticker = getIntent().getStringExtra(StocksAdapter.KEY_TICKER);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getIntent().getStringExtra(StocksAdapter.KEY_TICKER));
@@ -46,22 +47,20 @@ public class StockInfoActivity extends AppCompatActivity
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        Bundle bundles = new Bundle();
+        bundles.putString(StocksAdapter.KEY_TICKER, ticker);
 
         switch (tab.getPosition()) {
             case 0:
-                transaction.replace(R.id.fr_container, ChartFragment.class, null);
-                break;
-
-            case 1:
-                transaction.replace(R.id.fr_container, SummaryFragment.class, null);
+                transaction.replace(R.id.fr_container, ChartFragment.class, bundles);
                 break;
 
             case 2:
-                transaction.replace(R.id.fr_container, NewsFragment.class, null);
+                transaction.replace(R.id.fr_container, NewsFragment.class, bundles);
                 break;
 
             case 3:
-                transaction.replace(R.id.fr_container, ForecastsFragment.class, null);
+                transaction.replace(R.id.fr_container, ForecastsFragment.class, bundles);
                 break;
         }
 

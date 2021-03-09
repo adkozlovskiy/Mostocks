@@ -33,6 +33,23 @@ public class Stock {
     @Expose
     private String logo;
 
+    @ColumnInfo(name = "industry")
+    @SerializedName("finnhubIndustry")
+    @Expose
+    private String industry;
+
+    @ColumnInfo(name = "ipo")
+    @SerializedName("ipo")
+    @Expose
+    private String ipo;
+
+    @ColumnInfo(name = "capitalization")
+    @SerializedName("marketCapitalization")
+    @Expose
+    private double capitalization;
+
+    private boolean isFavorite;
+
     public Stock(@NonNull String ticker) {
         this.ticker = ticker;
     }
@@ -64,5 +81,37 @@ public class Stock {
 
     public void setLogo(String logo) {
         this.logo = logo;
+    }
+
+    public String getIndustry() {
+        return industry;
+    }
+
+    public void setIndustry(String industry) {
+        this.industry = industry;
+    }
+
+    public String getIpo() {
+        return ipo;
+    }
+
+    public void setIpo(String ipo) {
+        this.ipo = ipo;
+    }
+
+    public double getCapitalization() {
+        return capitalization;
+    }
+
+    public void setCapitalization(double capitalization) {
+        this.capitalization = capitalization;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
     }
 }

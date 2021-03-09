@@ -2,7 +2,10 @@ package com.kozlovskiy.mostocks.api;
 
 import com.kozlovskiy.mostocks.entities.ConstituentsResponse;
 import com.kozlovskiy.mostocks.entities.Cost;
+import com.kozlovskiy.mostocks.entities.News;
 import com.kozlovskiy.mostocks.entities.Stock;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -39,4 +42,7 @@ public interface StockApi {
      */
     @GET("quote?")
     Call<Cost> getStockCost(@Query("symbol") String symbol, @Query("token") String token);
+
+    @GET("company-news?")
+    Call<List<News>> getCompanyNews(@Query("symbol") String symbol, @Query("from") String from, @Query("to") String to, @Query("token") String token);
 }

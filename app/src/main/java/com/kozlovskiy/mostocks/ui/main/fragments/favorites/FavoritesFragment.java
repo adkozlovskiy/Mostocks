@@ -19,13 +19,12 @@ import java.util.List;
 public class FavoritesFragment extends Fragment
         implements FavoritesView {
 
-    public static final String TAG = FavoritesPresenter.class.getSimpleName();
     private FavoritesPresenter favoritesPresenter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
 
     public FavoritesFragment() {
-        super(R.layout.fragment_favorites);
+        super(R.layout.fragment_stocks);
     }
 
     @Override
