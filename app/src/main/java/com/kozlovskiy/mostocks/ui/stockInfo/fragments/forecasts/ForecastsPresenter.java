@@ -1,14 +1,14 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.github.mikephil.charting.data.BarEntry;
+import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.TechAnalysisResponse;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 
 import java.util.ArrayList;
 
+import im.dacer.androidcharts.PieHelper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -17,7 +17,7 @@ import io.reactivex.schedulers.Schedulers;
 public class ForecastsPresenter {
 
     private final ForecastsView forecastsView;
-    private final ArrayList<BarEntry> entries;
+    private final ArrayList<PieHelper> entries;
     public static final String TAG = ForecastsPresenter.class.getSimpleName();
     private final StocksRepository stocksRepository;
 
@@ -39,8 +39,11 @@ public class ForecastsPresenter {
                         int buyMark = Integer.parseInt(object.getCount().get("buy"));
                         int holdMark = Integer.parseInt(object.getCount().get("neutral"));
                         int sellMark = Integer.parseInt(object.getCount().get("sell"));
+                        float sum = buyMark + holdMark + sellMark;
 
-                        entries.add(new BarEntry(0, new float[]{2, 4.5f, 3}));
+                        entries.add(new PieHelper(Math.round((buyMark / sum) * 100), R.color.buyIndicatorColor));
+                        entries.add(new PieHelper(Math.round((holdMark / sum) * 100), R.color.holdIndicatorColor));
+                        entries.add(new PieHelper(Math.round((sellMark / sum) * 100), R.color.sellIndicatorColor));
 
                         buildGraph();
 
@@ -54,7 +57,6 @@ public class ForecastsPresenter {
     }
 
     public void buildGraph() {
-        Log.d(TAG, "buildGraph: ");
         forecastsView.showGraph(entries);
     }
 }

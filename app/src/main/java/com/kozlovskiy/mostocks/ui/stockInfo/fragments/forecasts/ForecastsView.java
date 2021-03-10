@@ -1,11 +1,11 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts;
 
-import com.github.mikephil.charting.data.BarEntry;
-
 import java.util.ArrayList;
+
+import im.dacer.androidcharts.PieHelper;
 
 public interface ForecastsView {
 
-    void showGraph(ArrayList<BarEntry> entries);
+    void showGraph(ArrayList<PieHelper> entries);
 
 }
