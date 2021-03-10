@@ -61,9 +61,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
+                    android:drawablePadding="4dp"
                     android:fontFamily="@font/montserrat_medium"
                     android:textColor="@color/textColor"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    app:drawableStartCompat="@drawable/ic_ipo_date" />
 
                 <TextView
                     android:id="@+id/tv_capitalization"
@@ -80,7 +82,7 @@
             android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="10dp"
             android:paddingBottom="14dp"
             android:scrollbars="none"
             android:visibility="gone" />

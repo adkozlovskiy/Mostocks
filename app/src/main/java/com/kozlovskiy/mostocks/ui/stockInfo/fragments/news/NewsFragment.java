@@ -89,6 +89,7 @@ public class NewsFragment extends Fragment implements NewsView {
                 )
         );
 
+        //
         tvName.setText(stock.getName());
         tvIpo.setText(stock.getIpo());
         tvCapitalization.setText(StockCostUtils.convertCost(stock.getCapitalization()));

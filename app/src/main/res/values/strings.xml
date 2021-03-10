@@ -14,5 +14,6 @@
     <string name="turn_on_network">Enable</string>
     <string name="cancel">Cancel</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="link"><a href="https://www.google.com/">Read more...</a></string>
+    <string name="ipo">IPO</string>
+    <string name="mc">MC</string>
 </resources>
