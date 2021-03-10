@@ -55,9 +55,8 @@
                 android:textColor="@color/textAccentColor"
                 android:textSize="14sp" />
 
-            <view
-                android:id="@+id/bar_view"
-                class="im.dacer.androidcharts.BarView"
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/bar_chart"
                 android:layout_width="match_parent"
                 android:layout_height="140dp"
                 android:layout_marginStart="20dp"

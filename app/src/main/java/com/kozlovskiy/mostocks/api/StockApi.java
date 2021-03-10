@@ -4,6 +4,7 @@ import com.kozlovskiy.mostocks.entities.ConstituentsResponse;
 import com.kozlovskiy.mostocks.entities.Cost;
 import com.kozlovskiy.mostocks.entities.News;
 import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.entities.TechAnalysisResponse;
 
 import java.util.List;
 
@@ -45,4 +46,7 @@ public interface StockApi {
 
     @GET("company-news?")
     Call<List<News>> getCompanyNews(@Query("symbol") String symbol, @Query("from") String from, @Query("to") String to, @Query("token") String token);
+
+    @GET("scan/technical-indicator?")
+    Call<TechAnalysisResponse> getTechAnalysis(@Query("symbol") String symbol, @Query("resolution") String resolution, @Query("token") String token);
 }

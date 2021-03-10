@@ -1,6 +1,7 @@
 package com.kozlovskiy.mostocks.repo;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import com.kozlovskiy.mostocks.entities.ConstituentsResponse;
 import com.kozlovskiy.mostocks.entities.Cost;
 import com.kozlovskiy.mostocks.entities.News;
 import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.entities.TechAnalysisResponse;
 import com.kozlovskiy.mostocks.room.StocksDao;
 
 import java.net.SocketTimeoutException;
@@ -27,6 +29,8 @@ public class StocksRepository {
 
     private final StocksDao stocksDao;
     private final Context context;
+    public static final String TAG = StocksRepository.class.getSimpleName();
+
 
     public StocksRepository(Context context) {
         this.context = context;
@@ -161,6 +165,30 @@ public class StocksRepository {
 
                     @Override
                     public void onFailure(@NonNull Call<List<News>> call, @NonNull Throwable t) {
+                        emitter.onError(t);
+                    }
+                }));
+    }
+
+    public Single<TechAnalysisResponse.TechnicalAnalysis> updateTechAnalysis(String ticker) {
+        return Single.create(emitter -> StockService.getInstance().getApi()
+                .getTechAnalysis(ticker, "M", StockService.TOKEN)
+                .enqueue(new Callback<TechAnalysisResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<TechAnalysisResponse> call, @NonNull Response<TechAnalysisResponse> response) {
+                        if (response.body() != null) {
+                            TechAnalysisResponse.TechnicalAnalysis technicalAnalysis = response
+                                    .body()
+                                    .getTechnicalAnalysis();
+
+                            Log.d(TAG, "onResponse: ");
+                            emitter.onSuccess(technicalAnalysis);
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<TechAnalysisResponse> call, @NonNull Throwable t) {
                         emitter.onError(t);
                     }
                 }));
