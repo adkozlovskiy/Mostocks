@@ -31,5 +31,4 @@
         <activity android:name=".ui.stockInfo.StockInfoActivity" />
         <activity android:name=".ui.main.MainActivity" />
     </application>
-
 </manifest>
