@@ -17,4 +17,10 @@
     <string name="ipo">IPO</string>
     <string name="mc">MC</string>
     <string name="technical_analysis">Technical analysis</string>
+    <string name="buy">Buy</string>
+    <string name="sell">Sell</string>
+    <string name="neutral">Neutral</string>
+    <string name="need_to_buy">Need to buy</string>
+    <string name="need_to_sell">Need to sell</string>
+    <string name="need_to_hold">Need to hold</string>
 </resources>

@@ -1,8 +1,8 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts;
 
 import android.content.Context;
+import android.graphics.Color;
 
-import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.TechAnalysisResponse;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 
@@ -35,18 +35,7 @@ public class ForecastsPresenter {
                 .subscribe(new DisposableSingleObserver<TechAnalysisResponse.TechnicalAnalysis>() {
                     @Override
                     public void onSuccess(@NonNull TechAnalysisResponse.TechnicalAnalysis object) {
-
-                        int buyMark = Integer.parseInt(object.getCount().get("buy"));
-                        int holdMark = Integer.parseInt(object.getCount().get("neutral"));
-                        int sellMark = Integer.parseInt(object.getCount().get("sell"));
-                        float sum = buyMark + holdMark + sellMark;
-
-                        entries.add(new PieHelper(Math.round((buyMark / sum) * 100), R.color.buyIndicatorColor));
-                        entries.add(new PieHelper(Math.round((holdMark / sum) * 100), R.color.holdIndicatorColor));
-                        entries.add(new PieHelper(Math.round((sellMark / sum) * 100), R.color.sellIndicatorColor));
-
-                        buildGraph();
-
+                        buildGraph(object);
                     }
 
                     @Override
@@ -56,7 +45,31 @@ public class ForecastsPresenter {
                 });
     }
 
-    public void buildGraph() {
-        forecastsView.showGraph(entries);
+    public void buildGraph(TechAnalysisResponse.TechnicalAnalysis object) {
+
+        int buyMark = Integer.parseInt(object.getCount().get("buy"));
+        int holdMark = Integer.parseInt(object.getCount().get("neutral"));
+        int sellMark = Integer.parseInt(object.getCount().get("sell"));
+        float sum = buyMark + holdMark + sellMark;
+
+        String signal = object.getSignal();
+        entries.add(new PieHelper(Math.round((buyMark / sum) * 100),
+                Color.rgb(36, 178, 93)));
+        entries.add(new PieHelper(Math.round((holdMark / sum) * 100),
+                Color.rgb(173, 200, 234)));
+        entries.add(new PieHelper(Math.round((sellMark / sum) * 100),
+                Color.rgb(242, 185, 104)));
+
+        int max = Math.max(Math.max(buyMark, holdMark), sellMark);
+        int selected = 0;
+
+        if (max == holdMark) {
+            selected = 1;
+        } else if (max == sellMark) {
+            selected = 2;
+        }
+
+        forecastsView.showGraph(entries, selected);
+        forecastsView.showForecastStats(buyMark, holdMark, sellMark, signal);
     }
 }
