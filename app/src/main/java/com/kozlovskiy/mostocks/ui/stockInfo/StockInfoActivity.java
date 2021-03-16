@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.tabs.TabLayout;
 import com.kozlovskiy.mostocks.R;
+import com.kozlovskiy.mostocks.services.websocket.StockCostSocketConnection;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart.ChartFragment;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts.ForecastsFragment;
@@ -18,6 +19,7 @@ public class StockInfoActivity extends AppCompatActivity
 
     private StockInfoPresenter stockInfoPresenter;
     private String ticker;
+    private StockCostSocketConnection stockCostSocketConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,9 @@ public class StockInfoActivity extends AppCompatActivity
         setContentView(R.layout.activity_stock_info);
         stockInfoPresenter = new StockInfoPresenter(this);
         ticker = getIntent().getStringExtra(StocksAdapter.KEY_TICKER);
+
+        stockCostSocketConnection = new StockCostSocketConnection(this);
+        stockCostSocketConnection.openConnection(ticker);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getIntent().getStringExtra(StocksAdapter.KEY_TICKER));
@@ -81,5 +86,11 @@ public class StockInfoActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         stockInfoPresenter.unsubscribe();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stockCostSocketConnection.closeConnection();
     }
 }

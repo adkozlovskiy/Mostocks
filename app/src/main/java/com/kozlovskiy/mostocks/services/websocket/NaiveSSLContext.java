@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks.services;
+package com.kozlovskiy.mostocks.services.websocket;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;

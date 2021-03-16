@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks.services;
+package com.kozlovskiy.mostocks.services.websocket;
 
 import android.util.Log;
 
@@ -21,11 +21,12 @@ public class ClientWebSocket {
     private final MessageListener listener;
     private final String host;
     private WebSocket ws;
+    private String ticker;
 
-
-    public ClientWebSocket(MessageListener listener, String host) {
+    public ClientWebSocket(MessageListener listener, String host, String ticker) {
         this.listener = listener;
         this.host = host;
+        this.ticker = ticker;
     }
 
     public void connect() {
@@ -41,11 +42,7 @@ public class ClientWebSocket {
                     ws = factory.createSocket(host);
                     ws.addListener(new SocketListener());
                     ws.connect();
-                } catch (WebSocketException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (NoSuchAlgorithmException e) {
+                } catch (WebSocketException | IOException | NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 }
             }
@@ -55,9 +52,7 @@ public class ClientWebSocket {
     private void reconnect() {
         try {
             ws = ws.recreate().connect();
-        } catch (WebSocketException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (WebSocketException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -70,13 +65,16 @@ public class ClientWebSocket {
         ws.disconnect();
     }
 
-
     public class SocketListener extends WebSocketAdapter {
 
         @Override
         public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
             super.onConnected(websocket, headers);
-            websocket.sendText("{\"type\":\"subscribe\",\"symbol\":\"AAPL\"}");
+
+            if (ticker != null) {
+                subscribe(ticker);
+            }
+
             Log.i(TAG, "onConnected");
         }
 
@@ -88,7 +86,6 @@ public class ClientWebSocket {
         @Override
         public void onError(WebSocket websocket, WebSocketException cause) {
             Log.i(TAG, "Error -->" + cause.getMessage());
-
             reconnect();
         }
 
@@ -115,6 +112,9 @@ public class ClientWebSocket {
         }
     }
 
+    public void subscribe(String ticker) {
+        ws.sendText("{\"type\":\"subscribe\",\"symbol\":\"" + ticker + "\"}");
+    }
 
     public interface MessageListener {
         void onSocketMessage(String message);

@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.tabs.TabLayout;
-import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.ui.main.fragments.favorites.FavoritesFragment;
 import com.kozlovskiy.mostocks.ui.main.fragments.stocks.StocksFragment;
@@ -25,8 +24,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         searchEditText = findViewById(R.id.et_search);
-
-        ((AppDelegate) getApplication().getApplicationContext()).openSocketConnection();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

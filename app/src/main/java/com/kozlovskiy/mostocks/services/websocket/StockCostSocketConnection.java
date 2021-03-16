@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks.services;
+package com.kozlovskiy.mostocks.services.websocket;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,16 +8,17 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.kozlovskiy.mostocks.services.websocket.ClientWebSocket;
 
 public class StockCostSocketConnection implements ClientWebSocket.MessageListener {
     private ClientWebSocket clientWebSocket;
     private final Context context;
-    public Gson gson = new Gson();
     private final Handler socketConnectionHandler;
+    private String ticker;
 
     private final Runnable checkConnectionRunnable = () -> {
         if (!clientWebSocket.getConnection().isOpen()) {
-            openConnection();
+            openConnection(ticker);
         }
         startCheckConnection();
     };
@@ -35,11 +36,12 @@ public class StockCostSocketConnection implements ClientWebSocket.MessageListene
         socketConnectionHandler = new Handler();
     }
 
-    public void openConnection() {
+    public void openConnection(String ticker) {
+        this.ticker = ticker;
         if (clientWebSocket != null) clientWebSocket.close();
         try {
             clientWebSocket = new ClientWebSocket(this,
-                    "wss://ws.finnhub.io?token=c0l8c7748v6orbr0u010");
+                    "wss://ws.finnhub.io?token=c0l8c7748v6orbr0u010", ticker);
             clientWebSocket.connect();
 
             Log.i("Websocket", "Socket connected by user ");
@@ -59,15 +61,11 @@ public class StockCostSocketConnection implements ClientWebSocket.MessageListene
         stopCheckConnection();
     }
 
-
     @Override
     public void onSocketMessage(String message) {
         Log.d("websocket", "onSocketMessage: mes" + message);
     }
 
-    /**
-     * Screen state listener for socket live cycle
-     */
     private void initScreenStateListener() {
         context.registerReceiver(screenStateReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
         context.registerReceiver(screenStateReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
@@ -86,7 +84,7 @@ public class StockCostSocketConnection implements ClientWebSocket.MessageListene
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
                 Log.i("Websocket", "Screen ON");
-                openConnection();
+                openConnection(ticker);
             } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
                 Log.i("Websocket", "Screen OFF");
                 closeConnection();
