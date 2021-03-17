@@ -1,36 +1,75 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart;
 
 import android.content.Context;
-import android.os.Message;
-import android.util.Log;
+import android.os.Handler;
 
+import com.google.gson.Gson;
+import com.kozlovskiy.mostocks.AppDelegate;
+import com.kozlovskiy.mostocks.entities.SocketData;
+import com.kozlovskiy.mostocks.entities.SocketResponse;
+import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.services.websocket.ClientWebSocket;
 import com.kozlovskiy.mostocks.services.websocket.StockCostSocketConnection;
+import com.kozlovskiy.mostocks.utils.StockCostUtils;
+
+import static android.os.Looper.getMainLooper;
 
 public class ChartPresenter implements ClientWebSocket.MessageListener {
 
-    private final ChartView chartView;
+    private ChartView chartView;
     private StockCostSocketConnection stockCostSocketConnection;
+    private final String ticker;
+    private double previousCost;
+    private double currentCost;
     private Context context;
+    private StocksDao stocksDao;
 
-    public ChartPresenter(ChartView chartView, Context context) {
+    public ChartPresenter(ChartView chartView, Context context, String ticker) {
         this.chartView = chartView;
         this.context = context;
+        this.ticker = ticker;
 
+        stocksDao = ((AppDelegate) context.getApplicationContext())
+                .getDatabase()
+                .getDao();
     }
 
     public void subscribe(String ticker) {
-        stockCostSocketConnection = new StockCostSocketConnection(context, ticker);
+        stockCostSocketConnection = new StockCostSocketConnection(ticker);
         stockCostSocketConnection.setListener(this);
         stockCostSocketConnection.openConnection();
     }
 
     public void unsubscribe() {
         stockCostSocketConnection.closeConnection();
+        chartView = null;
     }
 
     @Override
     public void onSocketMessage(String message) {
-        Log.d("websocket", "onSocketMessage: " +message);
+        Gson gson = new Gson();
+        try {
+            SocketResponse response = gson.fromJson(message, SocketResponse.class);
+            if (response.getType().equals("trade")) {
+                SocketData data = response.getData().get(0);
+
+                if (data.getS().equals(ticker)) {
+                    Handler mainHandler = new Handler(getMainLooper());
+
+                    Runnable mainRunnable = () -> chartView.showUpdatedCost(
+                            StockCostUtils.convertCost(data.getP()));
+                    mainHandler.post(mainRunnable);
+
+                    previousCost = currentCost;
+                    currentCost = data.getP();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void cacheCurrentCost() {
+
     }
 }

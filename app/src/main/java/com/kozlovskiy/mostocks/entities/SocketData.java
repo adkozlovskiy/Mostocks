@@ -5,23 +5,27 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class LiveData {
+public class SocketData {
 
     @SerializedName("c")
     @Expose
     private List<String> c = null;
+
     @SerializedName("p")
     @Expose
     private Double p;
+
     @SerializedName("s")
     @Expose
     private String s;
+
     @SerializedName("t")
     @Expose
-    private Integer t;
+    private Long t;
+
     @SerializedName("v")
     @Expose
-    private Integer v;
+    private Long v;
 
     public List<String> getC() {
         return c;
@@ -47,19 +51,19 @@ public class LiveData {
         this.s = s;
     }
 
-    public Integer getT() {
+    public Long getT() {
         return t;
     }
 
-    public void setT(Integer t) {
+    public void setT(Long t) {
         this.t = t;
     }
 
-    public Integer getV() {
+    public Long getV() {
         return v;
     }
 
-    public void setV(Integer v) {
+    public void setV(Long v) {
         this.v = v;
     }
 }

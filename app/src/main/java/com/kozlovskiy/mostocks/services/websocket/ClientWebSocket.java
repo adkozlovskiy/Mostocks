@@ -17,11 +17,11 @@ import javax.net.ssl.SSLContext;
 
 public class ClientWebSocket {
 
-    private static final String TAG = "Websocket";
+    private static final String TAG = ClientWebSocket.class.getSimpleName();
     private final MessageListener listener;
     private final String host;
-    private WebSocket ws;
-    private String ticker;
+    private WebSocket webSocket;
+    private final String ticker;
 
     public ClientWebSocket(MessageListener listener, String host, String ticker) {
         this.listener = listener;
@@ -32,16 +32,17 @@ public class ClientWebSocket {
     public void connect() {
         new Thread(() -> {
 
-            if (ws != null) {
+            if (webSocket != null) {
                 reconnect();
             } else {
                 try {
                     WebSocketFactory factory = new WebSocketFactory();
                     SSLContext context = NaiveSSLContext.getInstance("TLS");
                     factory.setSSLContext(context);
-                    ws = factory.createSocket(host);
-                    ws.addListener(new SocketListener());
-                    ws.connect();
+                    webSocket = factory.createSocket(host);
+                    webSocket.addListener(new SocketListener());
+                    webSocket.connect();
+
                 } catch (WebSocketException | IOException | NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 }
@@ -51,18 +52,18 @@ public class ClientWebSocket {
 
     private void reconnect() {
         try {
-            ws = ws.recreate().connect();
+            webSocket = webSocket.recreate().connect();
         } catch (WebSocketException | IOException e) {
             e.printStackTrace();
         }
     }
 
     public WebSocket getConnection() {
-        return ws;
+        return webSocket;
     }
 
     public void close() {
-        ws.disconnect();
+        webSocket.disconnect();
     }
 
     public class SocketListener extends WebSocketAdapter {
@@ -110,9 +111,8 @@ public class ClientWebSocket {
     }
 
     public void subscribe(String ticker) {
-        Log.d(TAG, "subscribe: ");
         try {
-            ws.sendText("{\"type\":\"subscribe\",\"symbol\":\"" + ticker + "\"}");
+            webSocket.sendText("{\"type\":\"subscribe\",\"symbol\":\"" + ticker + "\"}");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -10,10 +10,13 @@
         android:id="@+id/tv_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
         android:fontFamily="@font/montserrat_semibold"
+        android:text="$189.90"
         android:textColor="@color/textAccentColor"
         android:textSize="28sp" />
+
+
 
 </LinearLayout>

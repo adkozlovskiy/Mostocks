@@ -1,7 +1,6 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,7 +17,7 @@ public class ChartFragment extends Fragment implements ChartView {
     private TextView tvPrice;
     private String ticker;
     public static final String TAG = ChartFragment.class.getSimpleName();
-    
+
     public ChartFragment() {
         super(R.layout.fragment_chart);
     }
@@ -26,7 +25,8 @@ public class ChartFragment extends Fragment implements ChartView {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        chartPresenter = new ChartPresenter(this, getContext());
+        ticker = getTicker();
+        chartPresenter = new ChartPresenter(this, getContext(), ticker);
     }
 
     @Override
@@ -39,7 +39,6 @@ public class ChartFragment extends Fragment implements ChartView {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         tvPrice = view.findViewById(R.id.tv_price);
-        ticker = getTicker();
     }
 
     private String getTicker() {
