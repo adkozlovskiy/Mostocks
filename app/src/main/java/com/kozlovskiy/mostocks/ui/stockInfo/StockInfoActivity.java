@@ -19,7 +19,6 @@ public class StockInfoActivity extends AppCompatActivity
 
     private StockInfoPresenter stockInfoPresenter;
     private String ticker;
-    private StockCostSocketConnection stockCostSocketConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,9 +26,6 @@ public class StockInfoActivity extends AppCompatActivity
         setContentView(R.layout.activity_stock_info);
         stockInfoPresenter = new StockInfoPresenter(this);
         ticker = getIntent().getStringExtra(StocksAdapter.KEY_TICKER);
-
-        stockCostSocketConnection = new StockCostSocketConnection(this);
-        stockCostSocketConnection.openConnection(ticker);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getIntent().getStringExtra(StocksAdapter.KEY_TICKER));
@@ -41,10 +37,13 @@ public class StockInfoActivity extends AppCompatActivity
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.addOnTabSelectedListener(this);
 
+        Bundle bundles = new Bundle();
+        bundles.putString(StocksAdapter.KEY_TICKER, ticker);
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
-                    .add(R.id.fr_container, ChartFragment.class, null)
+                    .add(R.id.fr_container, ChartFragment.class, bundles)
                     .commit();
         }
     }
@@ -86,11 +85,5 @@ public class StockInfoActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         stockInfoPresenter.unsubscribe();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stockCostSocketConnection.closeConnection();
     }
 }

@@ -71,11 +71,8 @@ public class ClientWebSocket {
         public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
             super.onConnected(websocket, headers);
 
-            if (ticker != null) {
-                subscribe(ticker);
-            }
-
-            Log.i(TAG, "onConnected");
+            Log.d(TAG, "onConnected: ");
+            subscribe(ticker);
         }
 
         public void onTextMessage(WebSocket websocket, String message) {
@@ -113,7 +110,12 @@ public class ClientWebSocket {
     }
 
     public void subscribe(String ticker) {
-        ws.sendText("{\"type\":\"subscribe\",\"symbol\":\"" + ticker + "\"}");
+        Log.d(TAG, "subscribe: ");
+        try {
+            ws.sendText("{\"type\":\"subscribe\",\"symbol\":\"" + ticker + "\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public interface MessageListener {
