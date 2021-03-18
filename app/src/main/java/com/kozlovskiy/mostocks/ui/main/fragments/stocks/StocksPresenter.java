@@ -30,6 +30,15 @@ public class StocksPresenter {
     private final AlertDialog.Builder builder;
     private final StocksDao stocksDao;
     public static final String TAG = StocksPresenter.class.getSimpleName();
+    private boolean isLoading;
+
+    public boolean isLoading() {
+        return isLoading;
+    }
+
+    public void setLoading(boolean loading) {
+        isLoading = loading;
+    }
 
     private StocksView stocksView;
     private List<Stock> stocks;

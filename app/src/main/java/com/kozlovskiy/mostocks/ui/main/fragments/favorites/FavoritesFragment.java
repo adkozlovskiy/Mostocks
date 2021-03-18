@@ -1,7 +1,6 @@
 package com.kozlovskiy.mostocks.ui.main.fragments.favorites;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -25,7 +24,8 @@ public class FavoritesFragment extends Fragment
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private TextView tvNoTicker;
-    public static final String TAG = FavoritesFragment.class.getSimpleName();
+    private LinearLayoutManager llm;
+    private StocksAdapter stocksAdapter;
 
     public FavoritesFragment() {
         super(R.layout.fragment_stocks);
@@ -35,6 +35,8 @@ public class FavoritesFragment extends Fragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         favoritesPresenter = new FavoritesPresenter(this, getContext());
+        llm = new LinearLayoutManager(getContext());
+        stocksAdapter = new StocksAdapter(getContext(), true, this);
     }
 
     @Override
@@ -44,25 +46,26 @@ public class FavoritesFragment extends Fragment
         recyclerView = view.findViewById(R.id.recycler);
         progressBar = view.findViewById(R.id.progress_bar);
         tvNoTicker = view.findViewById(R.id.tv_no_tickers);
+
+        recyclerView.setLayoutManager(llm);
+        recyclerView.setAdapter(stocksAdapter);
+
         favoritesPresenter.initializeFavorites();
     }
 
     @Override
     public void updateStocks(List<Stock> stocks) {
-        LinearLayoutManager llm = new LinearLayoutManager(getContext());
-        StocksAdapter stocksAdapter = new StocksAdapter(getContext(), stocks, true, this);
-        recyclerView.setLayoutManager(llm);
-        recyclerView.setAdapter(stocksAdapter);
-
-        progressBar.setVisibility(View.GONE);
-
-        if (stocksAdapter.getItemCount() == 0) {
-            tvNoTicker.setVisibility(View.VISIBLE);
-        } else {
-            recyclerView.setVisibility(View.VISIBLE);
-        }
-
         stocksAdapter.updateStocks(stocks);
+
+        if (progressBar.getVisibility() == View.VISIBLE) {
+            progressBar.setVisibility(View.GONE);
+
+            if (stocksAdapter.getItemCount() == 0) {
+                tvNoTicker.setVisibility(View.VISIBLE);
+            } else {
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override

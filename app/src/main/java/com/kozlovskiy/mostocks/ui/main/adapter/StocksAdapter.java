@@ -37,9 +37,8 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     private List<Stock> stocks;
     private final ItemsCountListener itemsCountListener;
 
-    public StocksAdapter(Context context, List<Stock> stocks, boolean isFavoriteRecycler, ItemsCountListener itemsCountListener) {
+    public StocksAdapter(Context context, boolean isFavoriteRecycler, ItemsCountListener itemsCountListener) {
         this.context = context;
-        this.stocks = stocks;
         this.isFavoriteRecycler = isFavoriteRecycler;
         this.itemsCountListener = itemsCountListener;
         this.stocksDao = ((AppDelegate) context
@@ -172,7 +171,11 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     }
 
     public void updateStocks(List<Stock> stocks) {
-        this.stocks = stocks;
+        if (this.stocks == null || this.stocks.isEmpty())
+            this.stocks = stocks;
+
+        else this.stocks.addAll(stocks);
+
         notifyDataSetChanged();
     }
 
