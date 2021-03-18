@@ -14,7 +14,7 @@ public class StockCostSocketConnection {
     }
 
     private final Runnable checkConnectionRunnable = () -> {
-        if (!clientWebSocket.getConnection().isOpen()) {
+        if (clientWebSocket == null || !clientWebSocket.getConnection().isOpen()) {
             openConnection();
         }
         startCheckConnection();
@@ -40,7 +40,6 @@ public class StockCostSocketConnection {
                     "wss://ws.finnhub.io?token=c0l8c7748v6orbr0u010", ticker);
             clientWebSocket.connect();
 
-            Log.i("Websocket", "Socket connected by user ");
         } catch (Exception e) {
             e.printStackTrace();
         }

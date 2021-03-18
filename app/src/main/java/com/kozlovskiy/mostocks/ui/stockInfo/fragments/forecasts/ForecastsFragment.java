@@ -38,6 +38,7 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
     private TextView tvHoldHolder;
     private TextView tvBuyHolder;
     private TextView tvTitle;
+    private TextView tvSignals;
 
     public ForecastsFragment() {
         super(R.layout.fragment_forecasts);
@@ -69,6 +70,7 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
         tvHoldHolder = view.findViewById(R.id.tv_hold_holder);
         tvBuyHolder = view.findViewById(R.id.tv_buy_holder);
         tvTitle = view.findViewById(R.id.tv_title);
+        tvSignals = view.findViewById(R.id.tv_signals);
     }
 
     @Override
@@ -85,6 +87,7 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
         String date = simpleDateFormat.format(currentDate);
 
         tvTitle.setVisibility(View.VISIBLE);
+        tvSignals.setVisibility(View.VISIBLE);
 
         tvDate.setText(date);
         tvDate.setVisibility(View.VISIBLE);

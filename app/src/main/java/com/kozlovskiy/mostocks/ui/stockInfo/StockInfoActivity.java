@@ -1,6 +1,8 @@
 package com.kozlovskiy.mostocks.ui.stockInfo;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -17,8 +19,6 @@ public class StockInfoActivity extends AppCompatActivity
         implements StockInfoView, TabLayout.OnTabSelectedListener {
 
     private StockInfoPresenter stockInfoPresenter;
-    private String ticker;
-    private double currentCost, previousCost;
     private Bundle bundles;
 
     @Override
@@ -26,9 +26,6 @@ public class StockInfoActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock_info);
         stockInfoPresenter = new StockInfoPresenter(this);
-        ticker = getIntent().getStringExtra(StocksAdapter.KEY_TICKER);
-        currentCost = getIntent().getDoubleExtra(StocksAdapter.KEY_CURRENT_COST, -1);
-        previousCost = getIntent().getDoubleExtra(StocksAdapter.KEY_PREVIOUS_COST, -1);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getIntent().getStringExtra(StocksAdapter.KEY_TICKER));
@@ -39,6 +36,10 @@ public class StockInfoActivity extends AppCompatActivity
 
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.addOnTabSelectedListener(this);
+
+        String ticker = getIntent().getStringExtra(StocksAdapter.KEY_TICKER);
+        double currentCost = getIntent().getDoubleExtra(StocksAdapter.KEY_CURRENT_COST, -1);
+        double previousCost = getIntent().getDoubleExtra(StocksAdapter.KEY_PREVIOUS_COST, -1);
 
         bundles = new Bundle();
         bundles.putString(StocksAdapter.KEY_TICKER, ticker);
@@ -61,11 +62,11 @@ public class StockInfoActivity extends AppCompatActivity
                 transaction.replace(R.id.fr_container, ChartFragment.class, bundles);
                 break;
 
-            case 2:
+            case 1:
                 transaction.replace(R.id.fr_container, NewsFragment.class, bundles);
                 break;
 
-            case 3:
+            case 2:
                 transaction.replace(R.id.fr_container, ForecastsFragment.class, bundles);
                 break;
         }
@@ -87,5 +88,22 @@ public class StockInfoActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         stockInfoPresenter.unsubscribe();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.stock_info_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_star) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

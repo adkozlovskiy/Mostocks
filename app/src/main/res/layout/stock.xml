@@ -68,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:paddingBottom="4dp"
-                    android:src="@drawable/ic_star" />
+                    android:src="@drawable/ic_star_gray" />
 
             </LinearLayout>
 

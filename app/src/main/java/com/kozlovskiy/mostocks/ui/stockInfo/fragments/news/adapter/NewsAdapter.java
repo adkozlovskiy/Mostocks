@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.News;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -72,7 +73,17 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         if (news.getImage() != null && !news.getImage().isEmpty()) {
             Picasso.get().load(news.getImage())
                     .placeholder(R.drawable.white)
-                    .into(holder.ivImage);
+                    .into(holder.ivImage, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            holder.ivImage.setVisibility(View.GONE);
+                        }
+                    });
 
         } else holder.ivImage.setVisibility(View.GONE);
 

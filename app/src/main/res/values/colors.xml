@@ -12,5 +12,5 @@
     <color name="positiveCost">#24B25D</color>
     <color name="buyIndicatorColor">#24B25D</color>
     <color name="holdIndicatorColor">#adc8ea</color>
-    <color name="sellIndicatorColor">#B22424</color>
+    <color name="sellIndicatorColor">#f2b968</color>
 </resources>

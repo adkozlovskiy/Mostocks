@@ -58,25 +58,39 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_date" />
 
             <TextView
+                android:id="@+id/tv_signals"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="6dp"
+                android:text="@string/ai_signals"
+                android:textColor="@color/textAccentColor"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_signal" />
+
+            <TextView
                 android:id="@+id/tv_buy_holder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="6dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="4dp"
                 android:text="@string/buy"
-                android:textColor="@color/textAccentColor"
+                android:textColor="@color/buyIndicatorColor"
                 android:textSize="14sp"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/pie_view" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_signals" />
 
             <TextView
                 android:id="@+id/tv_buy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="6dp"
-                android:textColor="@color/textAccentColor"
+                android:textColor="@color/buyIndicatorColor"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toTopOf="@+id/tv_hold"
                 app:layout_constraintStart_toStartOf="@+id/tv_hold" />
@@ -86,9 +100,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="6dp"
                 android:text="@string/neutral"
-                android:textColor="@color/textAccentColor"
+                android:textColor="@color/holdIndicatorColor"
                 android:textSize="14sp"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
@@ -99,7 +112,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
-                android:textColor="@color/textAccentColor"
+                android:textColor="@color/holdIndicatorColor"
                 android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@+id/tv_hold_holder"
                 app:layout_constraintTop_toTopOf="@+id/tv_hold_holder" />
@@ -109,10 +122,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="6dp"
                 android:layout_marginBottom="20dp"
                 android:text="@string/sell"
-                android:textColor="@color/textAccentColor"
+                android:textColor="@color/sellIndicatorColor"
                 android:textSize="14sp"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
@@ -122,8 +134,7 @@
                 android:id="@+id/tv_sell"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:textColor="@color/textAccentColor"
+                android:textColor="@color/sellIndicatorColor"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="@id/tv_hold"
                 app:layout_constraintTop_toBottomOf="@+id/tv_hold" />
@@ -136,7 +147,7 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_date"
                 app:layout_constraintVertical_bias="1.0" />
 

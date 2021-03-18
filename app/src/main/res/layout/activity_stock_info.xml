@@ -30,14 +30,6 @@
             android:textColor="@color/textAccentColor" />
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_summary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_semibold"
-            android:text="@string/summary"
-            android:textColor="@color/textColor" />
-
-        <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_news"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

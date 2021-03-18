@@ -72,7 +72,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
         holder.ivStar.setImageResource(stock.isFavorite()
                 ? R.drawable.ic_star_gold
-                : R.drawable.ic_star);
+                : R.drawable.ic_star_gray);
 
         if (stock.getLogo() != null && !stock.getLogo().isEmpty()) {
             Picasso.get().load(stock.getLogo())
@@ -138,7 +138,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
                         itemsCountListener.onZeroItems();
                     }
                 }
-                holder.ivStar.setImageResource(R.drawable.ic_star);
+                holder.ivStar.setImageResource(R.drawable.ic_star_gray);
 
             }
 
