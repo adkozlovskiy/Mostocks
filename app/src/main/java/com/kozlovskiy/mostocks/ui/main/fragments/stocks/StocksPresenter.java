@@ -4,6 +4,7 @@ import android.accounts.NetworkErrorException;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.util.Log;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
@@ -28,6 +29,7 @@ public class StocksPresenter {
     private final StocksRepository stocksRepository;
     private final AlertDialog.Builder builder;
     private final StocksDao stocksDao;
+    public static final String TAG = StocksPresenter.class.getSimpleName();
 
     private StocksView stocksView;
     private List<Stock> stocks;

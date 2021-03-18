@@ -12,6 +12,16 @@
         android:layout_gravity="center"
         android:layout_marginBottom="55dp" />
 
+    <TextView
+        android:id="@+id/tv_no_tickers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:fontFamily="@font/montserrat_medium"
+        android:text="@string/no_favorites"
+        android:textColor="@color/textAccentColor" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"

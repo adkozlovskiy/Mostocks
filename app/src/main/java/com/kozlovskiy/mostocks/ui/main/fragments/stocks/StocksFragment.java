@@ -53,7 +53,7 @@ public class StocksFragment extends Fragment
     @Override
     public void updateStocks(List<Stock> stocks) {
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
-        StocksAdapter stocksAdapter = new StocksAdapter(getContext(), stocks);
+        StocksAdapter stocksAdapter = new StocksAdapter(getContext(), stocks, false, null);
         recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(stocksAdapter);
 

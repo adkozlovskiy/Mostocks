@@ -1,8 +1,10 @@
 package com.kozlovskiy.mostocks.ui.main.fragments.favorites;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,11 +19,13 @@ import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 import java.util.List;
 
 public class FavoritesFragment extends Fragment
-        implements FavoritesView {
+        implements FavoritesView, StocksAdapter.ItemsCountListener {
 
     private FavoritesPresenter favoritesPresenter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
+    private TextView tvNoTicker;
+    public static final String TAG = FavoritesFragment.class.getSimpleName();
 
     public FavoritesFragment() {
         super(R.layout.fragment_stocks);
@@ -39,19 +43,24 @@ public class FavoritesFragment extends Fragment
 
         recyclerView = view.findViewById(R.id.recycler);
         progressBar = view.findViewById(R.id.progress_bar);
-
+        tvNoTicker = view.findViewById(R.id.tv_no_tickers);
         favoritesPresenter.initializeFavorites();
     }
 
     @Override
     public void updateStocks(List<Stock> stocks) {
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
-        StocksAdapter stocksAdapter = new StocksAdapter(getContext(), stocks);
+        StocksAdapter stocksAdapter = new StocksAdapter(getContext(), stocks, true, this);
         recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(stocksAdapter);
 
         progressBar.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
+
+        if (stocksAdapter.getItemCount() == 0) {
+            tvNoTicker.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+        }
 
         stocksAdapter.updateStocks(stocks);
     }
@@ -60,5 +69,11 @@ public class FavoritesFragment extends Fragment
     public void onDestroyView() {
         super.onDestroyView();
         favoritesPresenter.unsubscribe();
+    }
+
+    @Override
+    public void onZeroItems() {
+        recyclerView.setVisibility(View.GONE);
+        tvNoTicker.setVisibility(View.VISIBLE);
     }
 }

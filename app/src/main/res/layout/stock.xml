@@ -53,6 +53,7 @@
                     android:id="@+id/tv_symbol"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="AAPL"
                     android:fontFamily="@font/montserrat_medium"
                     android:textColor="#272727"
                     android:textSize="18sp"
@@ -60,11 +61,13 @@
 
                 <ImageView
                     android:id="@+id/iv_star"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp"
+                    android:paddingTop="2dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginStart="6dp"
-                    android:layout_marginBottom="1dp"
+                    android:paddingBottom="4dp"
                     android:src="@drawable/ic_star" />
 
             </LinearLayout>

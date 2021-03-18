@@ -29,13 +29,19 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
     public static final String TAG = StocksAdapter.class.getSimpleName();
     public static final String KEY_TICKER = "TICKER";
+    public static final String KEY_CURRENT_COST = "CURRENT_COST";
+    public static final String KEY_PREVIOUS_COST = "PREVIOUS_COST";
     private final Context context;
     private final StocksDao stocksDao;
+    private final boolean isFavoriteRecycler;
     private List<Stock> stocks;
+    private final ItemsCountListener itemsCountListener;
 
-    public StocksAdapter(Context context, List<Stock> stocks) {
+    public StocksAdapter(Context context, List<Stock> stocks, boolean isFavoriteRecycler, ItemsCountListener itemsCountListener) {
         this.context = context;
         this.stocks = stocks;
+        this.isFavoriteRecycler = isFavoriteRecycler;
+        this.itemsCountListener = itemsCountListener;
         this.stocksDao = ((AppDelegate) context
                 .getApplicationContext())
                 .getDatabase()
@@ -52,6 +58,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         Stock stock = stocks.get(position);
         Cost stockCost = stocksDao.getCost(stock.getTicker());
 
@@ -109,10 +116,11 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             holder.changeView.setTextColor(color);
         }
 
-
         holder.cardView.setOnClickListener(v -> {
             Intent intent = new Intent(context, StockInfoActivity.class);
             intent.putExtra(KEY_TICKER, stock.getTicker());
+            intent.putExtra(KEY_CURRENT_COST, stockCost.getCurrentCost());
+            intent.putExtra(KEY_PREVIOUS_COST, stockCost.getPreviousCost());
             context.startActivity(intent);
         });
 
@@ -120,9 +128,19 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             if (!stock.isFavorite()) {
                 stocksDao.addFavorite(new Favorite(stock.getTicker()));
                 holder.ivStar.setImageResource(R.drawable.ic_star_gold);
+
             } else {
                 stocksDao.removeFavorite(new Favorite(stock.getTicker()));
+                if (isFavoriteRecycler) {
+                    stocks.remove(stock);
+                    notifyItemRemoved(holder.getAdapterPosition());
+
+                    if (getItemCount() == 0) {
+                        itemsCountListener.onZeroItems();
+                    }
+                }
                 holder.ivStar.setImageResource(R.drawable.ic_star);
+
             }
 
             stock.setFavorite(!stock.isFavorite());
@@ -151,7 +169,6 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             ivLogo = view.findViewById(R.id.iv_logo);
             ivStar = view.findViewById(R.id.iv_star);
         }
-
     }
 
     public void updateStocks(List<Stock> stocks) {
@@ -162,5 +179,9 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     private boolean isFavorite(Stock stock) {
         Favorite favorite = stocksDao.getFavorite(stock.getTicker());
         return favorite != null;
+    }
+
+    public interface ItemsCountListener {
+        void onZeroItems();
     }
 }

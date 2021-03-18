@@ -23,4 +23,5 @@
     <string name="need_to_buy">Need to buy</string>
     <string name="need_to_sell">Need to sell</string>
     <string name="need_to_hold">Need to hold</string>
+    <string name="no_favorites">You have not added your favorite tickers yet.</string>
 </resources>

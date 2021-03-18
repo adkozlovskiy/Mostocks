@@ -8,7 +8,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.tabs.TabLayout;
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.services.websocket.StockCostSocketConnection;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart.ChartFragment;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts.ForecastsFragment;
@@ -19,6 +18,8 @@ public class StockInfoActivity extends AppCompatActivity
 
     private StockInfoPresenter stockInfoPresenter;
     private String ticker;
+    private double currentCost, previousCost;
+    private Bundle bundles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +27,8 @@ public class StockInfoActivity extends AppCompatActivity
         setContentView(R.layout.activity_stock_info);
         stockInfoPresenter = new StockInfoPresenter(this);
         ticker = getIntent().getStringExtra(StocksAdapter.KEY_TICKER);
+        currentCost = getIntent().getDoubleExtra(StocksAdapter.KEY_CURRENT_COST, -1);
+        previousCost = getIntent().getDoubleExtra(StocksAdapter.KEY_PREVIOUS_COST, -1);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getIntent().getStringExtra(StocksAdapter.KEY_TICKER));
@@ -37,8 +40,10 @@ public class StockInfoActivity extends AppCompatActivity
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.addOnTabSelectedListener(this);
 
-        Bundle bundles = new Bundle();
+        bundles = new Bundle();
         bundles.putString(StocksAdapter.KEY_TICKER, ticker);
+        bundles.putDouble(StocksAdapter.KEY_CURRENT_COST, currentCost);
+        bundles.putDouble(StocksAdapter.KEY_PREVIOUS_COST, previousCost);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -51,9 +56,6 @@ public class StockInfoActivity extends AppCompatActivity
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        Bundle bundles = new Bundle();
-        bundles.putString(StocksAdapter.KEY_TICKER, ticker);
-
         switch (tab.getPosition()) {
             case 0:
                 transaction.replace(R.id.fr_container, ChartFragment.class, bundles);

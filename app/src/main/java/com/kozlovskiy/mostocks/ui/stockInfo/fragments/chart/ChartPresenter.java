@@ -1,8 +1,10 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 
+import com.github.mikephil.charting.charts.CandleStickChart;
 import com.google.gson.Gson;
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.entities.SocketData;
@@ -42,7 +44,6 @@ public class ChartPresenter implements ClientWebSocket.MessageListener {
 
     public void unsubscribe() {
         stockCostSocketConnection.closeConnection();
-        chartView = null;
     }
 
     @Override
@@ -70,6 +71,14 @@ public class ChartPresenter implements ClientWebSocket.MessageListener {
     }
 
     public void cacheCurrentCost() {
+
+    }
+
+    public void configureCandlesChart(CandleStickChart chart) {
+        chart.setBackgroundColor(Color.WHITE);
+        chart.getDescription().setEnabled(false);
+
+        chartView.buildCandlesChart(chart);
 
     }
 }

@@ -17,6 +17,21 @@
         android:textColor="@color/textAccentColor"
         android:textSize="28sp" />
 
+    <TextView
+        android:id="@+id/tv_price_change"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:drawableStart="@drawable/ic_go_up"
+        android:drawablePadding="5dp"
+        android:fontFamily="@font/montserrat_semibold"
+        android:text="$1.15 (1.08%)"
+        android:textColor="@color/positiveCost"
+        android:textSize="16sp" />
 
-
+    <com.github.mikephil.charting.charts.CandleStickChart
+        android:id="@+id/chart_candles"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="20dp" />
 </LinearLayout>
