@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
     public static final String TAG = MainActivity.class.getSimpleName();
     private EditText searchEditText;
     private TabLayout navigationTabs;
+    private Bundle bundles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,10 +26,14 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
         setContentView(R.layout.activity_main);
         searchEditText = findViewById(R.id.et_search);
 
+        String json = getIntent().getStringExtra("stocks");
+        bundles = new Bundle();
+        bundles.putString("stocks", json);
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
-                    .add(R.id.fr_container, StocksFragment.class, null)
+                    .add(R.id.fr_container, StocksFragment.class, bundles)
                     .commit();
         }
 
@@ -79,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
         if (tab.getPosition() == 1) {
             transaction.replace(R.id.fr_container, FavoritesFragment.class, null);
         } else {
-            transaction.replace(R.id.fr_container, StocksFragment.class, null);
+            transaction.replace(R.id.fr_container, StocksFragment.class, bundles);
         }
 
         transaction.commit();

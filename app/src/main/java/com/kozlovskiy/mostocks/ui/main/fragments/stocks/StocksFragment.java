@@ -12,10 +12,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class StocksFragment extends Fragment
@@ -69,8 +72,12 @@ public class StocksFragment extends Fragment
             }
         };
 
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<Stock>>(){}.getType();
+        List<Stock> stocks = gson.fromJson(getArguments().getString("stocks"), type);
+
         recyclerView.addOnScrollListener(scrollListener);
-        stocksPresenter.initializeStocks();
+        stocksPresenter.initializeStocks(stocks);
     }
 
     @Override

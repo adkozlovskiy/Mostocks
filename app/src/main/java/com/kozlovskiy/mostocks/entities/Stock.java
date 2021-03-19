@@ -1,5 +1,8 @@
 package com.kozlovskiy.mostocks.entities;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -9,7 +12,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Entity
-public class Stock {
+public class Stock implements Parcelable {
 
     @PrimaryKey
     @ColumnInfo(name = "ticker")
@@ -53,6 +56,29 @@ public class Stock {
     public Stock(@NonNull String ticker) {
         this.ticker = ticker;
     }
+
+    protected Stock(Parcel in) {
+        ticker = in.readString();
+        name = in.readString();
+        currency = in.readString();
+        logo = in.readString();
+        industry = in.readString();
+        ipo = in.readString();
+        capitalization = in.readDouble();
+        isFavorite = in.readByte() != 0;
+    }
+
+    public static final Creator<Stock> CREATOR = new Creator<Stock>() {
+        @Override
+        public Stock createFromParcel(Parcel in) {
+            return new Stock(in);
+        }
+
+        @Override
+        public Stock[] newArray(int size) {
+            return new Stock[size];
+        }
+    };
 
     @NonNull
     public String getTicker() {
@@ -113,5 +139,22 @@ public class Stock {
 
     public void setFavorite(boolean favorite) {
         isFavorite = favorite;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(ticker);
+        dest.writeString(name);
+        dest.writeString(currency);
+        dest.writeString(logo);
+        dest.writeString(industry);
+        dest.writeString(ipo);
+        dest.writeDouble(capitalization);
+        dest.writeByte((byte) (isFavorite ? 1 : 0));
     }
 }

@@ -4,24 +4,15 @@ import android.accounts.NetworkErrorException;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.room.StocksDao;
-import com.kozlovskiy.mostocks.utils.NetworkUtils;
-import com.kozlovskiy.mostocks.utils.SettingsUtils;
 
 import java.net.SocketTimeoutException;
 import java.util.List;
-
-import io.reactivex.Completable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.observers.DisposableCompletableObserver;
-import io.reactivex.schedulers.Schedulers;
 
 public class StocksPresenter {
 
@@ -56,15 +47,16 @@ public class StocksPresenter {
 
     }
 
-    public void initializeStocks() {
-        if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
+    public void initializeStocks(List<Stock> stocks) {
+        stocksView.updateStocks(stocks);
+        /*if (NetworkUtils.isNetworkConnectionNotGranted(context)) {
             stocksView.showRetryDialog(getRetryDialog(new NetworkErrorException()));
 
         } else if (SettingsUtils.cacheIsUpToDate(context)) {
             stocksView.updateStocks(stocksDao.getStocks());
 
         } else {
-            stocksRepository.updateTickers()
+            stocksRepository.initializeTickers()
                     .flatMapCompletable(stocks -> Completable.mergeArray(
                             stocksRepository.updateProfiles(stocks),
                             stocksRepository.updateCost(stocks)
@@ -85,7 +77,7 @@ public class StocksPresenter {
                             stocksView.showRetryDialog(getRetryDialog(e));
                         }
                     });
-        }
+        } */
     }
 
     private Dialog getRetryDialog(Throwable throwable) {
@@ -93,7 +85,7 @@ public class StocksPresenter {
 
         if (throwable instanceof SocketTimeoutException) {
             builder.setMessage(R.string.timed_out)
-                    .setPositiveButton(R.string.retry, (dialog, id) -> initializeStocks())
+                    .setPositiveButton(R.string.retry, (dialog, id) -> initializeStocks(stocks))
                     .setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
 
         } else if (throwable instanceof NetworkErrorException) {

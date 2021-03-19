@@ -81,7 +81,7 @@ public class StocksRepository {
                             List<String> tickers = response.body().getConstituents();
                             List<Stock> stocks = new ArrayList<>();
 
-                            for (int i = 0; i < 14; i++) {
+                            for (int i = 0; i < 10; i++) {
                                 stocks.add(new Stock(tickers.get(i)));
                             }
 
@@ -91,6 +91,40 @@ public class StocksRepository {
                                 stocksDao.updateStocks(stocks);
                             }
 
+                            emitter.onSuccess(stocks);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<ConstituentsResponse> call, @NonNull Throwable t) {
+                        if (t instanceof SocketTimeoutException)
+                            Toast.makeText(context, "Время вышло", Toast.LENGTH_SHORT).show();
+
+                        t.printStackTrace();
+                    }
+                }));
+    }
+
+    public Single<List<Stock>> initializeTickers() {
+        return Single.create(emitter -> StockService.getInstance().getApi()
+                .getTickers("^GSPC", StockService.TOKEN)
+                .enqueue(new Callback<ConstituentsResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ConstituentsResponse> call, @NonNull Response<ConstituentsResponse> response) {
+                        if (response.body() != null) {
+                            List<String> tickers = response.body().getConstituents();
+                            List<Stock> stocks = new ArrayList<>();
+
+                            for (String ticker : tickers) {
+                                stocks.add(new Stock(ticker));
+                            }
+
+
+                            if (stocksDao.getStocks().size() == 0) {
+                                stocksDao.cacheStocks(stocks);
+                            } else {
+                                stocksDao.updateStocks(stocks);
+                            }
                             emitter.onSuccess(stocks);
                         }
                     }

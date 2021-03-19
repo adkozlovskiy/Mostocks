@@ -76,7 +76,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
                     .into(holder.ivImage, new Callback() {
                         @Override
                         public void onSuccess() {
-                            
+
                         }
 
                         @Override

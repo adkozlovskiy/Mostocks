@@ -46,7 +46,6 @@ public class ForecastsPresenter {
     }
 
     public void buildGraph(TechAnalysisResponse.TechnicalAnalysis object) {
-
         int buyMark = Integer.parseInt(object.getCount().get("buy"));
         int holdMark = Integer.parseInt(object.getCount().get("neutral"));
         int sellMark = Integer.parseInt(object.getCount().get("sell"));
