@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme">
 
         <service
-            android:name=".services.CostMonitorService"
+            android:name=".services.WebSocketService"
             android:enabled="true"
             android:exported="true" />
 

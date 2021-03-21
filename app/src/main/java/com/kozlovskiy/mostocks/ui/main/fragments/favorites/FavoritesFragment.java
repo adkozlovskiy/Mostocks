@@ -1,5 +1,6 @@
 package com.kozlovskiy.mostocks.ui.main.fragments.favorites;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -29,19 +30,26 @@ public class FavoritesFragment extends Fragment
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private TextView tvNoTicker;
-    private LinearLayoutManager llm;
+    private LinearLayoutManager linearLayoutManager;
     private StocksAdapter stocksAdapter;
+    private Gson gson;
+    private Type type;
 
     public FavoritesFragment() {
         super(R.layout.fragment_stocks);
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        favoritesPresenter = new FavoritesPresenter(this, getContext());
-        llm = new LinearLayoutManager(getContext());
-        stocksAdapter = new StocksAdapter(getContext(), true, this);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        favoritesPresenter = new FavoritesPresenter(this, context);
+
+        stocksAdapter = new StocksAdapter(context, true, this);
+        linearLayoutManager = new LinearLayoutManager(context);
+
+        gson = new Gson();
+        type = new TypeToken<List<Stock>>() {
+        }.getType();
     }
 
     @Override
@@ -52,17 +60,15 @@ public class FavoritesFragment extends Fragment
         progressBar = view.findViewById(R.id.progress_bar);
         tvNoTicker = view.findViewById(R.id.tv_no_tickers);
 
-        recyclerView.setLayoutManager(llm);
+        recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(stocksAdapter);
 
-        String json = getArguments().getString(KEY_STOCKS_INTENT);
+        if (getArguments() != null) {
+            String json = getArguments().getString(KEY_STOCKS_INTENT);
 
-        Gson gson = new Gson();
-        Type type = new TypeToken<List<Stock>>() {
-        }.getType();
-
-        List<Stock> stocks = gson.fromJson(json, type);
-        favoritesPresenter.initializeFavorites(stocks);
+            List<Stock> stocks = gson.fromJson(json, type);
+            favoritesPresenter.initializeFavorites(stocks);
+        }
     }
 
     @Override

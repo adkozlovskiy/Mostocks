@@ -15,30 +15,37 @@ import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
-public class ClientWebSocket {
+public class WebSocketClient {
 
-    private static final String TAG = ClientWebSocket.class.getSimpleName();
+    private static final String TAG = WebSocketClient.class.getSimpleName();
     private final MessageListener listener;
     private final String host;
-    private WebSocket webSocket;
-    private final String ticker;
+    private final String symbol;
 
-    public ClientWebSocket(MessageListener listener, String host, String ticker) {
-        this.listener = listener;
-        this.host = host;
-        this.ticker = ticker;
+    private WebSocket webSocket;
+
+    public interface MessageListener {
+        void onSocketMessage(String message);
     }
 
-    public void connect() {
-        new Thread(() -> {
+    public WebSocketClient(MessageListener listener, String host, String symbol) {
+        this.listener = listener;
+        this.host = host;
+        this.symbol = symbol;
+    }
 
+    public void openConnection() {
+        Thread connectionThread = new Thread(() -> {
             if (webSocket != null) {
-                reconnect();
+                reopenConnection();
+
             } else {
                 try {
                     WebSocketFactory factory = new WebSocketFactory();
+
                     SSLContext context = NaiveSSLContext.getInstance("TLS");
                     factory.setSSLContext(context);
+
                     webSocket = factory.createSocket(host);
                     webSocket.addListener(new SocketListener());
                     webSocket.connect();
@@ -47,24 +54,34 @@ public class ClientWebSocket {
                     e.printStackTrace();
                 }
             }
-        }).start();
-    }
+        });
 
-    private void reconnect() {
-        try {
-            webSocket = webSocket.recreate().connect();
-        } catch (WebSocketException | IOException e) {
-            e.printStackTrace();
-        }
+        connectionThread.start();
     }
 
     public WebSocket getConnection() {
         return webSocket;
     }
 
-    public void close() {
-        if (webSocket != null) {
-            webSocket.disconnect();
+    public void reopenConnection() {
+        try {
+            webSocket = webSocket.recreate().connect();
+
+        } catch (WebSocketException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeConnection() {
+        webSocket.disconnect();
+    }
+
+    public void subscribe(String symbol) {
+        try {
+            webSocket.sendText("{\"type\":\"subscribe\",\"symbol\":\"" + symbol + "\"}");
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -75,7 +92,7 @@ public class ClientWebSocket {
             super.onConnected(websocket, headers);
 
             Log.d(TAG, "onConnected: ");
-            subscribe(ticker);
+            subscribe(symbol);
         }
 
         public void onTextMessage(WebSocket websocket, String message) {
@@ -86,7 +103,7 @@ public class ClientWebSocket {
         @Override
         public void onError(WebSocket websocket, WebSocketException cause) {
             Log.i(TAG, "Error -->" + cause.getMessage());
-            reconnect();
+            reopenConnection();
         }
 
         @Override
@@ -94,15 +111,17 @@ public class ClientWebSocket {
                                    WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
                                    boolean closedByServer) {
             Log.i(TAG, "onDisconnected");
+
             if (closedByServer) {
-                reconnect();
+                Log.d(TAG, "onDisconnected: reopen connection.");
+                reopenConnection();
             }
         }
 
         @Override
         public void onUnexpectedError(WebSocket websocket, WebSocketException cause) {
             Log.i(TAG, "Error -->" + cause.getMessage());
-            reconnect();
+            reopenConnection();
         }
 
         @Override
@@ -110,17 +129,5 @@ public class ClientWebSocket {
             super.onPongFrame(websocket, frame);
             websocket.sendPing("Are you there?");
         }
-    }
-
-    public void subscribe(String ticker) {
-        try {
-            webSocket.sendText("{\"type\":\"subscribe\",\"symbol\":\"" + ticker + "\"}");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public interface MessageListener {
-        void onSocketMessage(String message);
     }
 }

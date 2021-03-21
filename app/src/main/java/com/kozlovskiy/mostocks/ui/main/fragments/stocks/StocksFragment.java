@@ -23,7 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Stock;
-import com.kozlovskiy.mostocks.services.CostMonitorService;
+import com.kozlovskiy.mostocks.services.WebSocketService;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 
 import java.lang.reflect.Type;
@@ -40,15 +40,16 @@ public class StocksFragment extends Fragment
     private StocksPresenter stocksPresenter;
     private StocksAdapter stocksAdapter;
     private LinearLayoutManager llm;
-    CostMonitorService costMonitorService;
-    public static final String BROADCAST_ACTION = CostMonitorService.QuoteBinder.class.getCanonicalName();
+    WebSocketService webSocketService;
+    public static final String BROADCAST_ACTION = WebSocketService.QuoteBinder.class.getCanonicalName();
 
     boolean bound = false;
     ServiceConnection connection = new ServiceConnection() {
         public void onServiceConnected(ComponentName name, IBinder binder) {
             Log.d(TAG, "onServiceConnected: ");
-            CostMonitorService.QuoteBinder quoteBinder = (CostMonitorService.QuoteBinder) binder;
-            costMonitorService = quoteBinder.getInstance();
+            WebSocketService.QuoteBinder quoteBinder = (WebSocketService.QuoteBinder) binder;
+            webSocketService = quoteBinder.getInstance();
+            webSocketService.bindSocket("AAPL"); // TODO: 21.03.2021
             bound = true;
         }
 
@@ -98,7 +99,7 @@ public class StocksFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
-        Intent intent = new Intent(getContext(), CostMonitorService.class);
+        Intent intent = new Intent(getContext(), WebSocketService.class);
         getActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 

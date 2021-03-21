@@ -13,19 +13,19 @@ public class SocketData {
 
     @SerializedName("p")
     @Expose
-    private Double p;
+    private Double quote;
 
     @SerializedName("s")
     @Expose
-    private String s;
+    private String symbol;
 
     @SerializedName("t")
     @Expose
-    private Long t;
+    private Long timestamp;
 
     @SerializedName("v")
     @Expose
-    private Long v;
+    private Long volume;
 
     public List<String> getC() {
         return c;
@@ -35,35 +35,35 @@ public class SocketData {
         this.c = c;
     }
 
-    public Double getP() {
-        return p;
+    public Double getQuote() {
+        return quote;
     }
 
-    public void setP(Double p) {
-        this.p = p;
+    public void setQuote(Double quote) {
+        this.quote = quote;
     }
 
-    public String getS() {
-        return s;
+    public String getSymbol() {
+        return symbol;
     }
 
-    public void setS(String s) {
-        this.s = s;
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 
-    public Long getT() {
-        return t;
+    public Long getTimestamp() {
+        return timestamp;
     }
 
-    public void setT(Long t) {
-        this.t = t;
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public Long getV() {
-        return v;
+    public Long getVolume() {
+        return volume;
     }
 
-    public void setV(Long v) {
-        this.v = v;
+    public void setVolume(Long volume) {
+        this.volume = volume;
     }
 }

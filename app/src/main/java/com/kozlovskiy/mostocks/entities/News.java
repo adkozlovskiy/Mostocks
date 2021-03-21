@@ -16,8 +16,8 @@ public class News {
     @Expose
     private int id;
 
-    @ColumnInfo(name = "ticker")
-    private String ticker;
+    @ColumnInfo(name = "symbol")
+    private String symbol;
 
     @ColumnInfo(name = "datetime")
     @SerializedName("datetime")
@@ -52,12 +52,12 @@ public class News {
         this.id = id;
     }
 
-    public String getTicker() {
-        return ticker;
+    public String getSymbol() {
+        return symbol;
     }
 
-    public void setTicker(String ticker) {
-        this.ticker = ticker;
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 
     public long getDatetime() {

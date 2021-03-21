@@ -66,6 +66,7 @@ public class StocksRepository {
                             @Override
                             public void onResponse(@NonNull Call<Quote> call, @NonNull Response<Quote> response) {
                                 if (response.body() != null) {
+                                    Log.d(TAG, "getSymbolQuotes: stocks costs loaded for " + stock.getSymbol());
                                     Quote quote = response.body();
                                     stock.setOpen(quote.getOpen());
                                     stock.setCurrent(quote.getCurrent());
@@ -77,6 +78,7 @@ public class StocksRepository {
                                     updatedStocks.add(stock);
 
                                     if (updatedStocks.size() == stocks.size()) {
+                                        Log.d(TAG, "getSymbolQuotes: stocks costs loaded...");
                                         emitter.onSuccess(updatedStocks);
                                     }
                                 }
@@ -91,9 +93,10 @@ public class StocksRepository {
         });
     }
 
-    public Single<List<News>> updateNews(String ticker) {
+    public Single<List<News>> updateNews(String symbol) {
+        Log.d(TAG, "updateNews: news loading...");
         return Single.create(emitter -> FinnhubService.getInstance().getApi()
-                .getCompanyNews(ticker, "2021-01-01", "2021-03-01", FinnhubService.TOKEN)
+                .getCompanyNews(symbol, "2021-01-01", "2021-03-01", FinnhubService.TOKEN)
                 .enqueue(new Callback<List<News>>() {
                     @Override
                     public void onResponse(@NonNull Call<List<News>> call, @NonNull Response<List<News>> response) {
@@ -101,10 +104,11 @@ public class StocksRepository {
                             List<News> newsList = response.body();
 
                             for (News news : newsList) {
-                                news.setTicker(ticker);
+                                news.setSymbol(symbol);
                             }
 
                             stocksDao.cacheNews(newsList);
+                            Log.d(TAG, "updateNews: news loaded");
                             emitter.onSuccess(newsList);
                         }
                     }
@@ -116,9 +120,10 @@ public class StocksRepository {
                 }));
     }
 
-    public Single<TechAnalysisResponse.TechnicalAnalysis> updateTechAnalysis(String ticker) {
+    public Single<TechAnalysisResponse.TechnicalAnalysis> updateTechAnalysis(String symbol) {
+        Log.d(TAG, "updateTechAnalysis: tech loading...");
         return Single.create(emitter -> FinnhubService.getInstance().getApi()
-                .getTechAnalysis(ticker, "M", FinnhubService.TOKEN)
+                .getTechAnalysis(symbol, "M", FinnhubService.TOKEN)
                 .enqueue(new Callback<TechAnalysisResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<TechAnalysisResponse> call, @NonNull Response<TechAnalysisResponse> response) {
@@ -128,6 +133,7 @@ public class StocksRepository {
                                     .getTechnicalAnalysis();
 
                             emitter.onSuccess(technicalAnalysis);
+                            Log.d(TAG, "updateTechAnalysis: tech loaded.");
                         }
                     }
 

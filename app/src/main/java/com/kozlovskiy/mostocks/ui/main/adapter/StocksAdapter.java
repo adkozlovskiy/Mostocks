@@ -31,17 +31,19 @@ import java.util.List;
 
 public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder> {
 
+    public static final String MAIN_IMAGE_URL = "https://eodhistoricaldata.com/img/logos/US/";
     public static final String TAG = StocksAdapter.class.getSimpleName();
-    public static final String KEY_TICKER = "TICKER";
     public static final String KEY_CURRENT_COST = "CURRENT_COST";
     public static final String KEY_PREVIOUS_COST = "PREVIOUS_COST";
-    public static final String MAIN_IMAGE_URL = "https://eodhistoricaldata.com/img/logos/US/";
     public static final String KEY_IS_FAVORITE = "IS_FAVORITE";
+    public static final String KEY_TICKER = "TICKER";
+
     private final Context context;
     private final StocksDao stocksDao;
     private final boolean isFavoriteRecycler;
-    private List<Stock> stocks;
     private final ItemsCountListener itemsCountListener;
+
+    private List<Stock> stocks;
 
     public StocksAdapter(Context context, boolean isFavoriteRecycler, ItemsCountListener itemsCountListener) {
         this.context = context;
@@ -64,27 +66,30 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Stock stock = stocks.get(position);
-
-        stock.setFavorite(isFavorite(stock));
-
         holder.symbolView.setText(stock.getSymbol());
 
         if (stock.getName() != null && !stock.getName().isEmpty()) {
-            String nameCropped = stock.getName().length() > 21 ? stock.getName().substring(0, 19).trim() + "\u2026" : stock.getName();
+            String nameCropped = stock.getName().length() > 21
+                    ? stock.getName().substring(0, 19).trim() + "\u2026"
+                    : stock.getName();
             holder.companyView.setText(nameCropped);
         }
-        Bitmap bitmap = BitmapUtil.markSymbolOnBitmap(context, R.drawable.blue_background, stock.getSymbol().substring(0, 1));
-        Drawable d = new BitmapDrawable(context.getResources(), bitmap);
 
+        stock.setFavorite(isFavorite(stock));
         holder.ivStar.setImageResource(stock.isFavorite()
                 ? R.drawable.ic_star_gold
                 : R.drawable.ic_star_gray);
+
+        Bitmap bitmap = BitmapUtil.markSymbolOnBitmap(context,
+                R.drawable.blue_background, stock.getSymbol().substring(0, 1));
+
+        Drawable placeholder = new BitmapDrawable(context.getResources(), bitmap);
 
         Picasso.get()
                 .load(MAIN_IMAGE_URL + stock.getSymbol() + ".png")
                 .networkPolicy(NetworkPolicy.OFFLINE)
                 .fit()
-                .placeholder(d)
+                .placeholder(placeholder)
                 .into(holder.ivLogo, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -96,21 +101,19 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
                         Picasso.get()
                                 .load(MAIN_IMAGE_URL + stock.getSymbol() + ".png")
                                 .fit()
-                                .placeholder(d)
+                                .placeholder(placeholder)
                                 .into(holder.ivLogo);
                     }
                 });
 
-        if (position % 2 == 0) {
-            holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.cardColor));
-        } else {
-            holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.backgroundColor));
-        }
+        holder.cardView.setCardBackgroundColor(position % 2 == 0
+                ? context.getResources().getColor(R.color.cardColor)
+                : context.getResources().getColor(R.color.backgroundColor));
 
-        String costString = QuoteConverter.convertToCurrencyFormat(stock.getCurrent(), 2, 2);
+        String quote = QuoteConverter.convertToCurrencyFormat(stock.getCurrent(), 2, 2);
+        holder.costView.setText(quote);
+
         int color = context.getResources().getColor(R.color.textColor);
-        holder.costView.setText(costString);
-
         double difference = stock.getCurrent() - stock.getPrevious();
         String changeString = QuoteConverter.convertToCurrencyFormat(difference, 2, 2);
         String percentString = QuoteConverter.convertToDefaultFormat(difference / stock.getPrevious() * 100, 2, 2);
@@ -118,12 +121,15 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         if (stock.getCurrent() - stock.getPrevious() > 0) {
             color = context.getResources().getColor(R.color.positiveCost);
             changeString = "+" + changeString;
+
         } else if (stock.getCurrent() - stock.getPrevious() < 0) {
             color = context.getResources().getColor(R.color.negativeCost);
             percentString = QuoteConverter.convertToDefaultFormat(difference / stock.getPrevious() * -100, 2, 2);
+
         }
 
         changeString += " (" + percentString + "%)";
+
         holder.changeView.setText(changeString);
         holder.changeView.setTextColor(color);
 

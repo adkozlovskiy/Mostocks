@@ -10,16 +10,16 @@ import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.entities.SocketData;
 import com.kozlovskiy.mostocks.entities.SocketResponse;
 import com.kozlovskiy.mostocks.room.StocksDao;
-import com.kozlovskiy.mostocks.services.websocket.ClientWebSocket;
-import com.kozlovskiy.mostocks.services.websocket.StockCostSocketConnection;
+import com.kozlovskiy.mostocks.services.websocket.WebSocketClient;
+import com.kozlovskiy.mostocks.services.websocket.WebSocketConnection;
 import com.kozlovskiy.mostocks.utils.QuoteConverter;
 
 import static android.os.Looper.getMainLooper;
 
-public class ChartPresenter implements ClientWebSocket.MessageListener {
+public class ChartPresenter implements WebSocketClient.MessageListener {
 
     private final ChartView chartView;
-    private StockCostSocketConnection stockCostSocketConnection;
+    private WebSocketConnection webSocketConnection;
     private final String ticker;
     private double previousCost;
     private double currentCost;
@@ -37,13 +37,13 @@ public class ChartPresenter implements ClientWebSocket.MessageListener {
     }
 
     public void subscribe(String ticker) {
-        stockCostSocketConnection = new StockCostSocketConnection(ticker);
-        stockCostSocketConnection.setListener(this);
-        stockCostSocketConnection.openConnection();
+        webSocketConnection = new WebSocketConnection(ticker);
+        webSocketConnection.setListener(this);
+        webSocketConnection.openConnection();
     }
 
     public void unsubscribe() {
-        stockCostSocketConnection.closeConnection();
+        webSocketConnection.closeConnection();
     }
 
     @Override
@@ -54,15 +54,15 @@ public class ChartPresenter implements ClientWebSocket.MessageListener {
             if (response.getType().equals("trade")) {
                 SocketData data = response.getData().get(0);
 
-                if (data.getS().equals(ticker)) {
+                if (data.getSymbol().equals(ticker)) {
                     Handler mainHandler = new Handler(getMainLooper());
 
                     Runnable mainRunnable = () -> chartView.showUpdatedCost(
-                            QuoteConverter.convertToCurrencyFormat(data.getP(), 2, 4));
+                            QuoteConverter.convertToCurrencyFormat(data.getQuote(), 2, 4));
                     mainHandler.post(mainRunnable);
 
                     previousCost = currentCost;
-                    currentCost = data.getP();
+                    currentCost = data.getQuote();
                 }
             }
         } catch (Exception e) {
