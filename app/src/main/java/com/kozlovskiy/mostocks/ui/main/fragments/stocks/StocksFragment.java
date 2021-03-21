@@ -25,6 +25,7 @@ import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.services.WebSocketService;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
+import com.kozlovskiy.mostocks.utils.NetworkUtil;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -34,28 +35,32 @@ import static com.kozlovskiy.mostocks.ui.splash.SplashActivity.KEY_STOCKS_INTENT
 public class StocksFragment extends Fragment
         implements StocksView {
 
-    private RecyclerView recyclerView;
-    private ProgressBar progressBar;
+    public static final String BROADCAST_ACTION = WebSocketService.class.getCanonicalName();
     public static final String TAG = StocksFragment.class.getSimpleName();
+
     private StocksPresenter stocksPresenter;
     private StocksAdapter stocksAdapter;
+    private RecyclerView recyclerView;
+    private ProgressBar progressBar;
     private LinearLayoutManager llm;
-    WebSocketService webSocketService;
-    public static final String BROADCAST_ACTION = WebSocketService.QuoteBinder.class.getCanonicalName();
+    private Context context;
+    private Gson gson;
+    private Type type;
 
     boolean bound = false;
+
     ServiceConnection connection = new ServiceConnection() {
         public void onServiceConnected(ComponentName name, IBinder binder) {
-            Log.d(TAG, "onServiceConnected: ");
             WebSocketService.QuoteBinder quoteBinder = (WebSocketService.QuoteBinder) binder;
-            webSocketService = quoteBinder.getInstance();
+            WebSocketService webSocketService = quoteBinder.getInstance();
             webSocketService.bindSocket("AAPL"); // TODO: 21.03.2021
+            Log.d(TAG, "onServiceConnected: ");
             bound = true;
         }
 
         public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "onServiceDisconnected: ");
             bound = false;
+            Log.d(TAG, "onServiceDisconnected: ");
         }
     };
 
@@ -64,19 +69,15 @@ public class StocksFragment extends Fragment
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Gson gson = new Gson();
-        Type type = new TypeToken<List<Stock>>() {
-        }.getType();
-        String json = getArguments().getString(KEY_STOCKS_INTENT);
-        List<Stock> stocks = gson.fromJson(json, type);
-        stocksPresenter = new StocksPresenter(this, getContext(), stocks);
-        llm = new LinearLayoutManager(getContext());
-        stocksAdapter = new StocksAdapter(getContext(), false, null);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
 
-        IntentFilter filter = new IntentFilter(BROADCAST_ACTION);
-        getActivity().registerReceiver(quoteReceiver, filter);
+        llm = new LinearLayoutManager(context);
+        stocksAdapter = new StocksAdapter(context, false, null);
+
+        gson = new Gson();
+        type = new TypeToken<List<Stock>>() {}.getType();
     }
 
     @Override
@@ -88,19 +89,33 @@ public class StocksFragment extends Fragment
         recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(stocksAdapter);
 
-        stocksPresenter.initializeStocks();
+        if (getArguments() != null) {
+            String json = getArguments().getString(KEY_STOCKS_INTENT);
+            List<Stock> stocks = gson.fromJson(json, type);
+
+            stocksPresenter = new StocksPresenter(this, context, stocks);
+
+            if (NetworkUtil.isNetworkConnectionNotGranted(context)) {
+                stocksPresenter.buildNoNetworkDialog();
+
+            } else stocksPresenter.initializeStocks();
+        }
     }
 
     @Override
-    public void showRetryDialog(Dialog dialog) {
-        dialog.show();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
         Intent intent = new Intent(getContext(), WebSocketService.class);
-        getActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+        IntentFilter filter = new IntentFilter(BROADCAST_ACTION);
+        context.registerReceiver(quoteReceiver, filter);
+    }
+
+    @Override
+    public void showDialog(Dialog dialog) {
+        dialog.show();
     }
 
     @Override
@@ -116,22 +131,18 @@ public class StocksFragment extends Fragment
     @Override
     public void onStop() {
         super.onStop();
-        getActivity().unbindService(connection);
-        bound = false;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+        context.unbindService(connection);
+        context.unregisterReceiver(quoteReceiver);
         stocksPresenter.unsubscribe();
-        getActivity().unregisterReceiver(quoteReceiver);
     }
 
-    BroadcastReceiver quoteReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver quoteReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String symbol = intent.getStringExtra("symbol");
             double quote = intent.getDoubleExtra("quote", -1);
+
+            Log.d(TAG, "onReceive: symbol " + symbol + ", quote" + quote);
 
         }
     };

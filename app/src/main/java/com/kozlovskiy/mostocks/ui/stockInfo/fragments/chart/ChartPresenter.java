@@ -3,6 +3,7 @@ package com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
+import android.util.Log;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
 import com.google.gson.Gson;
@@ -18,7 +19,8 @@ import static android.os.Looper.getMainLooper;
 
 public class ChartPresenter implements WebSocketClient.MessageListener {
 
-    private final ChartView chartView;
+    public static final String TAG = ChartPresenter.class.getSimpleName();
+    private ChartView chartView;
     private WebSocketConnection webSocketConnection;
     private final String ticker;
     private double previousCost;
@@ -40,10 +42,13 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         webSocketConnection = new WebSocketConnection(ticker);
         webSocketConnection.setListener(this);
         webSocketConnection.openConnection();
+        Log.d(TAG, "subscribe: ");
     }
 
     public void unsubscribe() {
         webSocketConnection.closeConnection();
+        Log.d(TAG, "unsubscribe: ");
+        chartView = null;
     }
 
     @Override

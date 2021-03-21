@@ -133,6 +133,6 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
             return null;
         }
 
-        return getArguments().getString(StocksAdapter.KEY_TICKER);
+        return getArguments().getString(StocksAdapter.KEY_SYMBOL);
     }
 }

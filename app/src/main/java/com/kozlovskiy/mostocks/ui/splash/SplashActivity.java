@@ -24,16 +24,14 @@ public class SplashActivity extends AppCompatActivity
 
         if (NetworkUtil.isNetworkConnectionNotGranted(this)) {
             splashPresenter.buildNoNetworkDialog();
-        }
 
-        splashPresenter.initializeTickers();
+        } else splashPresenter.initializeTickers();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         splashPresenter.unsubscribe();
-        // TODO: 21.03.2021 cancel loading
     }
 
     @Override

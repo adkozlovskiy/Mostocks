@@ -38,6 +38,7 @@ public class WebSocketClient {
         Thread connectionThread = new Thread(() -> {
             if (webSocket != null) {
                 reopenConnection();
+                Log.d(TAG, "openConnection: reopen !!!");
 
             } else {
                 try {

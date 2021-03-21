@@ -113,6 +113,6 @@ public class NewsFragment extends Fragment implements NewsView {
     }
 
     private String getTicker() {
-        return getArguments().getString(StocksAdapter.KEY_TICKER);
+        return getArguments().getString(StocksAdapter.KEY_SYMBOL);
     }
 }

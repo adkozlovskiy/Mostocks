@@ -29,7 +29,7 @@ public class StockInfoActivity extends AppCompatActivity
         stockInfoPresenter = new StockInfoPresenter(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(getIntent().getStringExtra(StocksAdapter.KEY_TICKER));
+        toolbar.setTitle(getIntent().getStringExtra(StocksAdapter.KEY_SYMBOL));
         toolbar.setNavigationIcon(R.drawable.back_button);
         setSupportActionBar(toolbar);
 
@@ -38,11 +38,11 @@ public class StockInfoActivity extends AppCompatActivity
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.addOnTabSelectedListener(this);
 
-        String ticker = getIntent().getStringExtra(StocksAdapter.KEY_TICKER);
+        String ticker = getIntent().getStringExtra(StocksAdapter.KEY_SYMBOL);
         isFavorite = getIntent().getBooleanExtra(StocksAdapter.KEY_IS_FAVORITE, false);
 
         bundles = new Bundle();
-        bundles.putString(StocksAdapter.KEY_TICKER, ticker);
+        bundles.putString(StocksAdapter.KEY_SYMBOL, ticker);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

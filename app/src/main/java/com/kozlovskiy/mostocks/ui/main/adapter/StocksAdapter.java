@@ -36,7 +36,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     public static final String KEY_CURRENT_COST = "CURRENT_COST";
     public static final String KEY_PREVIOUS_COST = "PREVIOUS_COST";
     public static final String KEY_IS_FAVORITE = "IS_FAVORITE";
-    public static final String KEY_TICKER = "TICKER";
+    public static final String KEY_SYMBOL = "SYMBOL";
 
     private final Context context;
     private final StocksDao stocksDao;
@@ -135,7 +135,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
         holder.cardView.setOnClickListener(v -> {
             Intent intent = new Intent(context, StockInfoActivity.class);
-            intent.putExtra(KEY_TICKER, stock.getSymbol());
+            intent.putExtra(KEY_SYMBOL, stock.getSymbol());
             intent.putExtra(KEY_IS_FAVORITE, stock.isFavorite());
             context.startActivity(intent);
         });
