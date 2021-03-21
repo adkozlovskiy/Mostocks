@@ -12,19 +12,19 @@ import com.kozlovskiy.mostocks.entities.SocketResponse;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.services.websocket.ClientWebSocket;
 import com.kozlovskiy.mostocks.services.websocket.StockCostSocketConnection;
-import com.kozlovskiy.mostocks.utils.StockCostUtils;
+import com.kozlovskiy.mostocks.utils.QuoteConverter;
 
 import static android.os.Looper.getMainLooper;
 
 public class ChartPresenter implements ClientWebSocket.MessageListener {
 
-    private ChartView chartView;
+    private final ChartView chartView;
     private StockCostSocketConnection stockCostSocketConnection;
     private final String ticker;
     private double previousCost;
     private double currentCost;
-    private Context context;
-    private StocksDao stocksDao;
+    private final Context context;
+    private final StocksDao stocksDao;
 
     public ChartPresenter(ChartView chartView, Context context, String ticker) {
         this.chartView = chartView;
@@ -58,7 +58,7 @@ public class ChartPresenter implements ClientWebSocket.MessageListener {
                     Handler mainHandler = new Handler(getMainLooper());
 
                     Runnable mainRunnable = () -> chartView.showUpdatedCost(
-                            StockCostUtils.convertCost(data.getP()));
+                            QuoteConverter.convertToCurrencyFormat(data.getP(), 2, 4));
                     mainHandler.post(mainRunnable);
 
                     previousCost = currentCost;
@@ -70,15 +70,10 @@ public class ChartPresenter implements ClientWebSocket.MessageListener {
         }
     }
 
-    public void cacheCurrentCost() {
-
-    }
-
     public void configureCandlesChart(CandleStickChart chart) {
         chart.setBackgroundColor(Color.WHITE);
         chart.getDescription().setEnabled(false);
 
         chartView.buildCandlesChart(chart);
-
     }
 }

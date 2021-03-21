@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.kozlovskiy.mostocks.entities.Cost;
 import com.kozlovskiy.mostocks.entities.Favorite;
 import com.kozlovskiy.mostocks.entities.News;
 import com.kozlovskiy.mostocks.entities.Stock;
@@ -25,29 +24,17 @@ public interface StocksDao {
     @Update()
     void updateStocks(List<Stock> stocks);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertCost(List<Cost> costs);
-
-    @Update()
-    void updateCost(List<Cost> costs);
-
     @Query("SELECT * FROM Stock")
     List<Stock> getStocks();
 
-    @Query("SELECT * FROM Stock WHERE ticker = :ticker")
-    Stock getStockByTicker(String ticker);
+    @Query("SELECT * FROM Stock WHERE symbol = :symbol")
+    Stock getStockBySymbol(String symbol);
 
     @Query("SELECT * FROM Favorite")
     List<Favorite> getFavorites();
 
-    @Query("SELECT * FROM Cost")
-    List<Cost> getCosts();
-
-    @Query("SELECT * FROM Cost WHERE ticker = :ticker")
-    Cost getCost(String ticker);
-
-    @Query("SELECT * FROM Favorite WHERE ticker = :ticker")
-    Favorite getFavorite(String ticker);
+    @Query("SELECT * FROM Favorite WHERE symbol = :symbol")
+    Favorite getFavorite(String symbol);
 
     @Delete()
     void removeFavorite(Favorite favorite);

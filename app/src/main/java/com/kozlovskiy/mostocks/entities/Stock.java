@@ -1,8 +1,5 @@
 package com.kozlovskiy.mostocks.entities;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -12,77 +9,39 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Entity
-public class Stock implements Parcelable {
+public class Stock {
 
     @PrimaryKey
-    @ColumnInfo(name = "ticker")
-    @SerializedName("ticker")
+    @ColumnInfo(name = "symbol")
+    @SerializedName("symbol")
     @Expose
     @NonNull
-    private final String ticker;
+    private String symbol;
 
     @ColumnInfo(name = "name")
     @SerializedName("name")
     @Expose
     private String name;
 
-    @ColumnInfo(name = "currency")
-    @SerializedName("currency")
-    @Expose
-    private String currency;
-
-    @ColumnInfo(name = "logo")
-    @SerializedName("logo")
-    @Expose
-    private String logo;
-
-    @ColumnInfo(name = "industry")
-    @SerializedName("finnhubIndustry")
-    @Expose
-    private String industry;
-
-    @ColumnInfo(name = "ipo")
-    @SerializedName("ipo")
-    @Expose
-    private String ipo;
-
-    @ColumnInfo(name = "capitalization")
-    @SerializedName("marketCapitalization")
-    @Expose
-    private double capitalization;
-
+    private double open;
+    private double high;
+    private double low;
+    private double current;
+    private double previous;
+    private long time;
     private boolean isFavorite;
 
-    public Stock(@NonNull String ticker) {
-        this.ticker = ticker;
+    public Stock(@NonNull String symbol) {
+        this.symbol = symbol;
     }
-
-    protected Stock(Parcel in) {
-        ticker = in.readString();
-        name = in.readString();
-        currency = in.readString();
-        logo = in.readString();
-        industry = in.readString();
-        ipo = in.readString();
-        capitalization = in.readDouble();
-        isFavorite = in.readByte() != 0;
-    }
-
-    public static final Creator<Stock> CREATOR = new Creator<Stock>() {
-        @Override
-        public Stock createFromParcel(Parcel in) {
-            return new Stock(in);
-        }
-
-        @Override
-        public Stock[] newArray(int size) {
-            return new Stock[size];
-        }
-    };
 
     @NonNull
-    public String getTicker() {
-        return ticker;
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(@NonNull String symbol) {
+        this.symbol = symbol;
     }
 
     public String getName() {
@@ -93,44 +52,52 @@ public class Stock implements Parcelable {
         this.name = name;
     }
 
-    public String getCurrency() {
-        return currency;
+    public double getOpen() {
+        return open;
     }
 
-    public void setCurrency(String currency) {
-        this.currency = currency;
+    public void setOpen(double open) {
+        this.open = open;
     }
 
-    public String getLogo() {
-        return logo;
+    public double getHigh() {
+        return high;
     }
 
-    public void setLogo(String logo) {
-        this.logo = logo;
+    public void setHigh(double high) {
+        this.high = high;
     }
 
-    public String getIndustry() {
-        return industry;
+    public double getLow() {
+        return low;
     }
 
-    public void setIndustry(String industry) {
-        this.industry = industry;
+    public void setLow(double low) {
+        this.low = low;
     }
 
-    public String getIpo() {
-        return ipo;
+    public double getCurrent() {
+        return current;
     }
 
-    public void setIpo(String ipo) {
-        this.ipo = ipo;
+    public void setCurrent(double current) {
+        this.current = current;
     }
 
-    public double getCapitalization() {
-        return capitalization;
+    public double getPrevious() {
+        return previous;
     }
 
-    public void setCapitalization(double capitalization) {
-        this.capitalization = capitalization;
+    public void setPrevious(double previous) {
+        this.previous = previous;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 
     public boolean isFavorite() {
@@ -139,22 +106,5 @@ public class Stock implements Parcelable {
 
     public void setFavorite(boolean favorite) {
         isFavorite = favorite;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(ticker);
-        dest.writeString(name);
-        dest.writeString(currency);
-        dest.writeString(logo);
-        dest.writeString(industry);
-        dest.writeString(ipo);
-        dest.writeDouble(capitalization);
-        dest.writeByte((byte) (isFavorite ? 1 : 0));
     }
 }

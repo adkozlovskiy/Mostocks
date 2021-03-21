@@ -14,11 +14,6 @@ public class FavoritesPresenter {
 
     private FavoritesView favoritesView;
     private final StocksDao stocksDao;
-    private List<Stock> stocks;
-
-    public List<Stock> getStocks() {
-        return stocks;
-    }
 
     public FavoritesPresenter(FavoritesView favoritesView, Context context) {
         this.favoritesView = favoritesView;
@@ -29,19 +24,17 @@ public class FavoritesPresenter {
 
     }
 
-    public void initializeFavorites() {
-        stocks = stocksDao.getStocks();
-
+    public void initializeFavorites(List<Stock> stocks) {
         ArrayList<Stock> filteredStocks = new ArrayList<>();
         List<Favorite> favorites = stocksDao.getFavorites();
         List<String> favoritesStrings = new ArrayList<>();
 
         for (Favorite favorite : favorites) {
-            favoritesStrings.add(favorite.getTicker());
+            favoritesStrings.add(favorite.getSymbol());
         }
 
         for (Stock stock : stocks) {
-            if (favoritesStrings.contains(stock.getTicker())) {
+            if (favoritesStrings.contains(stock.getSymbol())) {
                 filteredStocks.add(stock);
             }
         }

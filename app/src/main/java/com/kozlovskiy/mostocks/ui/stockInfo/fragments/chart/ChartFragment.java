@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.utils.StockCostUtils;
+import com.kozlovskiy.mostocks.utils.QuoteConverter;
 
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_CURRENT_COST;
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_PREVIOUS_COST;
@@ -48,7 +48,7 @@ public class ChartFragment extends Fragment implements ChartView {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         tvPrice = view.findViewById(R.id.tv_price);
-        tvPrice.setText(StockCostUtils.convertCost(currentCost));
+        tvPrice.setText(QuoteConverter.convertToCurrencyFormat(currentCost, 2, 4));
         candleChart = view.findViewById(R.id.chart_candles);
 
         chartPresenter.configureCandlesChart(candleChart);

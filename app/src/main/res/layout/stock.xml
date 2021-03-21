@@ -22,6 +22,7 @@
             android:layout_height="55dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            app:cardElevation="0dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             app:cardCornerRadius="10dp">
@@ -30,6 +31,7 @@
                 android:id="@+id/iv_logo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:contentDescription="@string/company_logo"
                 android:scaleType="centerCrop" />
 
         </androidx.cardview.widget.CardView>
@@ -54,7 +56,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_medium"
-                    android:text="AAPL"
                     android:textColor="#272727"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -64,6 +65,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
+                    android:contentDescription="@string/add_or_remove_favorite"
                     android:paddingStart="6dp"
                     android:paddingTop="2dp"
                     android:paddingEnd="6dp"
@@ -88,14 +90,14 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="15dp"
             android:gravity="center_vertical|end"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            tools:ignore="RelativeOverlap">
 
             <TextView
                 android:id="@+id/tv_cost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_medium"
-                android:text="0.00"
                 android:textColor="#272727"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -105,10 +107,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_medium"
-                android:text="0.00"
                 android:textColor="@color/positiveCost"
                 android:textSize="12sp" />
         </LinearLayout>
-
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

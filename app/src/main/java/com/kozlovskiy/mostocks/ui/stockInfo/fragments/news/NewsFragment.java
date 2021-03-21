@@ -8,7 +8,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,11 +17,15 @@ import com.kozlovskiy.mostocks.entities.News;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.news.adapter.NewsAdapter;
-import com.kozlovskiy.mostocks.utils.StockCostUtils;
+import com.kozlovskiy.mostocks.utils.BitmapUtil;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.MAIN_IMAGE_URL;
 
 public class NewsFragment extends Fragment implements NewsView {
 
@@ -57,6 +60,7 @@ public class NewsFragment extends Fragment implements NewsView {
         tvCapitalization = view.findViewById(R.id.tv_capitalization);
 
         String ticker = getTicker();
+        ivLogo.setImageBitmap(BitmapUtil.markSymbolOnBitmap(getContext(), R.drawable.blue_background, ticker.substring(0, 1)));
         newsPresenter.initializeStock(ticker);
         newsPresenter.initializeNews(ticker);
     }
@@ -76,23 +80,36 @@ public class NewsFragment extends Fragment implements NewsView {
 
     @Override
     public void showStockInfo(Stock stock) {
-        if (stock.getLogo() != null && !stock.getLogo().isEmpty()) {
-            Picasso.get().load(stock.getLogo())
-                    .placeholder(R.drawable.white)
-                    .error(R.drawable.no_image)
-                    .into(ivLogo);
+        Picasso.get()
+                .load(MAIN_IMAGE_URL + stock.getSymbol() + ".png")
+                .networkPolicy(NetworkPolicy.OFFLINE)
 
-        } else ivLogo.setImageDrawable(
-                ResourcesCompat.getDrawable(getContext().getResources(),
-                        R.drawable.no_image,
-                        null
-                )
-        );
+                .into(ivLogo, new Callback() {
+                    @Override
+                    public void onSuccess() {
 
-        //
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Picasso.get()
+                                .load(MAIN_IMAGE_URL + stock.getSymbol() + ".png")
+                                .into(ivLogo, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        ivLogo.setImageBitmap(BitmapUtil.markSymbolOnBitmap(getContext(), R.drawable.blue_background, stock.getSymbol().substring(0, 1)));
+                                    }
+                                });
+                    }
+                });
+
+
         tvName.setText(stock.getName());
-        tvIpo.setText(stock.getIpo());
-        tvCapitalization.setText(StockCostUtils.convertCost(stock.getCapitalization()));
     }
 
     private String getTicker() {

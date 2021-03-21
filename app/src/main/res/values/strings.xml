@@ -23,7 +23,13 @@
     <string name="need_to_buy">Need to buy</string>
     <string name="need_to_sell">Need to sell</string>
     <string name="need_to_hold">Need to hold</string>
-    <string name="no_favorites">You have not favorite tickers.</string>
+    <string name="no_favorites">You have not favorite symbols.</string>
     <string name="ai_signals">AI Signals</string>
     <string name="add_to_favorites">Add to favorites</string>
+    <string name="company_logo">Company logo</string>
+    <string name="add_or_remove_favorite">Add or remove favorite ticker</string>
+    <string name="news_image">News image</string>
+    <string name="network_error">Network error</string>
+    <string name="no_network_message">You are not connected to the internet.</string>
+    <string name="unknown_error">Something went wrong</string>
 </resources>

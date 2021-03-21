@@ -1,7 +1,6 @@
 package com.kozlovskiy.mostocks.services.websocket;
 
 import android.os.Handler;
-import android.util.Log;
 
 public class StockCostSocketConnection {
     private ClientWebSocket clientWebSocket;
@@ -14,9 +13,10 @@ public class StockCostSocketConnection {
     }
 
     private final Runnable checkConnectionRunnable = () -> {
-        if (clientWebSocket == null || !clientWebSocket.getConnection().isOpen()) {
+        if (clientWebSocket.getConnection() == null || !clientWebSocket.getConnection().isOpen()) {
             openConnection();
         }
+
         startCheckConnection();
     };
 

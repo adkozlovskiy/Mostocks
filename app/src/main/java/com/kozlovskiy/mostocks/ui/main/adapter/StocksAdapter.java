@@ -2,6 +2,9 @@ package com.kozlovskiy.mostocks.ui.main.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,17 +13,18 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.entities.Cost;
 import com.kozlovskiy.mostocks.entities.Favorite;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.ui.stockInfo.StockInfoActivity;
-import com.kozlovskiy.mostocks.utils.StockCostUtils;
+import com.kozlovskiy.mostocks.utils.BitmapUtil;
+import com.kozlovskiy.mostocks.utils.QuoteConverter;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -31,6 +35,8 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     public static final String KEY_TICKER = "TICKER";
     public static final String KEY_CURRENT_COST = "CURRENT_COST";
     public static final String KEY_PREVIOUS_COST = "PREVIOUS_COST";
+    public static final String MAIN_IMAGE_URL = "https://eodhistoricaldata.com/img/logos/US/";
+    public static final String KEY_IS_FAVORITE = "IS_FAVORITE";
     private final Context context;
     private final StocksDao stocksDao;
     private final boolean isFavoriteRecycler;
@@ -57,35 +63,43 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
         Stock stock = stocks.get(position);
-        Cost stockCost = stocksDao.getCost(stock.getTicker());
 
         stock.setFavorite(isFavorite(stock));
 
-        holder.symbolView.setText(stock.getTicker());
+        holder.symbolView.setText(stock.getSymbol());
 
         if (stock.getName() != null && !stock.getName().isEmpty()) {
             String nameCropped = stock.getName().length() > 21 ? stock.getName().substring(0, 19).trim() + "\u2026" : stock.getName();
             holder.companyView.setText(nameCropped);
         }
+        Bitmap bitmap = BitmapUtil.markSymbolOnBitmap(context, R.drawable.blue_background, stock.getSymbol().substring(0, 1));
+        Drawable d = new BitmapDrawable(context.getResources(), bitmap);
 
         holder.ivStar.setImageResource(stock.isFavorite()
                 ? R.drawable.ic_star_gold
                 : R.drawable.ic_star_gray);
 
-        if (stock.getLogo() != null && !stock.getLogo().isEmpty()) {
-            Picasso.get().load(stock.getLogo())
-                    .placeholder(R.drawable.white)
-                    .error(R.drawable.no_image)
-                    .into(holder.ivLogo);
+        Picasso.get()
+                .load(MAIN_IMAGE_URL + stock.getSymbol() + ".png")
+                .networkPolicy(NetworkPolicy.OFFLINE)
+                .fit()
+                .placeholder(d)
+                .into(holder.ivLogo, new Callback() {
+                    @Override
+                    public void onSuccess() {
 
-        } else holder.ivLogo.setImageDrawable(
-                ResourcesCompat.getDrawable(context.getResources(),
-                        R.drawable.no_image,
-                        null
-                )
-        );
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Picasso.get()
+                                .load(MAIN_IMAGE_URL + stock.getSymbol() + ".png")
+                                .fit()
+                                .placeholder(d)
+                                .into(holder.ivLogo);
+                    }
+                });
 
         if (position % 2 == 0) {
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.cardColor));
@@ -93,43 +107,40 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.backgroundColor));
         }
 
-        if (stockCost != null) {
-            String costString = StockCostUtils.convertCost(stockCost.getCurrentCost());
-            int color = context.getResources().getColor(R.color.textColor);
-            holder.costView.setText(costString);
+        String costString = QuoteConverter.convertToCurrencyFormat(stock.getCurrent(), 2, 2);
+        int color = context.getResources().getColor(R.color.textColor);
+        holder.costView.setText(costString);
 
-            double difference = stockCost.getCurrentCost() - stockCost.getPreviousCost();
-            String changeString = StockCostUtils.convertCost(difference);
-            String percentString = StockCostUtils.convertPercents(difference / stockCost.getPreviousCost() * 100);
+        double difference = stock.getCurrent() - stock.getPrevious();
+        String changeString = QuoteConverter.convertToCurrencyFormat(difference, 2, 2);
+        String percentString = QuoteConverter.convertToDefaultFormat(difference / stock.getPrevious() * 100, 2, 2);
 
-            if (stockCost.getCurrentCost() - stockCost.getPreviousCost() > 0) {
-                color = context.getResources().getColor(R.color.positiveCost);
-                changeString = "+" + changeString;
-            } else if (stockCost.getCurrentCost() - stockCost.getPreviousCost() < 0) {
-                color = context.getResources().getColor(R.color.negativeCost);
-                percentString = StockCostUtils.convertPercents(difference / stockCost.getPreviousCost() * -100);
-            }
-
-            changeString += " (" + percentString + "%)";
-            holder.changeView.setText(changeString);
-            holder.changeView.setTextColor(color);
+        if (stock.getCurrent() - stock.getPrevious() > 0) {
+            color = context.getResources().getColor(R.color.positiveCost);
+            changeString = "+" + changeString;
+        } else if (stock.getCurrent() - stock.getPrevious() < 0) {
+            color = context.getResources().getColor(R.color.negativeCost);
+            percentString = QuoteConverter.convertToDefaultFormat(difference / stock.getPrevious() * -100, 2, 2);
         }
+
+        changeString += " (" + percentString + "%)";
+        holder.changeView.setText(changeString);
+        holder.changeView.setTextColor(color);
 
         holder.cardView.setOnClickListener(v -> {
             Intent intent = new Intent(context, StockInfoActivity.class);
-            intent.putExtra(KEY_TICKER, stock.getTicker());
-            intent.putExtra(KEY_CURRENT_COST, stockCost.getCurrentCost());
-            intent.putExtra(KEY_PREVIOUS_COST, stockCost.getPreviousCost());
+            intent.putExtra(KEY_TICKER, stock.getSymbol());
+            intent.putExtra(KEY_IS_FAVORITE, stock.isFavorite());
             context.startActivity(intent);
         });
 
         holder.ivStar.setOnClickListener(v -> {
             if (!stock.isFavorite()) {
-                stocksDao.addFavorite(new Favorite(stock.getTicker()));
+                stocksDao.addFavorite(new Favorite(stock.getSymbol()));
                 holder.ivStar.setImageResource(R.drawable.ic_star_gold);
 
             } else {
-                stocksDao.removeFavorite(new Favorite(stock.getTicker()));
+                stocksDao.removeFavorite(new Favorite(stock.getSymbol()));
                 if (isFavoriteRecycler) {
                     stocks.remove(stock);
                     notifyItemRemoved(holder.getAdapterPosition());
@@ -180,7 +191,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     }
 
     private boolean isFavorite(Stock stock) {
-        Favorite favorite = stocksDao.getFavorite(stock.getTicker());
+        Favorite favorite = stocksDao.getFavorite(stock.getSymbol());
         return favorite != null;
     }
 

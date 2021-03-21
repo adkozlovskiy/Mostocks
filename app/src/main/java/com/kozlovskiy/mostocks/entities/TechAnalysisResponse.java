@@ -18,7 +18,7 @@ public class TechAnalysisResponse {
         this.technicalAnalysis = technicalAnalysis;
     }
 
-    public class TechnicalAnalysis {
+    public static class TechnicalAnalysis {
 
         private int id;
         private String ticker;

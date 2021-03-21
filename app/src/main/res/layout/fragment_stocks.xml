@@ -17,10 +17,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="gone"
         android:fontFamily="@font/montserrat_medium"
         android:text="@string/no_favorites"
-        android:textColor="@color/textAccentColor" />
+        android:textColor="@color/textAccentColor"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
@@ -28,9 +28,7 @@
         android:layout_height="match_parent"
         android:background="@color/backgroundColor"
         android:clipToPadding="false"
-        android:overScrollMode="never"
         android:paddingBottom="10dp"
-        android:scrollbars="none"
         android:visibility="gone" />
 
 </FrameLayout>

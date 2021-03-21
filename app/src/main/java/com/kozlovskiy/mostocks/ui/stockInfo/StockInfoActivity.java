@@ -20,6 +20,7 @@ public class StockInfoActivity extends AppCompatActivity
 
     private StockInfoPresenter stockInfoPresenter;
     private Bundle bundles;
+    private boolean isFavorite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +39,10 @@ public class StockInfoActivity extends AppCompatActivity
         tabLayout.addOnTabSelectedListener(this);
 
         String ticker = getIntent().getStringExtra(StocksAdapter.KEY_TICKER);
-        double currentCost = getIntent().getDoubleExtra(StocksAdapter.KEY_CURRENT_COST, -1);
-        double previousCost = getIntent().getDoubleExtra(StocksAdapter.KEY_PREVIOUS_COST, -1);
+        isFavorite = getIntent().getBooleanExtra(StocksAdapter.KEY_IS_FAVORITE, false);
 
         bundles = new Bundle();
         bundles.putString(StocksAdapter.KEY_TICKER, ticker);
-        bundles.putDouble(StocksAdapter.KEY_CURRENT_COST, currentCost);
-        bundles.putDouble(StocksAdapter.KEY_PREVIOUS_COST, previousCost);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -88,6 +86,17 @@ public class StockInfoActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         stockInfoPresenter.unsubscribe();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (isFavorite) {
+            menu.findItem(R.id.action_star).setIcon(R.drawable.ic_star_outlined_gold);
+        } else {
+            menu.findItem(R.id.action_star).setIcon(R.drawable.ic_star_outlined);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

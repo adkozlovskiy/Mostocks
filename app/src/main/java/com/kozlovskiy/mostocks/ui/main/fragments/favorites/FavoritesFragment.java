@@ -11,11 +11,16 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 
+import java.lang.reflect.Type;
 import java.util.List;
+
+import static com.kozlovskiy.mostocks.ui.splash.SplashActivity.KEY_STOCKS_INTENT;
 
 public class FavoritesFragment extends Fragment
         implements FavoritesView, StocksAdapter.ItemsCountListener {
@@ -50,7 +55,14 @@ public class FavoritesFragment extends Fragment
         recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(stocksAdapter);
 
-        favoritesPresenter.initializeFavorites();
+        String json = getArguments().getString(KEY_STOCKS_INTENT);
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<Stock>>() {
+        }.getType();
+
+        List<Stock> stocks = gson.fromJson(json, type);
+        favoritesPresenter.initializeFavorites(stocks);
     }
 
     @Override

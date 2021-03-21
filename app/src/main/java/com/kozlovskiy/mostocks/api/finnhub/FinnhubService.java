@@ -1,16 +1,16 @@
-package com.kozlovskiy.mostocks.api;
+package com.kozlovskiy.mostocks.api.finnhub;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class StockService {
+public class FinnhubService {
 
     public static final String TOKEN = "c0l8c7748v6orbr0u010";
     private static final String BASE_URL = "https://finnhub.io/api/v1/";
-    private static StockService instance;
+    private static FinnhubService instance;
     private final Retrofit mRetrofit;
 
-    private StockService() {
+    private FinnhubService() {
         mRetrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -18,11 +18,11 @@ public class StockService {
     }
 
     /**
-     * @return {@link StockService} instance.
+     * @return {@link FinnhubService} instance.
      */
-    public static StockService getInstance() {
+    public static FinnhubService getInstance() {
         if (instance == null) {
-            instance = new StockService();
+            instance = new FinnhubService();
         }
 
         return instance;
@@ -31,7 +31,7 @@ public class StockService {
     /**
      * @return API instance.
      */
-    public StockApi getApi() {
-        return mRetrofit.create(StockApi.class);
+    public FinnhubApi getApi() {
+        return mRetrofit.create(FinnhubApi.class);
     }
 }

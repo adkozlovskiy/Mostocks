@@ -63,7 +63,9 @@ public class ClientWebSocket {
     }
 
     public void close() {
-        webSocket.disconnect();
+        if (webSocket != null) {
+            webSocket.disconnect();
+        }
     }
 
     public class SocketListener extends WebSocketAdapter {

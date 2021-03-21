@@ -47,9 +47,9 @@ public class NewsPresenter {
     }
 
 
-    public void initializeStock(String ticker) {
-        if (ticker != null) {
-            Stock stock = stocksDao.getStockByTicker(ticker);
+    public void initializeStock(String symbol) {
+        if (symbol != null) {
+            Stock stock = stocksDao.getStockBySymbol(symbol);
             newsView.showStockInfo(stock);
         }
     }
