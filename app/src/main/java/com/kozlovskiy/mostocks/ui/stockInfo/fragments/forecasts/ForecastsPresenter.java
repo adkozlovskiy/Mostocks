@@ -55,9 +55,9 @@ public class ForecastsPresenter {
         entries.add(new PieHelper(Math.round((buyMark / sum) * 100),
                 Color.rgb(36, 178, 93)));
         entries.add(new PieHelper(Math.round((holdMark / sum) * 100),
-                Color.rgb(173, 200, 234)));
+                Color.rgb(244, 202, 45)));
         entries.add(new PieHelper(Math.round((sellMark / sum) * 100),
-                Color.rgb(242, 185, 104)));
+                Color.rgb(178, 36, 36)));
 
         int max = Math.max(Math.max(buyMark, holdMark), sellMark);
         int selected = 0;

@@ -3,6 +3,7 @@ package com.kozlovskiy.mostocks.utils;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -26,8 +27,15 @@ public class NetworkUtil {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.network_error)
                 .setMessage(R.string.no_network_message)
-                .setNegativeButton(R.string.cancel, (di, id) -> di.cancel());
+                .setNegativeButton(R.string.exit, (di, id) -> finishApp(context)); // FIXME: 22.03.2021
 
         return builder.create();
+    }
+
+    public static void finishApp(Context context) { // FIXME: 22.03.2021
+        Intent i = new Intent(Intent.ACTION_MAIN);
+        i.addCategory(Intent.CATEGORY_HOME);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        context.startActivity(i);
     }
 }

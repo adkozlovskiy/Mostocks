@@ -20,13 +20,12 @@ public class StockInfoActivity extends AppCompatActivity
 
     private StockInfoPresenter stockInfoPresenter;
     private Bundle bundles;
-    private boolean isFavorite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock_info);
-        stockInfoPresenter = new StockInfoPresenter(this);
+        stockInfoPresenter = new StockInfoPresenter(this, this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getIntent().getStringExtra(StocksAdapter.KEY_SYMBOL));
@@ -41,8 +40,6 @@ public class StockInfoActivity extends AppCompatActivity
         String symbol = getIntent().getStringExtra(StocksAdapter.KEY_SYMBOL);
         double currentCost = getIntent().getDoubleExtra(StocksAdapter.KEY_CURRENT_COST, 0);
         double previousCost = getIntent().getDoubleExtra(StocksAdapter.KEY_PREVIOUS_COST, 0);
-
-        isFavorite = getIntent().getBooleanExtra(StocksAdapter.KEY_IS_FAVORITE, false);
 
         bundles = new Bundle();
         bundles.putString(StocksAdapter.KEY_SYMBOL, symbol);
@@ -91,33 +88,5 @@ public class StockInfoActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         stockInfoPresenter.unsubscribe();
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isFavorite) {
-            menu.findItem(R.id.action_star).setIcon(R.drawable.ic_star_outlined_gold);
-        } else {
-            menu.findItem(R.id.action_star).setIcon(R.drawable.ic_star_outlined);
-        }
-
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.stock_info_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_star) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

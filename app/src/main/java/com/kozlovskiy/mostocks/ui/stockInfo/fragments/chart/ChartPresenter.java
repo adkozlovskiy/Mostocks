@@ -61,8 +61,8 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         int color = context.getResources().getColor(R.color.textColor);
         double difference = cq - pq;
         Drawable quoteDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_no_changes);
-        String changeString = QuoteConverter.convertToCurrencyFormat(difference, 2, 2);
-        String percentString = QuoteConverter.convertToDefaultFormat(difference / pq * 100, 2, 2);
+        String changeString = QuoteConverter.convertToCurrencyFormat(difference, 1, 2);
+        String percentString = QuoteConverter.convertToDefaultFormat(difference / pq * 100, 1, 2);
 
         if (difference > 0) {
             color = context.getResources().getColor(R.color.positiveCost);
@@ -71,7 +71,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
 
         } else if (difference < 0) {
             color = context.getResources().getColor(R.color.negativeCost);
-            percentString = QuoteConverter.convertToDefaultFormat(difference / previousCost * -100, 2, 2);
+            percentString = QuoteConverter.convertToDefaultFormat(difference / pq * -100, 1, 2);
             quoteDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_go_down);
 
         }
@@ -86,14 +86,14 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         try {
             SocketResponse response = gson.fromJson(message, SocketResponse.class);
             if (response.getType().equals("trade")) {
-                SocketData data = response.getData().get(0);
+                SocketData data = response.getData().get(response.getData().size() - 1);
 
                 if (data.getSymbol().equals(ticker)) {
                     Handler mainHandler = new Handler(getMainLooper());
 
                     Runnable mainRunnable = () -> {
                         chartView.showUpdatedCost(
-                                QuoteConverter.convertToCurrencyFormat(data.getQuote(), 2, 4));
+                                QuoteConverter.convertToCurrencyFormat(data.getQuote(), 1, 2));
                         calculateQuoteChange(data.getQuote(), pq);
                     };
                     mainHandler.post(mainRunnable);

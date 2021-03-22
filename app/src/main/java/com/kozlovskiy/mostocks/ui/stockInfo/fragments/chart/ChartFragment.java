@@ -58,7 +58,7 @@ public class ChartFragment extends Fragment implements ChartView {
             double currentCost = getArguments().getDouble(KEY_CURRENT_COST);
             double previousCost = getArguments().getDouble(KEY_PREVIOUS_COST);
 
-            tvPrice.setText(QuoteConverter.convertToCurrencyFormat(currentCost, 2, 4));
+            tvPrice.setText(QuoteConverter.convertToCurrencyFormat(currentCost, 1, 2));
             chartPresenter.calculateQuoteChange(currentCost, previousCost);
             Log.d(TAG, "onResume: ");
         }
@@ -80,7 +80,7 @@ public class ChartFragment extends Fragment implements ChartView {
     public void showQuoteChange(String pq, int color, Drawable drawable) {
         tvPriceChange.setText(pq);
         tvPriceChange.setTextColor(color);
-        tvPriceChange.setCompoundDrawables(drawable, null, null, null);
+        tvPriceChange.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
     }
 
     @Override
