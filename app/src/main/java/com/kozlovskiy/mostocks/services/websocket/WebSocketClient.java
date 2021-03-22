@@ -79,6 +79,7 @@ public class WebSocketClient {
 
     public void subscribe(String symbol) {
         try {
+            Log.d(TAG, "subscribe: subscribed to " + symbol);
             webSocket.sendText("{\"type\":\"subscribe\",\"symbol\":\"" + symbol + "\"}");
 
         } catch (Exception e) {

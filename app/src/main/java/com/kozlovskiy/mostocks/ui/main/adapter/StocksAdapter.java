@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -118,11 +119,11 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         String changeString = QuoteConverter.convertToCurrencyFormat(difference, 2, 2);
         String percentString = QuoteConverter.convertToDefaultFormat(difference / stock.getPrevious() * 100, 2, 2);
 
-        if (stock.getCurrent() - stock.getPrevious() > 0) {
+        if (difference > 0) {
             color = context.getResources().getColor(R.color.positiveCost);
             changeString = "+" + changeString;
 
-        } else if (stock.getCurrent() - stock.getPrevious() < 0) {
+        } else if (difference < 0) {
             color = context.getResources().getColor(R.color.negativeCost);
             percentString = QuoteConverter.convertToDefaultFormat(difference / stock.getPrevious() * -100, 2, 2);
 
@@ -137,6 +138,8 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
             Intent intent = new Intent(context, StockInfoActivity.class);
             intent.putExtra(KEY_SYMBOL, stock.getSymbol());
             intent.putExtra(KEY_IS_FAVORITE, stock.isFavorite());
+            intent.putExtra(KEY_CURRENT_COST, stock.getCurrent());
+            intent.putExtra(KEY_PREVIOUS_COST, stock.getPrevious());
             context.startActivity(intent);
         });
 

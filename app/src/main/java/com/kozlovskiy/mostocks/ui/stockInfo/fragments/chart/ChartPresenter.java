@@ -2,12 +2,16 @@ package com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.Log;
+
+import androidx.appcompat.content.res.AppCompatResources;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
 import com.google.gson.Gson;
 import com.kozlovskiy.mostocks.AppDelegate;
+import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.SocketData;
 import com.kozlovskiy.mostocks.entities.SocketResponse;
 import com.kozlovskiy.mostocks.room.StocksDao;
@@ -25,6 +29,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
     private final String ticker;
     private double previousCost;
     private double currentCost;
+    private double pq;
     private final Context context;
     private final StocksDao stocksDao;
 
@@ -51,6 +56,30 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         chartView = null;
     }
 
+    public void calculateQuoteChange(double cq, double pq) {
+        this.pq = pq;
+        int color = context.getResources().getColor(R.color.textColor);
+        double difference = cq - pq;
+        Drawable quoteDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_no_changes);
+        String changeString = QuoteConverter.convertToCurrencyFormat(difference, 2, 2);
+        String percentString = QuoteConverter.convertToDefaultFormat(difference / pq * 100, 2, 2);
+
+        if (difference > 0) {
+            color = context.getResources().getColor(R.color.positiveCost);
+            changeString = "+" + changeString;
+            quoteDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_go_up);
+
+        } else if (difference < 0) {
+            color = context.getResources().getColor(R.color.negativeCost);
+            percentString = QuoteConverter.convertToDefaultFormat(difference / previousCost * -100, 2, 2);
+            quoteDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_go_down);
+
+        }
+
+        changeString += " (" + percentString + "%)";
+        chartView.showQuoteChange(changeString, color, quoteDrawable);
+    }
+
     @Override
     public void onSocketMessage(String message) {
         Gson gson = new Gson();
@@ -62,8 +91,11 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
                 if (data.getSymbol().equals(ticker)) {
                     Handler mainHandler = new Handler(getMainLooper());
 
-                    Runnable mainRunnable = () -> chartView.showUpdatedCost(
-                            QuoteConverter.convertToCurrencyFormat(data.getQuote(), 2, 4));
+                    Runnable mainRunnable = () -> {
+                        chartView.showUpdatedCost(
+                                QuoteConverter.convertToCurrencyFormat(data.getQuote(), 2, 4));
+                        calculateQuoteChange(data.getQuote(), pq);
+                    };
                     mainHandler.post(mainRunnable);
 
                     previousCost = currentCost;

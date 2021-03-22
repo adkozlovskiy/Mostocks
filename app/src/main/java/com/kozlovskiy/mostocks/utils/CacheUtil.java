@@ -16,7 +16,7 @@ public class CacheUtil {
     public static final String POSTFIX = "_ut";
     public static final String KEY_QUOTE_UPTIME = Quote.class.getSimpleName() + POSTFIX;
     public static final String KEY_TICKERS_CACHED = Stock.class.getSimpleName() + POSTFIX;
-    public static final long QUOTE_UPDATE_INTERVAL = 120 * 1000;
+    public static final long QUOTE_UPDATE_INTERVAL = 120 * 1000 * 60;
 
     public static void updateQuoteUptime(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_SETTINGS, MODE_PRIVATE);

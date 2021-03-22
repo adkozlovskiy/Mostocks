@@ -24,9 +24,9 @@
         android:layout_marginStart="20dp"
         android:drawablePadding="5dp"
         android:fontFamily="@font/montserrat_semibold"
-        android:textColor="@color/positiveCost"
+        android:textColor="@color/textColor"
         android:textSize="16sp"
-        app:drawableStartCompat="@drawable/ic_go_up" />
+        app:drawableStartCompat="@drawable/ic_no_changes" />
 
     <com.github.mikephil.charting.charts.CandleStickChart
         android:id="@+id/chart_candles"

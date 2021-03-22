@@ -38,11 +38,16 @@ public class StockInfoActivity extends AppCompatActivity
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.addOnTabSelectedListener(this);
 
-        String ticker = getIntent().getStringExtra(StocksAdapter.KEY_SYMBOL);
+        String symbol = getIntent().getStringExtra(StocksAdapter.KEY_SYMBOL);
+        double currentCost = getIntent().getDoubleExtra(StocksAdapter.KEY_CURRENT_COST, 0);
+        double previousCost = getIntent().getDoubleExtra(StocksAdapter.KEY_PREVIOUS_COST, 0);
+
         isFavorite = getIntent().getBooleanExtra(StocksAdapter.KEY_IS_FAVORITE, false);
 
         bundles = new Bundle();
-        bundles.putString(StocksAdapter.KEY_SYMBOL, ticker);
+        bundles.putString(StocksAdapter.KEY_SYMBOL, symbol);
+        bundles.putDouble(StocksAdapter.KEY_CURRENT_COST, currentCost);
+        bundles.putDouble(StocksAdapter.KEY_PREVIOUS_COST, previousCost);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()

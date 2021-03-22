@@ -1,6 +1,7 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,17 +15,18 @@ import com.github.mikephil.charting.charts.CandleStickChart;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.utils.QuoteConverter;
 
+import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_CURRENT_COST;
+import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_PREVIOUS_COST;
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_SYMBOL;
 
 public class ChartFragment extends Fragment implements ChartView {
 
     public static final String TAG = ChartFragment.class.getSimpleName();
-    private double currentCost, previousCost;
     private ChartPresenter chartPresenter;
     private CandleStickChart candleChart;
     private TextView tvPrice;
+    private TextView tvPriceChange;
     private Context context;
-    private String symbol;
 
     public ChartFragment() {
         super(R.layout.fragment_chart);
@@ -41,7 +43,7 @@ public class ChartFragment extends Fragment implements ChartView {
         super.onViewCreated(view, savedInstanceState);
 
         tvPrice = view.findViewById(R.id.tv_price);
-        tvPrice.setText(QuoteConverter.convertToCurrencyFormat(currentCost, 2, 4));
+        tvPriceChange = view.findViewById(R.id.tv_price_change);
         candleChart = view.findViewById(R.id.chart_candles);
     }
 
@@ -49,9 +51,15 @@ public class ChartFragment extends Fragment implements ChartView {
     public void onResume() {
         super.onResume();
         if (getArguments() != null) {
-            symbol = getArguments().getString(KEY_SYMBOL);
+            String symbol = getArguments().getString(KEY_SYMBOL);
             chartPresenter = new ChartPresenter(this, context, symbol);
             chartPresenter.subscribe(symbol);
+
+            double currentCost = getArguments().getDouble(KEY_CURRENT_COST);
+            double previousCost = getArguments().getDouble(KEY_PREVIOUS_COST);
+
+            tvPrice.setText(QuoteConverter.convertToCurrencyFormat(currentCost, 2, 4));
+            chartPresenter.calculateQuoteChange(currentCost, previousCost);
             Log.d(TAG, "onResume: ");
         }
 
@@ -69,8 +77,10 @@ public class ChartFragment extends Fragment implements ChartView {
     }
 
     @Override
-    public void showInitValues(double currentCost) {
-
+    public void showQuoteChange(String pq, int color, Drawable drawable) {
+        tvPriceChange.setText(pq);
+        tvPriceChange.setTextColor(color);
+        tvPriceChange.setCompoundDrawables(drawable, null, null, null);
     }
 
     @Override
