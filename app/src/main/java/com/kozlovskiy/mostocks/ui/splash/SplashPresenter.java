@@ -1,7 +1,6 @@
 package com.kozlovskiy.mostocks.ui.splash;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 
 import com.google.gson.Gson;
@@ -32,6 +31,9 @@ public class SplashPresenter {
     }
 
     public void initializeTickers() {
+        if (NetworkUtil.isNetworkConnectionNotGranted(context))
+            buildNoNetworkDialog();
+
         if (CacheUtil.getTickersCachedFlag(context)) {
             splashView.startMainActivity("");
 
@@ -74,8 +76,13 @@ public class SplashPresenter {
     }
 
     public void buildNoNetworkDialog() {
-        Dialog dialog = NetworkUtil.buildNoNetworkDialog(context);
-        splashView.showDialog(dialog);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(R.string.network_error)
+                .setMessage(R.string.no_network_message)
+                .setPositiveButton(R.string.retry, (di, id) -> initializeTickers())
+                .setNegativeButton(R.string.exit, (di, id) -> di.cancel());
+
+        splashView.showDialog(builder.create());
     }
 
     public void unsubscribe() {

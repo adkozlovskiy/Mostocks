@@ -52,13 +52,13 @@ public class ChartFragment extends Fragment implements ChartView {
         super.onResume();
         if (getArguments() != null) {
             String symbol = getArguments().getString(KEY_SYMBOL);
-            chartPresenter = new ChartPresenter(this, context, symbol);
-            chartPresenter.subscribe(symbol);
 
             double currentCost = getArguments().getDouble(KEY_CURRENT_COST);
             double previousCost = getArguments().getDouble(KEY_PREVIOUS_COST);
+            chartPresenter = new ChartPresenter(this, context, symbol, previousCost);
+            chartPresenter.subscribe(symbol);
 
-            tvPrice.setText(QuoteConverter.convertToCurrencyFormat(currentCost, 1, 2));
+            tvPrice.setText(QuoteConverter.convertToCurrencyFormat(currentCost, 0, 2));
             chartPresenter.calculateQuoteChange(currentCost, previousCost);
             Log.d(TAG, "onResume: ");
         }
@@ -68,7 +68,12 @@ public class ChartFragment extends Fragment implements ChartView {
 
     @Override
     public void showUpdatedCost(String cost) {
-        tvPrice.setText(cost);
+        try {
+            tvPrice.setText(cost);
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     @Override
@@ -78,9 +83,14 @@ public class ChartFragment extends Fragment implements ChartView {
 
     @Override
     public void showQuoteChange(String pq, int color, Drawable drawable) {
-        tvPriceChange.setText(pq);
-        tvPriceChange.setTextColor(color);
-        tvPriceChange.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        try {
+            tvPriceChange.setText(pq);
+            tvPriceChange.setTextColor(color);
+            tvPriceChange.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     @Override

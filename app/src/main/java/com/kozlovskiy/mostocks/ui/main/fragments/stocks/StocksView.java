@@ -11,4 +11,5 @@ public interface StocksView {
     void showDialog(Dialog dialog);
 
     void updateStocks(List<Stock> stocks);
+
 }

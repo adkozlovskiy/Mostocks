@@ -1,7 +1,6 @@
 package com.kozlovskiy.mostocks.ui.main.fragments.stocks;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 
 import com.kozlovskiy.mostocks.AppDelegate;
@@ -45,8 +44,11 @@ public class StocksPresenter {
     }
 
     public void initializeStocks() {
+        if (NetworkUtil.isNetworkConnectionNotGranted(context))
+            buildNoNetworkDialog();
+
         if (CacheUtil.quoteCacheIsUpToDate(context)) {
-            stocksView.updateStocks(stocks); // FIXME: 21.03.2021 (1)
+            stocksView.updateStocks(stocks);
 
         } else {
             stocksRepository.getSymbolQuotes(stocks).subscribeOn(Schedulers.io())
@@ -89,9 +91,15 @@ public class StocksPresenter {
         stocksView.showDialog(builder.create());
     }
 
+
     public void buildNoNetworkDialog() {
-        Dialog dialog = NetworkUtil.buildNoNetworkDialog(context);
-        stocksView.showDialog(dialog);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(R.string.network_error)
+                .setMessage(R.string.no_network_message)
+                .setPositiveButton(R.string.retry, (di, id) -> initializeStocks())
+                .setNegativeButton(R.string.exit, (di, id) -> di.cancel());
+
+        stocksView.showDialog(builder.create());
     }
 
     public void unsubscribe() {

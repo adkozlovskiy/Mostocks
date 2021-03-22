@@ -15,7 +15,6 @@ import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.ui.main.fragments.favorites.FavoritesFragment;
 import com.kozlovskiy.mostocks.ui.main.fragments.stocks.StocksFragment;
-import com.kozlovskiy.mostocks.utils.NetworkUtil;
 
 import static com.kozlovskiy.mostocks.ui.splash.SplashActivity.KEY_STOCKS_INTENT;
 
@@ -65,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
 
     @Override
     public void onBackPressed() {
-        NetworkUtil.finishApp(this);
+        super.onBackPressed();
     }
 
     @Override

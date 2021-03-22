@@ -25,9 +25,9 @@ import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.services.WebSocketService;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
-import com.kozlovskiy.mostocks.utils.NetworkUtil;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.kozlovskiy.mostocks.ui.splash.SplashActivity.KEY_STOCKS_INTENT;
@@ -43,17 +43,18 @@ public class StocksFragment extends Fragment
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private LinearLayoutManager llm;
+    private List<String> symbols;
     private Context context;
     private Gson gson;
     private Type type;
-
     boolean bound = false;
 
     ServiceConnection connection = new ServiceConnection() {
+
         public void onServiceConnected(ComponentName name, IBinder binder) {
             WebSocketService.QuoteBinder quoteBinder = (WebSocketService.QuoteBinder) binder;
             WebSocketService webSocketService = quoteBinder.getInstance();
-            webSocketService.bindSocket("AAPL"); // TODO: 21.03.2021
+            webSocketService.bindSocket(symbols);
             Log.d(TAG, "onServiceConnected: ");
             bound = true;
         }
@@ -77,7 +78,8 @@ public class StocksFragment extends Fragment
         stocksAdapter = new StocksAdapter(context, false, null);
 
         gson = new Gson();
-        type = new TypeToken<List<Stock>>() {}.getType();
+        type = new TypeToken<List<Stock>>() {
+        }.getType();
     }
 
     @Override
@@ -93,12 +95,13 @@ public class StocksFragment extends Fragment
             String json = getArguments().getString(KEY_STOCKS_INTENT);
             List<Stock> stocks = gson.fromJson(json, type);
 
+            symbols = new ArrayList<>();
+            for (Stock stock : stocks) {
+                symbols.add(stock.getSymbol());
+            }
+
             stocksPresenter = new StocksPresenter(this, context, stocks);
-
-            if (NetworkUtil.isNetworkConnectionNotGranted(context)) {
-                stocksPresenter.buildNoNetworkDialog();
-
-            } else stocksPresenter.initializeStocks();
+            stocksPresenter.initializeStocks();
         }
     }
 

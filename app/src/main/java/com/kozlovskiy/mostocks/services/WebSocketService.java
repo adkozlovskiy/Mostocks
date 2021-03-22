@@ -12,6 +12,8 @@ import com.kozlovskiy.mostocks.services.websocket.WebSocketClient;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketConnection;
 import com.kozlovskiy.mostocks.ui.main.fragments.stocks.StocksFragment;
 
+import java.util.List;
+
 public class WebSocketService extends Service implements WebSocketClient.MessageListener {
 
     public static final String TAG = WebSocketService.class.getSimpleName();
@@ -42,8 +44,8 @@ public class WebSocketService extends Service implements WebSocketClient.Message
         return super.onUnbind(intent);
     }
 
-    public void bindSocket(String symbol) {
-        webSocketConnection = new WebSocketConnection(symbol);
+    public void bindSocket(List<String> symbols) {
+        webSocketConnection = new WebSocketConnection(symbols);
         webSocketConnection.setListener(this);
         webSocketConnection.openConnection();
     }

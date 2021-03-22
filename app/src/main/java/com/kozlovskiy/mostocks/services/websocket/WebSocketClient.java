@@ -20,7 +20,7 @@ public class WebSocketClient {
     private static final String TAG = WebSocketClient.class.getSimpleName();
     private final MessageListener listener;
     private final String host;
-    private final String symbol;
+    private final List<String> symbols;
 
     private WebSocket webSocket;
 
@@ -28,10 +28,10 @@ public class WebSocketClient {
         void onSocketMessage(String message);
     }
 
-    public WebSocketClient(MessageListener listener, String host, String symbol) {
+    public WebSocketClient(MessageListener listener, String host, List<String> symbols) {
         this.listener = listener;
         this.host = host;
-        this.symbol = symbol;
+        this.symbols = symbols;
     }
 
     public void openConnection() {
@@ -77,13 +77,17 @@ public class WebSocketClient {
         webSocket.disconnect();
     }
 
-    public void subscribe(String symbol) {
-        try {
-            Log.d(TAG, "subscribe: subscribed to " + symbol);
-            webSocket.sendText("{\"type\":\"subscribe\",\"symbol\":\"" + symbol + "\"}");
+    public void subscribe(List<String> symbols) {
+        Log.d(TAG, "subscribe: ");
+        for (String symbol : symbols) {
+            Log.d(TAG, "subscribe: in loop");
+            try {
+                webSocket.sendText("{\"type\":\"subscribe\",\"symbol\":\"" + symbol + "\"}");
+                Log.d(TAG, "subscribe: subscribed to " + symbol);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -94,7 +98,7 @@ public class WebSocketClient {
             super.onConnected(websocket, headers);
 
             Log.d(TAG, "onConnected: ");
-            subscribe(symbol);
+            subscribe(symbols);
         }
 
         public void onTextMessage(WebSocket websocket, String message) {

@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.kozlovskiy.mostocks.entities.Stock;
 import com.kozlovskiy.mostocks.ui.main.MainActivity;
-import com.kozlovskiy.mostocks.utils.NetworkUtil;
 
 public class SplashActivity extends AppCompatActivity
         implements SplashView {
@@ -21,11 +20,7 @@ public class SplashActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         splashPresenter = new SplashPresenter(this, this);
-
-        if (NetworkUtil.isNetworkConnectionNotGranted(this)) {
-            splashPresenter.buildNoNetworkDialog();
-
-        } else splashPresenter.initializeTickers();
+        splashPresenter.initializeTickers();
     }
 
     @Override
@@ -39,6 +34,7 @@ public class SplashActivity extends AppCompatActivity
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(KEY_STOCKS_INTENT, json);
         startActivity(intent);
+        finish();
     }
 
     @Override
