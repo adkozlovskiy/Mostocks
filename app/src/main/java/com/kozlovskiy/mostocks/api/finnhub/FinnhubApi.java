@@ -1,5 +1,6 @@
 package com.kozlovskiy.mostocks.api.finnhub;
 
+import com.kozlovskiy.mostocks.entities.Candles;
 import com.kozlovskiy.mostocks.entities.News;
 import com.kozlovskiy.mostocks.entities.Quote;
 import com.kozlovskiy.mostocks.entities.TechAnalysisResponse;
@@ -20,4 +21,13 @@ public interface FinnhubApi {
 
     @GET("scan/technical-indicator?")
     Call<TechAnalysisResponse> getTechAnalysis(@Query("symbol") String symbol, @Query("resolution") String resolution, @Query("token") String token);
+
+    @GET("stock/candle?")
+    Call<Candles> getSymbolCandles(
+            @Query("symbol") String symbol,
+            @Query("resolution") String resolution,
+            @Query("from") String from,
+            @Query("to") String to,
+            @Query("token") String token
+    );
 }

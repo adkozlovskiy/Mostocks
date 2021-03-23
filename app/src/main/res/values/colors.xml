@@ -13,4 +13,6 @@
     <color name="buyIndicatorColor">#24B25D</color>
     <color name="holdIndicatorColor">#F4CA2D</color>
     <color name="sellIndicatorColor">#B22424</color>
+    <color name="colorBackgroundMarker">#141d2c</color>
+    <color name="colorTextMarker">#8d95a2</color>
 </resources>

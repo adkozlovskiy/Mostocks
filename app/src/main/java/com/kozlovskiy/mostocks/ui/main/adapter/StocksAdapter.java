@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -111,13 +110,13 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
                 ? context.getResources().getColor(R.color.cardColor)
                 : context.getResources().getColor(R.color.backgroundColor));
 
-        String quote = QuoteConverter.convertToCurrencyFormat(stock.getCurrent(), 2, 2);
+        String quote = QuoteConverter.toCurrencyFormat(stock.getCurrent(), 2, 2);
         holder.costView.setText(quote);
 
         int color = context.getResources().getColor(R.color.textColor);
         double difference = stock.getCurrent() - stock.getPrevious();
-        String changeString = QuoteConverter.convertToCurrencyFormat(difference, 2, 2);
-        String percentString = QuoteConverter.convertToDefaultFormat(difference / stock.getPrevious() * 100, 2, 2);
+        String changeString = QuoteConverter.toCurrencyFormat(difference, 2, 2);
+        String percentString = QuoteConverter.toDefaultFormat(difference / stock.getPrevious() * 100, 2, 2);
 
         if (difference > 0) {
             color = context.getResources().getColor(R.color.positiveCost);
@@ -125,7 +124,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
         } else if (difference < 0) {
             color = context.getResources().getColor(R.color.negativeCost);
-            percentString = QuoteConverter.convertToDefaultFormat(difference / stock.getPrevious() * -100, 2, 2);
+            percentString = QuoteConverter.toDefaultFormat(difference / stock.getPrevious() * -100, 2, 2);
 
         }
 

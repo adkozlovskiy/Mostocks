@@ -5,7 +5,7 @@ import java.util.Locale;
 
 public class QuoteConverter {
 
-    public static String convertToCurrencyFormat(double quote, int minDigits, int maxDigits) {
+    public static String toCurrencyFormat(double quote, int minDigits, int maxDigits) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
         formatter.setMinimumFractionDigits(minDigits);
         formatter.setMaximumFractionDigits(maxDigits);
@@ -13,7 +13,7 @@ public class QuoteConverter {
         return formatter.format(quote);
     }
 
-    public static String convertToDefaultFormat(double quote, int minDigits, int maxDigits) {
+    public static String toDefaultFormat(double quote, int minDigits, int maxDigits) {
         NumberFormat formatter = NumberFormat.getInstance();
         formatter.setMinimumFractionDigits(minDigits);
         formatter.setMaximumFractionDigits(maxDigits);

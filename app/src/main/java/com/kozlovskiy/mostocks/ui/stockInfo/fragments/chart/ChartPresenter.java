@@ -3,6 +3,7 @@ package com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.Log;
@@ -10,48 +11,56 @@ import android.util.Log;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.CandleData;
+import com.github.mikephil.charting.data.CandleDataSet;
+import com.github.mikephil.charting.data.CandleEntry;
 import com.google.gson.Gson;
-import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
+import com.kozlovskiy.mostocks.entities.Candles;
+import com.kozlovskiy.mostocks.entities.CandlesMarker;
 import com.kozlovskiy.mostocks.entities.SocketData;
 import com.kozlovskiy.mostocks.entities.SocketResponse;
-import com.kozlovskiy.mostocks.room.StocksDao;
+import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketClient;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketConnection;
 import com.kozlovskiy.mostocks.utils.QuoteConverter;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 import static android.os.Looper.getMainLooper;
 
 public class ChartPresenter implements WebSocketClient.MessageListener {
 
     public static final String TAG = ChartPresenter.class.getSimpleName();
-    private ChartView chartView;
-    private WebSocketConnection webSocketConnection;
-    private final String ticker;
-    private double previousCost;
-    private double currentCost;
-    private final double pq;
+    private final StocksRepository stocksRepository;
+    private final CandleStickChart chart;
+    private final ChartView chartView;
     private final Context context;
-    private final StocksDao stocksDao;
+    private final String symbol;
+    private final double pq;
 
-    public ChartPresenter(ChartView chartView, Context context, String ticker, double pq) {
+    private WebSocketConnection webSocketConnection;
+
+    public ChartPresenter(ChartView chartView, CandleStickChart chart, Context context, String symbol, double pq) {
+        this.stocksRepository = new StocksRepository(context);
         this.chartView = chartView;
+        this.chart = chart;
         this.context = context;
-        this.ticker = ticker;
+        this.symbol = symbol;
         this.pq = pq;
-
-        stocksDao = ((AppDelegate) context.getApplicationContext())
-                .getDatabase()
-                .getDao();
     }
 
-    public void subscribe(String symbol) {
-        List<String> symbols = new ArrayList<>();
-        symbols.add(symbol);
-        webSocketConnection = new WebSocketConnection(symbols);
+    public void subscribe() {
+        webSocketConnection = new WebSocketConnection(new ArrayList<String>() {{
+            add(symbol);
+        }});
         webSocketConnection.setListener(this);
         webSocketConnection.openConnection();
         Log.d(TAG, "subscribe: ");
@@ -66,8 +75,8 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         int color = context.getResources().getColor(R.color.textColor, context.getTheme());
         double difference = cq - pq;
         Drawable quoteDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_no_changes);
-        String changeString = QuoteConverter.convertToCurrencyFormat(difference, 0, 2);
-        String percentString = QuoteConverter.convertToDefaultFormat(difference / pq * 100, 0, 2);
+        String changeString = QuoteConverter.toCurrencyFormat(difference, 0, 2);
+        String percentString = QuoteConverter.toDefaultFormat(difference / pq * 100, 0, 2);
 
         if (difference > 0) {
             color = context.getResources().getColor(R.color.positiveCost, context.getTheme());
@@ -76,7 +85,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
 
         } else if (difference < 0) {
             color = context.getResources().getColor(R.color.negativeCost, context.getTheme());
-            percentString = QuoteConverter.convertToDefaultFormat(difference / pq * -100, 0, 2);
+            percentString = QuoteConverter.toDefaultFormat(difference / pq * -100, 0, 2);
             quoteDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_go_down);
 
         }
@@ -93,7 +102,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
             if (response.getType().equals("trade")) {
                 SocketData data = response.getData().get(response.getData().size() - 1);
 
-                if (data.getSymbol().equals(ticker)) {
+                if (data.getSymbol().equals(symbol)) {
                     Handler mainHandler = new Handler(getMainLooper());
 
                     Runnable mainRunnable = () -> {
@@ -102,13 +111,10 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
                         }
 
                         chartView.showUpdatedCost(
-                                QuoteConverter.convertToCurrencyFormat(data.getQuote(), 0, 2));
+                                QuoteConverter.toCurrencyFormat(data.getQuote(), 0, 2));
                         calculateQuoteChange(data.getQuote(), pq);
                     };
                     mainHandler.post(mainRunnable);
-
-                    previousCost = currentCost;
-                    currentCost = data.getQuote();
                 }
             }
         } catch (Exception e) {
@@ -116,10 +122,72 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         }
     }
 
-    public void configureCandlesChart(CandleStickChart chart) {
+    public void initializeCandles() {
+        stocksRepository.getSymbolCandles(symbol)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableSingleObserver<Candles>() {
+                    @Override
+                    public void onSuccess(@NonNull Candles candles) {
+                        configureCandlesChart(candles);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                    }
+                });
+    }
+
+    public void configureCandlesChart(Candles candles) {
         chart.setBackgroundColor(Color.WHITE);
         chart.getDescription().setEnabled(false);
+        chart.setMaxVisibleValueCount(0);
+        chart.setPinchZoom(false);
+        chart.setDoubleTapToZoomEnabled(false);
+        chart.setDrawGridBackground(false);
+        chart.setScaleEnabled(false);
 
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setEnabled(false);
+
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setEnabled(false);
+
+        YAxis rightAxis = chart.getAxisRight();
+        rightAxis.setEnabled(false);
+
+        chart.getLegend().setEnabled(false);
+
+        chart.resetTracking();
+        ArrayList<CandleEntry> values = new ArrayList<>();
+        for (int i = 0; i < candles.getVolumes().size(); i++) {
+            double high = candles.getHighPrices().get(i);
+            double low = candles.getLowPrices().get(i);
+
+            double open = candles.getOpenPrices().get(i);
+            double close = candles.getClosePrices().get(i);
+
+
+            values.add(new CandleEntry(i, (float) high, (float) low, (float) open, (float) close));
+        }
+
+        CandleDataSet set = new CandleDataSet(values, "Data Set");
+
+        set.setDrawIcons(false);
+        set.setShadowColor(Color.DKGRAY);
+        set.setShadowWidth(0.7f);
+        set.setDecreasingColor(context.getResources().getColor(R.color.sellIndicatorColor, context.getTheme()));
+        set.setDecreasingPaintStyle(Paint.Style.FILL);
+        set.setIncreasingColor(context.getResources().getColor(R.color.buyIndicatorColor, context.getTheme()));
+        set.setIncreasingPaintStyle(Paint.Style.FILL);
+        set.setNeutralColor(Color.GRAY);
+
+        CandlesMarker candlesMarker = new CandlesMarker(context, R.layout.candles_marker, values.size());
+        chart.setMarker(candlesMarker);
+        CandleData data = new CandleData(set);
+
+        chart.setData(data);
         chartView.buildCandlesChart(chart);
     }
 }

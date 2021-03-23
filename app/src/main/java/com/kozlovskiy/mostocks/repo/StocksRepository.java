@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.api.finnhub.FinnhubService;
 import com.kozlovskiy.mostocks.api.mstack.MStackService;
+import com.kozlovskiy.mostocks.entities.Candles;
 import com.kozlovskiy.mostocks.entities.News;
 import com.kozlovskiy.mostocks.entities.Quote;
 import com.kozlovskiy.mostocks.entities.Stock;
@@ -96,7 +97,7 @@ public class StocksRepository {
     public Single<List<News>> updateNews(String symbol) {
         Log.d(TAG, "updateNews: news loading...");
         return Single.create(emitter -> FinnhubService.getInstance().getApi()
-                .getCompanyNews(symbol, "2021-01-01", "2021-03-01", FinnhubService.TOKEN)
+                .getCompanyNews(symbol, "2021-01-01", "2021-03-01", FinnhubService.TOKEN) // TODO: 23.03.2021 from and to
                 .enqueue(new Callback<List<News>>() {
                     @Override
                     public void onResponse(@NonNull Call<List<News>> call, @NonNull Response<List<News>> response) {
@@ -132,6 +133,7 @@ public class StocksRepository {
                                     .body()
                                     .getTechnicalAnalysis();
 
+                            // TODO: 23.03.2021 caching
                             emitter.onSuccess(technicalAnalysis);
                             Log.d(TAG, "updateTechAnalysis: tech loaded.");
                         }
@@ -139,6 +141,31 @@ public class StocksRepository {
 
                     @Override
                     public void onFailure(@NonNull Call<TechAnalysisResponse> call, @NonNull Throwable t) {
+                        emitter.onError(t);
+                    }
+                }));
+    }
+
+    public Single<Candles> getSymbolCandles(String symbol) {
+        Log.d(TAG, "getSymbolCandles: loading...");
+        return Single.create(emitter -> FinnhubService.getInstance().getApi()
+                .getSymbolCandles(symbol, "1", "1615298999", "1615302599", FinnhubService.TOKEN) // TODO: 23.03.2021 from and to
+                .enqueue(new Callback<Candles>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Candles> call, @NonNull Response<Candles> response) {
+                        if (response.body() != null) {
+                            Candles candles = response.body();
+
+                            if (candles.getStatus().equals("ok"))
+                                // TODO: 23.03.2021 caching
+                                emitter.onSuccess(candles);
+
+                            else emitter.onError(new NullPointerException());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<Candles> call, @NonNull Throwable t) {
                         emitter.onError(t);
                     }
                 }));

@@ -29,7 +29,7 @@ public class NaiveSSLContext {
         return context;
     }
 
-    // TODO: 21.03.2021 скопировал код на траст менеджер, надо понять как он работает вообще :)
+    // TODO: 21.03.2021 скопировал код на траст менеджер, надо понять как он работает
     private static class NaiveTrustManager implements X509TrustManager {
 
         @Override

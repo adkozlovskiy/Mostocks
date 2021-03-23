@@ -55,15 +55,14 @@ public class ChartFragment extends Fragment implements ChartView {
 
             double currentCost = getArguments().getDouble(KEY_CURRENT_COST);
             double previousCost = getArguments().getDouble(KEY_PREVIOUS_COST);
-            chartPresenter = new ChartPresenter(this, context, symbol, previousCost);
-            chartPresenter.subscribe(symbol);
+            chartPresenter = new ChartPresenter(this, candleChart, context, symbol, previousCost);
+            chartPresenter.subscribe();
 
-            tvPrice.setText(QuoteConverter.convertToCurrencyFormat(currentCost, 0, 2));
+            tvPrice.setText(QuoteConverter.toCurrencyFormat(currentCost, 0, 2));
             chartPresenter.calculateQuoteChange(currentCost, previousCost);
-            Log.d(TAG, "onResume: ");
         }
 
-        chartPresenter.configureCandlesChart(candleChart);
+        chartPresenter.initializeCandles();
     }
 
     @Override
@@ -78,7 +77,7 @@ public class ChartFragment extends Fragment implements ChartView {
 
     @Override
     public void buildCandlesChart(CandleStickChart chart) {
-
+        chart.invalidate();
     }
 
     @Override

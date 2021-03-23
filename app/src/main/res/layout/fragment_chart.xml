@@ -28,9 +28,19 @@
         android:textSize="16sp"
         app:drawableStartCompat="@drawable/ic_no_changes" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/textColor" />
+
     <com.github.mikephil.charting.charts.CandleStickChart
         android:id="@+id/chart_candles"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginTop="20dp" />
+        android:layout_height="300dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/textColor" />
 </LinearLayout>

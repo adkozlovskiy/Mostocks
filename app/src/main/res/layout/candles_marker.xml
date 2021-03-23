@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="60dp"
+    android:orientation="vertical"
+    app:cardBackgroundColor="@color/colorBackgroundMarker"
+    app:cardCornerRadius="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/open"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open"
+            android:textColor="@color/colorTextMarker"
+            android:textSize="8sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/open_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$50.155"
+            android:textColor="#fff"
+            android:textSize="8sp"
+            app:layout_constraintStart_toStartOf="@id/close_value"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Close"
+            android:textColor="@color/colorTextMarker"
+            android:textSize="8sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/open" />
+
+        <TextView
+            android:id="@+id/close_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="$212.55"
+            android:textColor="#fff"
+            android:textSize="8sp"
+            app:layout_constraintStart_toEndOf="@id/close"
+            app:layout_constraintTop_toTopOf="@id/close" />
+
+        <TextView
+            android:id="@+id/high"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="High"
+            android:textColor="@color/colorTextMarker"
+            android:textSize="8sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/close" />
+
+        <TextView
+            android:id="@+id/high_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$100.20"
+            android:textColor="#fff"
+            android:textSize="8sp"
+            app:layout_constraintStart_toStartOf="@id/close_value"
+            app:layout_constraintTop_toTopOf="@id/high" />
+
+        <TextView
+            android:id="@+id/low"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Low"
+            android:textColor="@color/colorTextMarker"
+            android:textSize="8sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/high" />
+
+        <TextView
+            android:id="@+id/low_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$213.00"
+            android:textColor="#fff"
+            android:textSize="8sp"
+            app:layout_constraintStart_toStartOf="@id/close_value"
+            app:layout_constraintTop_toTopOf="@id/low" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
