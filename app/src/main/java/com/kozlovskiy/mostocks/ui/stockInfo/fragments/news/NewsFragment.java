@@ -1,5 +1,6 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.news;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -37,6 +38,7 @@ public class NewsFragment extends Fragment implements NewsView {
     private TextView tvName;
     private TextView tvIpo;
     private TextView tvCapitalization;
+    private Context context;
 
     public NewsFragment() {
         super(R.layout.fragment_news);
@@ -102,7 +104,9 @@ public class NewsFragment extends Fragment implements NewsView {
 
                                     @Override
                                     public void onError(Exception e) {
-                                        ivLogo.setImageBitmap(BitmapUtil.markSymbolOnBitmap(getContext(), R.drawable.blue_background, stock.getSymbol().substring(0, 1)));
+                                        if (ivLogo != null) {
+                                            ivLogo.setImageBitmap(BitmapUtil.markSymbolOnBitmap(context, R.drawable.blue_background, stock.getSymbol().substring(0, 1)));
+                                        }
                                     }
                                 });
                     }
@@ -110,6 +114,12 @@ public class NewsFragment extends Fragment implements NewsView {
 
 
         tvName.setText(stock.getName());
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
     }
 
     private String getTicker() {

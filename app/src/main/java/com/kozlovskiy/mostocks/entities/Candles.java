@@ -29,11 +29,11 @@ public class Candles {
 
     @SerializedName("t")
     @Expose
-    private List<Integer> timestamps = null;
+    private List<Long> timestamps = null;
 
     @SerializedName("v")
     @Expose
-    private List<Integer> volumes = null;
+    private List<Long> volumes = null;
 
 
     public List<Double> getClosePrices() {
@@ -76,19 +76,19 @@ public class Candles {
         this.status = status;
     }
 
-    public List<Integer> getTimestamps() {
+    public List<Long> getTimestamps() {
         return timestamps;
     }
 
-    public void setTimestamps(List<Integer> timestamps) {
+    public void setTimestamps(List<Long> timestamps) {
         this.timestamps = timestamps;
     }
 
-    public List<Integer> getVolumes() {
+    public List<Long> getVolumes() {
         return volumes;
     }
 
-    public void setVolumes(List<Integer> volumes) {
+    public void setVolumes(List<Long> volumes) {
         this.volumes = volumes;
     }
 

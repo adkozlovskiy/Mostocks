@@ -146,10 +146,10 @@ public class StocksRepository {
                 }));
     }
 
-    public Single<Candles> getSymbolCandles(String symbol) {
+    public Single<Candles> getSymbolCandles(String symbol, String resolution, long from, long to) {
         Log.d(TAG, "getSymbolCandles: loading...");
         return Single.create(emitter -> FinnhubService.getInstance().getApi()
-                .getSymbolCandles(symbol, "1", "1615298999", "1615302599", FinnhubService.TOKEN) // TODO: 23.03.2021 from and to
+                .getSymbolCandles(symbol, resolution, String.valueOf(from), String.valueOf(to), FinnhubService.TOKEN)
                 .enqueue(new Callback<Candles>() {
                     @Override
                     public void onResponse(@NonNull Call<Candles> call, @NonNull Response<Candles> response) {

@@ -16,6 +16,9 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.gson.Gson;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.entities.Candles;
@@ -122,8 +125,9 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         }
     }
 
-    public void initializeCandles() {
-        stocksRepository.getSymbolCandles(symbol)
+    public void initializeCandles(long from, long to, String resolution) {
+        Log.d(TAG, "initializeCandles: init from " + from + " to " + to);
+        stocksRepository.getSymbolCandles(symbol, resolution, from, to)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableSingleObserver<Candles>() {
@@ -143,10 +147,24 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         chart.setBackgroundColor(Color.WHITE);
         chart.getDescription().setEnabled(false);
         chart.setMaxVisibleValueCount(0);
-        chart.setPinchZoom(false);
+        chart.setPinchZoom(true);
         chart.setDoubleTapToZoomEnabled(false);
         chart.setDrawGridBackground(false);
-        chart.setScaleEnabled(false);
+        chart.setScaleEnabled(true);
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                if (e.getData() != null & e.getData() instanceof Long) {
+                    long timestamp = (Long) e.getData() * 1000;
+                    chartView.showTimeStamp(timestamp);
+                }
+            }
+
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setEnabled(false);
@@ -162,14 +180,17 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         chart.resetTracking();
         ArrayList<CandleEntry> values = new ArrayList<>();
         for (int i = 0; i < candles.getVolumes().size(); i++) {
+            long timestamp = candles.getTimestamps().get(i);
+
             double high = candles.getHighPrices().get(i);
             double low = candles.getLowPrices().get(i);
 
             double open = candles.getOpenPrices().get(i);
             double close = candles.getClosePrices().get(i);
 
-
-            values.add(new CandleEntry(i, (float) high, (float) low, (float) open, (float) close));
+            CandleEntry entry = new CandleEntry(i, (float) high, (float) low, (float) open, (float) close);
+            entry.setData(timestamp);
+            values.add(entry);
         }
 
         CandleDataSet set = new CandleDataSet(values, "Data Set");

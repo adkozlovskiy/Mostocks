@@ -11,4 +11,6 @@ public interface ChartView {
     void buildCandlesChart(CandleStickChart chart);
 
     void showQuoteChange(String pq, int color, Drawable drawable);
+
+    void showTimeStamp(long timestamp);
 }
