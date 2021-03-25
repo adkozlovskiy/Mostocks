@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:paddingStart="25dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="25dp">
+
+    <TextView
+        android:id="@+id/title_holder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Market Capitalization"
+        android:fontFamily="@font/montserrat_medium"
+        android:textColor="@color/textAccentColor"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/description_holder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat_medium"
+        android:text="Company cost."
+        android:textColor="@color/textColor"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@+id/title_holder"
+        app:layout_constraintTop_toBottomOf="@+id/title_holder" />
+
+    <TextView
+        android:id="@+id/param"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat_semibold"
+        android:text="144$"
+        android:textColor="@color/textAccentColor"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
