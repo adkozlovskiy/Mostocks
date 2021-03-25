@@ -2,7 +2,7 @@ package com.kozlovskiy.mostocks.ui.main.fragments.stocks;
 
 import android.app.Dialog;
 
-import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.models.stock.Stock;
 
 import java.util.List;
 

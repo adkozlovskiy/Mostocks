@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.models.stock.Stock;
 import com.kozlovskiy.mostocks.ui.main.MainActivity;
 
 public class SplashActivity extends AppCompatActivity

@@ -1,8 +1,8 @@
 package com.kozlovskiy.mostocks.ui.stockInfo;
 
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -13,12 +13,22 @@ import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart.ChartFragment;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts.ForecastsFragment;
+import com.kozlovskiy.mostocks.ui.stockInfo.fragments.indicators.IndicatorsFragment;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.news.NewsFragment;
+import com.kozlovskiy.mostocks.utils.BitmapUtil;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+
+import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.MAIN_IMAGE_URL;
 
 public class StockInfoActivity extends AppCompatActivity
         implements StockInfoView, TabLayout.OnTabSelectedListener {
 
     private StockInfoPresenter stockInfoPresenter;
+    private ImageView ivLogo;
+    private ImageView ivBackButton;
+    private TextView tvSymbol, tvName;
     private Bundle bundles;
 
     @Override
@@ -28,16 +38,23 @@ public class StockInfoActivity extends AppCompatActivity
         stockInfoPresenter = new StockInfoPresenter(this, this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(getIntent().getStringExtra(StocksAdapter.KEY_SYMBOL));
-        toolbar.setNavigationIcon(R.drawable.back_button);
-        setSupportActionBar(toolbar);
+        ivLogo = toolbar.findViewById(R.id.iv_logo);
+        ivBackButton = toolbar.findViewById(R.id.back_button);
+        ivBackButton.setOnClickListener(v -> onBackPressed());
+        tvSymbol = toolbar.findViewById(R.id.tv_symbol);
+        tvName = toolbar.findViewById(R.id.tv_name);
 
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        setSupportActionBar(toolbar);
 
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.addOnTabSelectedListener(this);
 
         String symbol = getIntent().getStringExtra(StocksAdapter.KEY_SYMBOL);
+        String name = getIntent().getStringExtra(StocksAdapter.KEY_NAME);
+        initializeLogo(symbol);
+        tvSymbol.setText(symbol);
+        tvName.setText(name);
+
         double currentCost = getIntent().getDoubleExtra(StocksAdapter.KEY_CURRENT_COST, 0);
         double previousCost = getIntent().getDoubleExtra(StocksAdapter.KEY_PREVIOUS_COST, 0);
 
@@ -54,6 +71,38 @@ public class StockInfoActivity extends AppCompatActivity
         }
     }
 
+    private void initializeLogo(String symbol) {
+        Picasso.get()
+                .load(MAIN_IMAGE_URL + symbol + ".png")
+                .networkPolicy(NetworkPolicy.OFFLINE)
+
+                .into(ivLogo, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Picasso.get()
+                                .load(MAIN_IMAGE_URL + symbol + ".png")
+                                .into(ivLogo, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        if (ivLogo != null) {
+                                            ivLogo.setImageBitmap(BitmapUtil.markSymbolOnBitmap(StockInfoActivity.this, R.drawable.blue_background, symbol.substring(0, 1)));
+                                        }
+                                    }
+                                });
+                    }
+                });
+    }
+
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -67,6 +116,10 @@ public class StockInfoActivity extends AppCompatActivity
                 break;
 
             case 2:
+                transaction.replace(R.id.fr_container, IndicatorsFragment.class, bundles);
+                break;
+
+            case 3:
                 transaction.replace(R.id.fr_container, ForecastsFragment.class, bundles);
                 break;
         }

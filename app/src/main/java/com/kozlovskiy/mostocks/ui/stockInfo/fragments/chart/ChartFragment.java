@@ -5,11 +5,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
@@ -29,6 +32,12 @@ import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_SYMBOL;
 public class ChartFragment extends Fragment implements ChartView {
 
     public static final String TAG = ChartFragment.class.getSimpleName();
+    public static final String HALF_HOUR_RESOLUTION = "30";
+    public static final String HOUR_RESOLUTION = "60";
+    public static final String DAY_RESOLUTION = "D";
+    public static final String WEEK_RESOLUTION = "W";
+    public static final String MONTH_RESOLUTION = "M";
+
     private final SimpleDateFormat dateFormat =
             new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
     private final SimpleDateFormat timeFormat =
@@ -39,18 +48,22 @@ public class ChartFragment extends Fragment implements ChartView {
     private TextView tvPriceChange;
     private TextView tvDatestamp;
     private TextView tvTimestamp;
+    private ProgressBar progressBar;
     private Context context;
 
     private final Date date = new Date();
     private final long timestamp = date.getTime();
     private final List<CardView> cardViews = new ArrayList<>();
 
+    private boolean candlesChartSelected = false;
     private CardView cvThirties;
     private CardView cvHour;
     private CardView cvDay;
     private CardView cvWeek;
     private CardView cvMonth;
     private CardView cvSelected;
+
+    private ImageView ivChartButton;
 
     public ChartFragment() {
         super(R.layout.fragment_chart);
@@ -70,6 +83,23 @@ public class ChartFragment extends Fragment implements ChartView {
         candleChart = view.findViewById(R.id.chart_candles);
         tvDatestamp = view.findViewById(R.id.tv_datestamp);
         tvTimestamp = view.findViewById(R.id.tv_timestamp);
+        progressBar = view.findViewById(R.id.progress_bar);
+
+        CardView cvChartButton = view.findViewById(R.id.chart_button);
+        ivChartButton = view.findViewById(R.id.chart_icon);
+
+        cvChartButton.setOnClickListener(v -> {
+            if (candlesChartSelected) {
+                ivChartButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
+                        R.drawable.ic_line_chart, context.getTheme()));
+
+            } else {
+                ivChartButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
+                        R.drawable.ic_candles_chart, context.getTheme()));
+            }
+
+            candlesChartSelected = !candlesChartSelected;
+        });
 
         cvThirties = view.findViewById(R.id.cv_thirties);
         cvThirties.setOnClickListener(cardClickListener);
@@ -90,18 +120,13 @@ public class ChartFragment extends Fragment implements ChartView {
         cvMonth = view.findViewById(R.id.cv_month);
         cvMonth.setOnClickListener(cardClickListener);
         cardViews.add(cvMonth);
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
         if (getArguments() != null) {
             String symbol = getArguments().getString(KEY_SYMBOL);
 
             double currentCost = getArguments().getDouble(KEY_CURRENT_COST);
             double previousCost = getArguments().getDouble(KEY_PREVIOUS_COST);
             chartPresenter = new ChartPresenter(this, candleChart, context, symbol, previousCost);
-            chartPresenter.subscribe();
 
             tvPrice.setText(QuoteConverter.toCurrencyFormat(currentCost, 0, 2));
             chartPresenter.calculateQuoteChange(currentCost, previousCost);
@@ -111,8 +136,14 @@ public class ChartFragment extends Fragment implements ChartView {
         long MILLIS_IN_MINUTE = 60 * MILLIS_IN_SECOND;
         long MILLIS_IN_HOUR = 60 * MILLIS_IN_MINUTE;
 
-        chartPresenter.initializeCandles((timestamp - 60 * 24 * MILLIS_IN_HOUR) / MILLIS_IN_SECOND, timestamp / MILLIS_IN_SECOND, "D");
+        initializeCandles((timestamp - 60 * 24 * MILLIS_IN_HOUR) / MILLIS_IN_SECOND, timestamp / MILLIS_IN_SECOND, "D");
         selectCard(cvDay);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        chartPresenter.subscribe();
     }
 
     @Override
@@ -127,6 +158,8 @@ public class ChartFragment extends Fragment implements ChartView {
 
     @Override
     public void buildCandlesChart(CandleStickChart chart) {
+        candleChart.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
         chart.invalidate();
     }
 
@@ -165,40 +198,51 @@ public class ChartFragment extends Fragment implements ChartView {
 
         if (id == R.id.cv_thirties) {
             selectCard(cvThirties);
-            from = 90 * MILLIS_IN_HOUR;
-            resolution = "30";
+            from = 70 * MILLIS_IN_HOUR;
+            resolution = HALF_HOUR_RESOLUTION;
 
         } else if (id == R.id.cv_hour) {
             selectCard(cvHour);
-            from = 120 * MILLIS_IN_HOUR;
-            resolution = "60";
+            from = 140 * MILLIS_IN_HOUR;
+            resolution = HOUR_RESOLUTION;
 
         } else if (id == R.id.cv_day) {
             selectCard(cvDay);
-            from = 24 * MILLIS_IN_HOUR * 60;
-            resolution = "D";
+            from = 24 * MILLIS_IN_HOUR * 90;
+            resolution = DAY_RESOLUTION;
 
         } else if (id == R.id.cv_week) {
             selectCard(cvWeek);
             from = 24 * MILLIS_IN_HOUR * 60 * 7;
-            resolution = "W";
+            resolution = WEEK_RESOLUTION;
 
         } else if (id == R.id.cv_month) {
             selectCard(cvMonth);
             from = 24 * MILLIS_IN_HOUR * 60 * 7 * 5;
-            resolution = "M";
+            resolution = MONTH_RESOLUTION;
         }
 
-        chartPresenter.initializeCandles((timestamp - from) / MILLIS_IN_SECOND, to, resolution);
+        initializeCandles((timestamp - from) / MILLIS_IN_SECOND, to, resolution);
     };
+
+    private void initializeCandles(long from, long to, String resolution) {
+        progressBar.setVisibility(View.VISIBLE);
+        candleChart.setVisibility(View.GONE);
+        chartPresenter.initializeCandles(from, to, resolution);
+    }
 
     private void selectCard(CardView card) {
         cvSelected = card;
-        cvSelected.setCardBackgroundColor(context.getResources().getColor(R.color.colorChartButtonBackgroundAccent, context.getTheme()));
+        cvSelected.setCardBackgroundColor(context.getResources()
+                .getColor(R.color.colorChartButtonBackgroundAccent, context.getTheme()));
+
+        tvTimestamp.setText("");
+        tvDatestamp.setText("");
 
         for (CardView cardView : cardViews) {
             if (cardView != cvSelected) {
-                cardView.setCardBackgroundColor(context.getResources().getColor(R.color.colorChartButtonBackground, context.getTheme()));
+                cardView.setCardBackgroundColor(context.getResources()
+                        .getColor(R.color.colorChartButtonBackground, context.getTheme()));
             }
         }
     }

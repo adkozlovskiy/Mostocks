@@ -3,7 +3,7 @@ package com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts;
 import android.content.Context;
 import android.graphics.Color;
 
-import com.kozlovskiy.mostocks.entities.TechAnalysisResponse;
+import com.kozlovskiy.mostocks.models.stockInfo.TechAnalysisResponse;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 
 import java.util.ArrayList;

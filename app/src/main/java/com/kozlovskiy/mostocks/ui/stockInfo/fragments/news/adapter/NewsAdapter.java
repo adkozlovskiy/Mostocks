@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.entities.News;
+import com.kozlovskiy.mostocks.models.stockInfo.News;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 

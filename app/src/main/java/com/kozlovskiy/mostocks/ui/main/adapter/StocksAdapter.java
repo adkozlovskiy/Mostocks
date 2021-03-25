@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.entities.Favorite;
-import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.models.stock.Favorite;
+import com.kozlovskiy.mostocks.models.stock.Stock;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.ui.stockInfo.StockInfoActivity;
 import com.kozlovskiy.mostocks.utils.BitmapUtil;
@@ -37,6 +37,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     public static final String KEY_PREVIOUS_COST = "PREVIOUS_COST";
     public static final String KEY_IS_FAVORITE = "IS_FAVORITE";
     public static final String KEY_SYMBOL = "SYMBOL";
+    public static final String KEY_NAME = "NAME";
 
     private final Context context;
     private final StocksDao stocksDao;
@@ -136,6 +137,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         holder.cardView.setOnClickListener(v -> {
             Intent intent = new Intent(context, StockInfoActivity.class);
             intent.putExtra(KEY_SYMBOL, stock.getSymbol());
+            intent.putExtra(KEY_NAME, stock.getName());
             intent.putExtra(KEY_IS_FAVORITE, stock.isFavorite());
             intent.putExtra(KEY_CURRENT_COST, stock.getCurrent());
             intent.putExtra(KEY_PREVIOUS_COST, stock.getPrevious());

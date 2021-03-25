@@ -3,8 +3,8 @@ package com.kozlovskiy.mostocks.ui.main.fragments.favorites;
 import android.content.Context;
 
 import com.kozlovskiy.mostocks.AppDelegate;
-import com.kozlovskiy.mostocks.entities.Favorite;
-import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.models.stock.Favorite;
+import com.kozlovskiy.mostocks.models.stock.Stock;
 import com.kozlovskiy.mostocks.room.StocksDao;
 
 import java.util.ArrayList;

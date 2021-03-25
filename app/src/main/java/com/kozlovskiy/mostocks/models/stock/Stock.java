@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks.entities;
+package com.kozlovskiy.mostocks.models.stock;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

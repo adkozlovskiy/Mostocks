@@ -3,6 +3,7 @@ package com.kozlovskiy.mostocks.ui.main;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,11 +24,16 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
     public static final String TAG = MainActivity.class.getSimpleName();
     private EditText searchEditText;
     private Bundle bundles;
+    private StocksDao stocksDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        stocksDao = ((AppDelegate) getApplicationContext())
+                .getDatabase()
+                .getDao();
 
         searchEditText = findViewById(R.id.et_search);
         TabLayout navigationTabs = findViewById(R.id.tabs);
@@ -60,6 +66,14 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
     protected void onResume() {
         super.onResume();
         searchEditText.addTextChangedListener(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stocksDao.clearNewsCache();
+        stocksDao.nullNewsUptime();
+        Log.d(TAG, "onDestroy: ");
     }
 
     @Override

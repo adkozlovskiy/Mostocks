@@ -1,4 +1,3 @@
-
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart;
 
 import android.content.Context;
@@ -21,10 +20,10 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.gson.Gson;
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.entities.Candles;
-import com.kozlovskiy.mostocks.entities.CandlesMarker;
-import com.kozlovskiy.mostocks.entities.SocketData;
-import com.kozlovskiy.mostocks.entities.SocketResponse;
+import com.kozlovskiy.mostocks.models.candles.Candles;
+import com.kozlovskiy.mostocks.models.candles.CandlesMarker;
+import com.kozlovskiy.mostocks.models.socket.SocketData;
+import com.kozlovskiy.mostocks.models.socket.SocketResponse;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketClient;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketConnection;
@@ -58,6 +57,8 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         this.context = context;
         this.symbol = symbol;
         this.pq = pq;
+
+        configureCandlesChart();
     }
 
     public void subscribe() {
@@ -133,7 +134,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
                 .subscribe(new DisposableSingleObserver<Candles>() {
                     @Override
                     public void onSuccess(@NonNull Candles candles) {
-                        configureCandlesChart(candles);
+                        updateCandlesData(candles);
                     }
 
                     @Override
@@ -143,7 +144,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
                 });
     }
 
-    public void configureCandlesChart(Candles candles) {
+    public void configureCandlesChart() {
         chart.setBackgroundColor(Color.WHITE);
         chart.getDescription().setEnabled(false);
         chart.setMaxVisibleValueCount(0);
@@ -176,8 +177,10 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         rightAxis.setEnabled(false);
 
         chart.getLegend().setEnabled(false);
-
         chart.resetTracking();
+    }
+
+    void updateCandlesData(Candles candles) {
         ArrayList<CandleEntry> values = new ArrayList<>();
         for (int i = 0; i < candles.getVolumes().size(); i++) {
             long timestamp = candles.getTimestamps().get(i);
@@ -206,8 +209,8 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
 
         CandlesMarker candlesMarker = new CandlesMarker(context, R.layout.candles_marker, values.size());
         chart.setMarker(candlesMarker);
-        CandleData data = new CandleData(set);
 
+        CandleData data = new CandleData(set);
         chart.setData(data);
         chartView.buildCandlesChart(chart);
     }

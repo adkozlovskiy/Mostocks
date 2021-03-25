@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks.entities;
+package com.kozlovskiy.mostocks.models.stock;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

@@ -1,6 +1,6 @@
 package com.kozlovskiy.mostocks.api.mstack;
 
-import com.kozlovskiy.mostocks.entities.StockData;
+import com.kozlovskiy.mostocks.models.stock.StockData;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

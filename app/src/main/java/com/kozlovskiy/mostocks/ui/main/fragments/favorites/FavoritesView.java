@@ -1,6 +1,6 @@
 package com.kozlovskiy.mostocks.ui.main.fragments.favorites;
 
-import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.models.stock.Stock;
 
 import java.util.List;
 

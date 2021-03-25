@@ -8,13 +8,15 @@ import androidx.annotation.NonNull;
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.api.finnhub.FinnhubService;
 import com.kozlovskiy.mostocks.api.mstack.MStackService;
-import com.kozlovskiy.mostocks.entities.Candles;
-import com.kozlovskiy.mostocks.entities.News;
-import com.kozlovskiy.mostocks.entities.Quote;
-import com.kozlovskiy.mostocks.entities.Stock;
-import com.kozlovskiy.mostocks.entities.StockData;
-import com.kozlovskiy.mostocks.entities.TechAnalysisResponse;
+import com.kozlovskiy.mostocks.models.candles.Candles;
+import com.kozlovskiy.mostocks.models.stockInfo.News;
+import com.kozlovskiy.mostocks.models.stock.Quote;
+import com.kozlovskiy.mostocks.models.stockInfo.Recommendation;
+import com.kozlovskiy.mostocks.models.stock.Stock;
+import com.kozlovskiy.mostocks.models.stock.StockData;
+import com.kozlovskiy.mostocks.models.stockInfo.TechAnalysisResponse;
 import com.kozlovskiy.mostocks.room.StocksDao;
+import com.kozlovskiy.mostocks.utils.CacheUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +30,10 @@ public class StocksRepository {
 
     private final StocksDao stocksDao;
     public static final String TAG = StocksRepository.class.getSimpleName();
+    private final Context context;
 
     public StocksRepository(Context context) {
+        this.context = context;
         stocksDao = ((AppDelegate) context.getApplicationContext())
                 .getDatabase()
                 .getDao();
@@ -94,31 +98,39 @@ public class StocksRepository {
         });
     }
 
-    public Single<List<News>> updateNews(String symbol) {
-        Log.d(TAG, "updateNews: news loading...");
-        return Single.create(emitter -> FinnhubService.getInstance().getApi()
-                .getCompanyNews(symbol, "2021-01-01", "2021-03-01", FinnhubService.TOKEN) // TODO: 23.03.2021 from and to
-                .enqueue(new Callback<List<News>>() {
-                    @Override
-                    public void onResponse(@NonNull Call<List<News>> call, @NonNull Response<List<News>> response) {
-                        if (response.body() != null) {
-                            List<News> newsList = response.body();
+    public Single<List<News>> updateNews(String symbol, String from, String to) {
+        return Single.create(emitter -> {
+            if (CacheUtil.newsCacheIsUpToDate(symbol, context)) {
+                emitter.onSuccess(stocksDao.getNewsBySymbol(symbol));
+                Log.d(TAG, "updateNews: from cache.");
 
-                            for (News news : newsList) {
-                                news.setSymbol(symbol);
+            } else {
+                Log.d(TAG, "updateNews: from network");
+                FinnhubService.getInstance().getApi()
+                        .getCompanyNews(symbol, from, to, FinnhubService.TOKEN)
+                        .enqueue(new Callback<List<News>>() {
+                            @Override
+                            public void onResponse(@NonNull Call<List<News>> call, @NonNull Response<List<News>> response) {
+                                if (response.body() != null) {
+                                    List<News> newsList = response.body();
+
+                                    for (News news : newsList) {
+                                        news.setSymbol(symbol);
+                                    }
+
+                                    stocksDao.cacheNews(newsList);
+                                    CacheUtil.updateNewsUptime(symbol, context);
+                                    emitter.onSuccess(newsList);
+                                }
                             }
 
-                            stocksDao.cacheNews(newsList);
-                            Log.d(TAG, "updateNews: news loaded");
-                            emitter.onSuccess(newsList);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<List<News>> call, @NonNull Throwable t) {
-                        emitter.onError(t);
-                    }
-                }));
+                            @Override
+                            public void onFailure(@NonNull Call<List<News>> call, @NonNull Throwable t) {
+                                emitter.onError(t);
+                            }
+                        });
+            }
+        });
     }
 
     public Single<TechAnalysisResponse.TechnicalAnalysis> updateTechAnalysis(String symbol) {
@@ -166,6 +178,28 @@ public class StocksRepository {
 
                     @Override
                     public void onFailure(@NonNull Call<Candles> call, @NonNull Throwable t) {
+                        emitter.onError(t);
+                    }
+                }));
+    }
+
+    public Single<Recommendation> getSymbolRecommendation(String symbol) {
+        Log.d(TAG, "getSymbolRecommendation: loading...");
+        return Single.create(emitter -> FinnhubService.getInstance().getApi()
+                .getSymbolRecommendation(symbol, FinnhubService.TOKEN)
+                .enqueue(new Callback<List<Recommendation>>() {
+                    @Override
+                    public void onResponse(@NonNull Call<List<Recommendation>> call, @NonNull Response<List<Recommendation>> response) {
+                        if (response.body() != null) {
+                            Recommendation recommendation = response.body().get(0);
+                            // TODO: 25.03.2021 caching
+                            emitter.onSuccess(recommendation);
+                            Log.d(TAG, "getSymbolRecommendation: loaded");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<List<Recommendation>> call, @NonNull Throwable t) {
                         emitter.onError(t);
                     }
                 }));

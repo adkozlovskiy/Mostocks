@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
     android:orientation="vertical"
     tools:context=".ui.stockInfo.fragments.chart.ChartFragment">
 
@@ -28,11 +29,40 @@
         android:textSize="16sp"
         app:drawableStartCompat="@drawable/ic_no_changes" />
 
-    <com.github.mikephil.charting.charts.CandleStickChart
-        android:id="@+id/chart_candles"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="20dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/chart_button"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="20dp"
+            app:cardBackgroundColor="@color/backgroundColor"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:id="@+id/chart_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                android:src="@drawable/ic_line_chart" />
+
+        </androidx.cardview.widget.CardView>
+
+        <com.github.mikephil.charting.charts.CandleStickChart
+            android:id="@+id/chart_candles"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:visibility="visible" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center" />
+    </FrameLayout>
 
     <View
         android:layout_width="match_parent"
@@ -53,7 +83,7 @@
             android:id="@+id/cv_thirties"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#2B2B2B"
+            app:cardBackgroundColor="#F6F6F6"
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp">
 

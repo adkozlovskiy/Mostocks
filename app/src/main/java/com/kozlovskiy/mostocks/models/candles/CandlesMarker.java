@@ -1,4 +1,4 @@
-package com.kozlovskiy.mostocks.entities;
+package com.kozlovskiy.mostocks.models.candles;
 
 import android.content.Context;
 import android.widget.TextView;

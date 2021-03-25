@@ -6,8 +6,8 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.google.gson.Gson;
-import com.kozlovskiy.mostocks.entities.SocketData;
-import com.kozlovskiy.mostocks.entities.SocketResponse;
+import com.kozlovskiy.mostocks.models.socket.SocketData;
+import com.kozlovskiy.mostocks.models.socket.SocketResponse;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketClient;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketConnection;
 import com.kozlovskiy.mostocks.ui.main.fragments.stocks.StocksFragment;

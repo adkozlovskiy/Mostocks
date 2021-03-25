@@ -38,4 +38,6 @@
     <string name="day_placeholder">D</string>
     <string name="week_placeholder">W</string>
     <string name="month_placeholder">M</string>
+    <string name="recommendations">Recommendations</string>
+    <string name="indicators">Indicators</string>
 </resources>

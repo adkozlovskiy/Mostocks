@@ -5,7 +5,7 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.models.stock.Stock;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.utils.CacheUtil;
 import com.kozlovskiy.mostocks.utils.NetworkUtil;

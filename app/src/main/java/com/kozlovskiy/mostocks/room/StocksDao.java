@@ -1,18 +1,20 @@
 package com.kozlovskiy.mostocks.room;
 
+import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.kozlovskiy.mostocks.entities.Favorite;
-import com.kozlovskiy.mostocks.entities.News;
-import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.models.stock.Favorite;
+import com.kozlovskiy.mostocks.models.stockInfo.News;
+import com.kozlovskiy.mostocks.models.stock.Stock;
+import com.kozlovskiy.mostocks.models.sys.Uptime;
 
 import java.util.List;
 
-@androidx.room.Dao
+@Dao
 public interface StocksDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -27,9 +29,6 @@ public interface StocksDao {
     @Query("SELECT * FROM Stock")
     List<Stock> getStocks();
 
-    @Query("SELECT * FROM Stock WHERE symbol = :symbol")
-    Stock getStockBySymbol(String symbol);
-
     @Query("SELECT * FROM Favorite")
     List<Favorite> getFavorites();
 
@@ -41,4 +40,25 @@ public interface StocksDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void cacheNews(List<News> newsList);
+
+    @Query("SELECT * FROM News WHERE symbol = :symbol ORDER BY datetime DESC")
+    List<News> getNewsBySymbol(String symbol);
+
+    @Query("DELETE FROM News")
+    void clearNewsCache();
+
+    @Query("UPDATE Uptime SET news_ut = 0")
+    void nullNewsUptime();
+
+    @Query("UPDATE Uptime SET news_ut = :ut WHERE symbol = :symbol")
+    void setNewsUptime(String symbol, long ut);
+
+    @Query("SELECT * FROM Uptime WHERE symbol = :symbol")
+    Uptime getUptimeSymbol(String symbol);
+
+    @Insert()
+    void addUptimeSymbol(Uptime uptime);
+
+    @Query("SELECT news_ut FROM Uptime WHERE symbol = :symbol")
+    long getNewsUptime(String symbol);
 }

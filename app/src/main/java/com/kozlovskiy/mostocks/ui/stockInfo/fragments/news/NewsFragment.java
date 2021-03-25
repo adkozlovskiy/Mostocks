@@ -2,10 +2,9 @@ package com.kozlovskiy.mostocks.ui.stockInfo.fragments.news;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,31 +13,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.entities.News;
-import com.kozlovskiy.mostocks.entities.Stock;
+import com.kozlovskiy.mostocks.models.stockInfo.News;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.news.adapter.NewsAdapter;
-import com.kozlovskiy.mostocks.utils.BitmapUtil;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.MAIN_IMAGE_URL;
-
 public class NewsFragment extends Fragment implements NewsView {
 
+    public static final String TAG = NewsFragment.class.getSimpleName();
     private final List<News> newsList = new ArrayList<>();
     private NewsPresenter newsPresenter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
-    private ImageView ivLogo;
-    private TextView tvName;
-    private TextView tvIpo;
-    private TextView tvCapitalization;
-    private Context context;
 
     public NewsFragment() {
         super(R.layout.fragment_news);
@@ -56,14 +44,9 @@ public class NewsFragment extends Fragment implements NewsView {
 
         recyclerView = view.findViewById(R.id.recycler);
         progressBar = view.findViewById(R.id.progress_bar);
-        ivLogo = view.findViewById(R.id.iv_logo);
-        tvName = view.findViewById(R.id.tv_name);
-        tvIpo = view.findViewById(R.id.tv_ipo);
-        tvCapitalization = view.findViewById(R.id.tv_capitalization);
 
         String ticker = getTicker();
-        ivLogo.setImageBitmap(BitmapUtil.markSymbolOnBitmap(getContext(), R.drawable.blue_background, ticker.substring(0, 1)));
-        newsPresenter.initializeStock(ticker);
+        Log.d(TAG, "onViewCreated: ");
         newsPresenter.initializeNews(ticker);
     }
 
@@ -81,45 +64,8 @@ public class NewsFragment extends Fragment implements NewsView {
     }
 
     @Override
-    public void showStockInfo(Stock stock) {
-        Picasso.get()
-                .load(MAIN_IMAGE_URL + stock.getSymbol() + ".png")
-                .networkPolicy(NetworkPolicy.OFFLINE)
-
-                .into(ivLogo, new Callback() {
-                    @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        Picasso.get()
-                                .load(MAIN_IMAGE_URL + stock.getSymbol() + ".png")
-                                .into(ivLogo, new Callback() {
-                                    @Override
-                                    public void onSuccess() {
-
-                                    }
-
-                                    @Override
-                                    public void onError(Exception e) {
-                                        if (ivLogo != null) {
-                                            ivLogo.setImageBitmap(BitmapUtil.markSymbolOnBitmap(context, R.drawable.blue_background, stock.getSymbol().substring(0, 1)));
-                                        }
-                                    }
-                                });
-                    }
-                });
-
-
-        tvName.setText(stock.getName());
-    }
-
-    @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        this.context = context;
     }
 
     private String getTicker() {
