@@ -6,7 +6,9 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.google.gson.Gson;
+import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.models.socket.SocketResponse;
+import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketClient;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketConnection;
 import com.kozlovskiy.mostocks.ui.main.fragments.stocks.StocksFragment;
@@ -25,6 +27,7 @@ public class WebSocketService extends Service implements WebSocketClient.Message
     private final Gson gson = new Gson();
 
     private WebSocketConnection webSocketConnection;
+    private StocksDao stocksDao;
 
     public class QuoteBinder extends Binder {
         public WebSocketService getInstance() {
@@ -34,6 +37,10 @@ public class WebSocketService extends Service implements WebSocketClient.Message
 
     @Override
     public IBinder onBind(Intent intent) {
+        stocksDao = ((AppDelegate) getApplicationContext())
+                .getDatabase()
+                .getDao();
+
         return binder;
     }
 

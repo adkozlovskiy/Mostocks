@@ -1,13 +1,13 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts;
 
-import java.util.ArrayList;
-
-import im.dacer.androidcharts.PieHelper;
+import com.github.mikephil.charting.charts.HorizontalBarChart;
 
 public interface ForecastsView {
 
-    void showGraph(ArrayList<PieHelper> entries, int selected);
+    void showTechAnalysisResult(String signal);
 
-    void showForecastStats(int buy, int hold, int sell, String signal);
+    void showRecommendationsResult(String period);
+
+    void buildRecommendationChart(HorizontalBarChart chart);
 
 }

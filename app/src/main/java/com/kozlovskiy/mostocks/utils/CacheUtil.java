@@ -12,6 +12,8 @@ import com.kozlovskiy.mostocks.room.StocksDao;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Completable;
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class CacheUtil {
@@ -34,6 +36,30 @@ public class CacheUtil {
     public static boolean quoteCacheIsUpToDate(Context context) {
         return new Date().getTime() - context.getSharedPreferences(KEY_SETTINGS, MODE_PRIVATE)
                 .getLong(KEY_QUOTE_UPTIME, 0) < QUOTE_UPDATE_INTERVAL;
+    }
+
+    public static Completable updateQuoteUptime(String symbol, Context context) {
+        return Completable.create(emitter -> {
+            StocksDao stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
+
+            if (stocksDao.getUptimeSymbol(symbol) != null)
+                stocksDao.setQuoteUptime(symbol, new Date().getTime() / 1000);
+
+            else {
+                Uptime uptime = new Uptime();
+                uptime.setSymbol(symbol);
+                uptime.setQuoteUptime(new Date().getTime() / 1000);
+                stocksDao.addUptimeSymbol(uptime);
+            }
+
+            emitter.onComplete();
+        });
+    }
+
+    public static boolean quoteCacheIsUpToDate(String symbol, Context context) {
+        StocksDao stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
+        long uptime = stocksDao.getQuoteUptime(symbol);
+        return new Date().getTime() - uptime * 1000 < QUOTE_UPDATE_INTERVAL;
     }
 
     public static void updateNewsUptime(String symbol, Context context) {

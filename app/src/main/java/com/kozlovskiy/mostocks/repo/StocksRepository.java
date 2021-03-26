@@ -99,6 +99,29 @@ public class StocksRepository {
         });
     }
 
+    public Single<Quote> getSymbolQuote(Stock stock) {
+        Log.d(TAG, "getSymbolQuotes: stocks costs loading...");
+        return Single.create(emitter -> {
+            FinnhubService.getInstance().getApi()
+                    .getSymbolQuote(stock.getSymbol(), FinnhubService.TOKEN)
+                    .enqueue(new Callback<Quote>() {
+                        @Override
+                        public void onResponse(@NonNull Call<Quote> call, @NonNull Response<Quote> response) {
+                            if (response.body() != null) {
+                                Log.d(TAG, "getSymbolQuotes: stocks costs loaded for " + stock.getSymbol());
+                                Quote quote = response.body(); //todo caching
+                                emitter.onSuccess(quote);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<Quote> call, @NonNull Throwable t) {
+                            emitter.onError(t);
+                        }
+                    });
+        });
+    }
+
     public Single<List<News>> updateNews(String symbol, String from, String to) {
         return Single.create(emitter -> {
             if (CacheUtil.newsCacheIsUpToDate(symbol, context)) {

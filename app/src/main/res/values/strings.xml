@@ -78,4 +78,5 @@
     <string name="low_52w">52w low</string>
     <string name="stocks_volatility">Stocks volatility to the market</string>
     <string name="beta">Beta</string>
+    <string name="recommendation">Recommendation</string>
 </resources>

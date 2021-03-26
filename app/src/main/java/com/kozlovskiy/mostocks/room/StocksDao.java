@@ -44,6 +44,9 @@ public interface StocksDao {
     @Query("SELECT * FROM News WHERE symbol = :symbol ORDER BY datetime DESC")
     List<News> getNewsBySymbol(String symbol);
 
+    @Insert()
+    void addUptimeSymbol(Uptime uptime);
+
     @Query("DELETE FROM News")
     void clearNewsCache();
 
@@ -56,9 +59,15 @@ public interface StocksDao {
     @Query("SELECT * FROM Uptime WHERE symbol = :symbol")
     Uptime getUptimeSymbol(String symbol);
 
-    @Insert()
-    void addUptimeSymbol(Uptime uptime);
-
     @Query("SELECT news_ut FROM Uptime WHERE symbol = :symbol")
     long getNewsUptime(String symbol);
+
+    @Query("UPDATE Uptime SET quote_ut = 0")
+    void nullQuoteUptime();
+
+    @Query("UPDATE Uptime SET quote_ut = :ut WHERE symbol = :symbol")
+    void setQuoteUptime(String symbol, long ut);
+
+    @Query("SELECT quote_ut FROM Uptime WHERE symbol = :symbol")
+    long getQuoteUptime(String symbol);
 }

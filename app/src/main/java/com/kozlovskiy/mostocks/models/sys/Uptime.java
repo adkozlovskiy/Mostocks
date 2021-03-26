@@ -14,6 +14,9 @@ public class Uptime {
     @ColumnInfo(name = "symbol")
     private String symbol;
 
+    @ColumnInfo(name = "quote_ut")
+    private long quoteUptime;
+
     @ColumnInfo(name = "news_ut")
     private long newsUptime;
 
@@ -52,6 +55,14 @@ public class Uptime {
 
     public void setSymbol(String symbol) {
         this.symbol = symbol;
+    }
+
+    public long getQuoteUptime() {
+        return quoteUptime;
+    }
+
+    public void setQuoteUptime(long quoteUptime) {
+        this.quoteUptime = quoteUptime;
     }
 
     public long getNewsUptime() {

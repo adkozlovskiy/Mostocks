@@ -108,8 +108,8 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
                 });
 
         holder.cardView.setCardBackgroundColor(position % 2 == 0
-                ? context.getResources().getColor(R.color.cardColor)
-                : context.getResources().getColor(R.color.backgroundColor));
+                ? context.getResources().getColor(R.color.cardColor, context.getTheme())
+                : context.getResources().getColor(R.color.backgroundColor, context.getTheme()));
 
         String quote = Converter.toCurrencyFormat(stock.getCurrent(), 2, 2);
         holder.costView.setText(quote);
@@ -120,11 +120,11 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         String percentString = Converter.toDefaultFormat(difference / stock.getPrevious() * 100, 2, 2);
 
         if (difference > 0) {
-            color = context.getResources().getColor(R.color.positiveCost);
+            color = context.getResources().getColor(R.color.positiveCost, context.getTheme());
             changeString = "+" + changeString;
 
         } else if (difference < 0) {
-            color = context.getResources().getColor(R.color.negativeCost);
+            color = context.getResources().getColor(R.color.negativeCost, context.getTheme());
             percentString = Converter.toDefaultFormat(difference / stock.getPrevious() * -100, 2, 2);
 
         }

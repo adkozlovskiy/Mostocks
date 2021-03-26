@@ -11,164 +11,126 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="12dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="8dp">
+        app:cardCornerRadius="8dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_title_tech"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/technical_analysis"
+                    android:textColor="@color/textAccentColor"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tv_date_tech"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/tv_title"
+                android:id="@+id/tv_signal_tech"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="16dp"
-                android:text="@string/technical_analysis"
-                android:textColor="@color/textAccentColor"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tv_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:textColor="@color/textColor"
-                android:textSize="14sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_title" />
-
-            <TextView
-                android:id="@+id/tv_signal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_gravity="center_vertical|end"
                 android:drawablePadding="5dp"
                 android:text="@string/need_to_hold"
                 android:textColor="@color/holdIndicatorColor"
                 android:textSize="14sp"
                 android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_signal"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_date" />
-
-            <TextView
-                android:id="@+id/tv_signals"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="6dp"
-                android:text="@string/ai_signals"
-                android:textColor="@color/textAccentColor"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_signal" />
-
-            <TextView
-                android:id="@+id/tv_buy_holder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="4dp"
-                android:text="@string/buy"
-                android:textColor="@color/buyIndicatorColor"
-                android:textSize="14sp"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_signals" />
-
-            <TextView
-                android:id="@+id/tv_buy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/buyIndicatorColor"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toTopOf="@+id/tv_hold"
-                app:layout_constraintStart_toStartOf="@+id/tv_hold" />
-
-            <TextView
-                android:id="@+id/tv_hold_holder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:text="@string/neutral"
-                android:textColor="@color/holdIndicatorColor"
-                android:textSize="14sp"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_buy_holder" />
-
-            <TextView
-                android:id="@+id/tv_hold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="25dp"
-                android:textColor="@color/holdIndicatorColor"
-                android:textSize="14sp"
-                app:layout_constraintStart_toEndOf="@+id/tv_hold_holder"
-                app:layout_constraintTop_toTopOf="@+id/tv_hold_holder" />
-
-            <TextView
-                android:id="@+id/tv_sell_holder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginBottom="20dp"
-                android:text="@string/sell"
-                android:textColor="@color/sellIndicatorColor"
-                android:textSize="14sp"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_hold_holder" />
-
-            <TextView
-                android:id="@+id/tv_sell"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/sellIndicatorColor"
-                android:textSize="14sp"
-                app:layout_constraintStart_toStartOf="@id/tv_hold"
-                app:layout_constraintTop_toBottomOf="@+id/tv_hold" />
-
-            <view
-                android:id="@+id/pie_view"
-                class="im.dacer.androidcharts.PieView"
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="20dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_date"
-                app:layout_constraintVertical_bias="1.0" />
+                app:drawableStartCompat="@drawable/ic_signal" />
 
             <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/pb_tech"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="12dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="8dp">
+        app:cardCornerRadius="8dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_title_rec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recommendation"
+                    android:textColor="@color/textAccentColor"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tv_date_rec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_signal_rec"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:drawablePadding="5dp"
+                android:text="@string/need_to_hold"
+                android:textColor="@color/holdIndicatorColor"
+                android:textSize="14sp"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_signal" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar_rec"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center" />
+
+        </FrameLayout>
+
+        <com.github.mikephil.charting.charts.HorizontalBarChart
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="90dp"
+            android:layout_marginBottom="15dp" />
 
     </androidx.cardview.widget.CardView>
 </LinearLayout>
