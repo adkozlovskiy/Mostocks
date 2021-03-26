@@ -22,12 +22,11 @@ import com.google.gson.Gson;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.models.candles.Candles;
 import com.kozlovskiy.mostocks.models.candles.CandlesMarker;
-import com.kozlovskiy.mostocks.models.socket.SocketData;
 import com.kozlovskiy.mostocks.models.socket.SocketResponse;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketClient;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketConnection;
-import com.kozlovskiy.mostocks.utils.QuoteConverter;
+import com.kozlovskiy.mostocks.utils.Converter;
 
 import java.util.ArrayList;
 
@@ -79,8 +78,8 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         int color = context.getResources().getColor(R.color.textColor, context.getTheme());
         double difference = cq - pq;
         Drawable quoteDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_no_changes);
-        String changeString = QuoteConverter.toCurrencyFormat(difference, 0, 2);
-        String percentString = QuoteConverter.toDefaultFormat(difference / pq * 100, 0, 2);
+        String changeString = Converter.toCurrencyFormat(difference, 0, 2);
+        String percentString = Converter.toDefaultFormat(difference / pq * 100, 0, 2);
 
         if (difference > 0) {
             color = context.getResources().getColor(R.color.positiveCost, context.getTheme());
@@ -89,7 +88,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
 
         } else if (difference < 0) {
             color = context.getResources().getColor(R.color.negativeCost, context.getTheme());
-            percentString = QuoteConverter.toDefaultFormat(difference / pq * -100, 0, 2);
+            percentString = Converter.toDefaultFormat(difference / pq * -100, 0, 2);
             quoteDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_go_down);
 
         }
@@ -104,7 +103,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         try {
             SocketResponse response = gson.fromJson(message, SocketResponse.class);
             if (response.getType().equals("trade")) {
-                SocketData data = response.getData().get(response.getData().size() - 1);
+                SocketResponse.Data data = response.getData().get(response.getData().size() - 1);
 
                 if (data.getSymbol().equals(symbol)) {
                     Handler mainHandler = new Handler(getMainLooper());
@@ -115,7 +114,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
                         }
 
                         chartView.showUpdatedCost(
-                                QuoteConverter.toCurrencyFormat(data.getQuote(), 0, 2));
+                                Converter.toCurrencyFormat(data.getQuote(), 0, 2));
                         calculateQuoteChange(data.getQuote(), pq);
                     };
                     mainHandler.post(mainRunnable);
@@ -163,7 +162,6 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
 
             @Override
             public void onNothingSelected() {
-
             }
         });
 

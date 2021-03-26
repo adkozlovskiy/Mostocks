@@ -9,11 +9,12 @@ import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.api.finnhub.FinnhubService;
 import com.kozlovskiy.mostocks.api.mstack.MStackService;
 import com.kozlovskiy.mostocks.models.candles.Candles;
-import com.kozlovskiy.mostocks.models.stockInfo.News;
 import com.kozlovskiy.mostocks.models.stock.Quote;
-import com.kozlovskiy.mostocks.models.stockInfo.Recommendation;
 import com.kozlovskiy.mostocks.models.stock.Stock;
-import com.kozlovskiy.mostocks.models.stock.StockData;
+import com.kozlovskiy.mostocks.models.stock.StockResponse;
+import com.kozlovskiy.mostocks.models.stockInfo.IndicatorsResponse;
+import com.kozlovskiy.mostocks.models.stockInfo.News;
+import com.kozlovskiy.mostocks.models.stockInfo.Recommendation;
 import com.kozlovskiy.mostocks.models.stockInfo.TechAnalysisResponse;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.utils.CacheUtil;
@@ -43,9 +44,9 @@ public class StocksRepository {
         Log.d(TAG, "getStockData: stocks loading...");
         return Single.create(emitter -> MStackService.getInstance().getApi()
                 .getStockData("XNAS", "30", MStackService.TOKEN)
-                .enqueue(new Callback<StockData>() {
+                .enqueue(new Callback<StockResponse>() {
                     @Override
-                    public void onResponse(@NonNull Call<StockData> call, @NonNull Response<StockData> response) {
+                    public void onResponse(@NonNull Call<StockResponse> call, @NonNull Response<StockResponse> response) {
                         if (response.body() != null) {
                             Log.d(TAG, "getStockData: stocks loaded...");
                             List<Stock> stocks = response.body().getData();
@@ -54,7 +55,7 @@ public class StocksRepository {
                     }
 
                     @Override
-                    public void onFailure(@NonNull Call<StockData> call, @NonNull Throwable t) {
+                    public void onFailure(@NonNull Call<StockResponse> call, @NonNull Throwable t) {
                         emitter.onError(t);
                     }
                 }));
@@ -203,5 +204,29 @@ public class StocksRepository {
                         emitter.onError(t);
                     }
                 }));
+    }
+
+    public Single<IndicatorsResponse.Indicators> getSymbolIndicators(String symbol) {
+        Log.d(TAG, "getSymbolIndicators: loading...");
+        return Single.create(emitter -> {
+            FinnhubService.getInstance().getApi()
+                    .getSymbolIndicators(symbol, "all", FinnhubService.TOKEN)
+                    .enqueue(new Callback<IndicatorsResponse>() {
+                        @Override
+                        public void onResponse(@NonNull Call<IndicatorsResponse> call, @NonNull Response<IndicatorsResponse> response) {
+                            if (response.body() != null) {
+                                IndicatorsResponse indicatorsResponse = response.body();
+                                IndicatorsResponse.Indicators indicators = indicatorsResponse.getIndicators();
+                                emitter.onSuccess(indicators);
+                                Log.d(TAG, "onResponse: loaded");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<IndicatorsResponse> call, @NonNull Throwable t) {
+                            emitter.onError(t);
+                        }
+                    });
+        });
     }
 }

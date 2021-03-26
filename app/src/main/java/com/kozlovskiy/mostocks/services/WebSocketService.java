@@ -6,7 +6,6 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.google.gson.Gson;
-import com.kozlovskiy.mostocks.models.socket.SocketData;
 import com.kozlovskiy.mostocks.models.socket.SocketResponse;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketClient;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketConnection;
@@ -56,7 +55,7 @@ public class WebSocketService extends Service implements WebSocketClient.Message
             SocketResponse response = gson.fromJson(message, SocketResponse.class);
 
             if (response.getType().equals(KEY_TRADE)) {
-                SocketData data = response.getData().get(0);
+                SocketResponse.Data data = response.getData().get(0);
 
                 intent.putExtra(KEY_SYMBOL, data.getSymbol());
                 intent.putExtra(KEY_QUOTE, data.getQuote());

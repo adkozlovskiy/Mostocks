@@ -1,5 +1,6 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts;
 
+import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -26,6 +27,7 @@ import im.dacer.androidcharts.PieView;
 
 public class ForecastsFragment extends Fragment implements ForecastsView {
 
+    private Context context;
     private ForecastsPresenter forecastsPresenter;
     private PieView stackedDataChart;
     private ProgressBar progressBar;
@@ -45,18 +47,24 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        forecastsPresenter = new ForecastsPresenter(this, getContext());
+        forecastsPresenter = new ForecastsPresenter(this, context);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        String ticker = getTicker();
+        String symbol = getSymbol();
 
-        if (ticker != null) {
-            forecastsPresenter.initializeGraphData(ticker);
+        if (symbol != null) {
+            forecastsPresenter.initializeGraphData(symbol);
         }
 
         stackedDataChart = view.findViewById(R.id.pie_view);
@@ -110,25 +118,25 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
         switch (signal) {
             case "buy":
                 tvSignal.setText(getString(R.string.need_to_buy));
-                tvSignal.setTextColor(getResources().getColor(R.color.buyIndicatorColor));
+                tvSignal.setTextColor(getResources().getColor(R.color.buyIndicatorColor, context.getTheme()));
                 drawable.setColorFilter(new PorterDuffColorFilter(
-                                ContextCompat.getColor(tvSignal.getContext(), R.color.buyIndicatorColor), PorterDuff.Mode.SRC_IN
+                                ContextCompat.getColor(context, R.color.buyIndicatorColor), PorterDuff.Mode.SRC_IN
                         )
                 );
                 break;
 
             case "sell":
                 tvSignal.setText(getString(R.string.need_to_sell));
-                tvSignal.setTextColor(getResources().getColor(R.color.sellIndicatorColor));
+                tvSignal.setTextColor(getResources().getColor(R.color.sellIndicatorColor, context.getTheme()));
                 drawable.setColorFilter(new PorterDuffColorFilter(
-                                ContextCompat.getColor(tvSignal.getContext(), R.color.sellIndicatorColor), PorterDuff.Mode.SRC_IN
+                                ContextCompat.getColor(context, R.color.sellIndicatorColor), PorterDuff.Mode.SRC_IN
                         )
                 );
                 break;
         }
     }
 
-    private String getTicker() {
+    private String getSymbol() {
         if (getArguments() == null) {
             return null;
         }

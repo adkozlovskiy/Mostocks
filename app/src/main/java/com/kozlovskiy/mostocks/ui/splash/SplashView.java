@@ -7,4 +7,5 @@ public interface SplashView {
     void startMainActivity(String json);
 
     void showDialog(Dialog dialog);
+
 }

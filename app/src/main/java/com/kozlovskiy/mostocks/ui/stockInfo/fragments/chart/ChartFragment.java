@@ -17,7 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.utils.QuoteConverter;
+import com.kozlovskiy.mostocks.utils.Converter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_CURRENT_
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_PREVIOUS_COST;
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_SYMBOL;
 
+// TODO: 26.03.2021 rewrite numbers to TimeUnit.
 public class ChartFragment extends Fragment implements ChartView {
 
     public static final String TAG = ChartFragment.class.getSimpleName();
@@ -39,9 +40,12 @@ public class ChartFragment extends Fragment implements ChartView {
     public static final String MONTH_RESOLUTION = "M";
 
     private final SimpleDateFormat dateFormat =
-            new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
+            new SimpleDateFormat("d MMMM yyyy", Locale.US);
+    private final SimpleDateFormat monthDateFormat =
+            new SimpleDateFormat("MMMM yyyy", Locale.US);
     private final SimpleDateFormat timeFormat =
-            new SimpleDateFormat("HH:mm", Locale.getDefault());
+            new SimpleDateFormat("HH:mm", Locale.US);
+
     private ChartPresenter chartPresenter;
     private CandleStickChart candleChart;
     private TextView tvPrice;
@@ -128,7 +132,7 @@ public class ChartFragment extends Fragment implements ChartView {
             double previousCost = getArguments().getDouble(KEY_PREVIOUS_COST);
             chartPresenter = new ChartPresenter(this, candleChart, context, symbol, previousCost);
 
-            tvPrice.setText(QuoteConverter.toCurrencyFormat(currentCost, 0, 2));
+            tvPrice.setText(Converter.toCurrencyFormat(currentCost, 0, 2));
             chartPresenter.calculateQuoteChange(currentCost, previousCost);
         }
 
@@ -178,7 +182,13 @@ public class ChartFragment extends Fragment implements ChartView {
     @Override
     public void showTimeStamp(long timestamp) {
         Date date = new Date(timestamp);
-        String dateString = dateFormat.format(date);
+
+        String dateString;
+        if (cvSelected == cvMonth)
+            dateString = monthDateFormat.format(date);
+
+        else dateString = dateFormat.format(date);
+
         String timeString = timeFormat.format(date);
         tvDatestamp.setText(dateString);
 

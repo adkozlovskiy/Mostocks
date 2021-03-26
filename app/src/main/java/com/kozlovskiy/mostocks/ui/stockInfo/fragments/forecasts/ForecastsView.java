@@ -9,4 +9,5 @@ public interface ForecastsView {
     void showGraph(ArrayList<PieHelper> entries, int selected);
 
     void showForecastStats(int buy, int hold, int sell, String signal);
+
 }

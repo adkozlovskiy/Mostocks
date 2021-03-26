@@ -8,8 +8,8 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.kozlovskiy.mostocks.models.stock.Favorite;
-import com.kozlovskiy.mostocks.models.stockInfo.News;
 import com.kozlovskiy.mostocks.models.stock.Stock;
+import com.kozlovskiy.mostocks.models.stockInfo.News;
 import com.kozlovskiy.mostocks.models.sys.Uptime;
 
 import java.util.List;

@@ -10,6 +10,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
+        android:paddingTop="5dp"
         style="@style/Toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize">
@@ -29,7 +30,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="16dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
 
@@ -43,7 +44,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="12dp"
                 android:gravity="center_vertical"
                 android:orientation="vertical">
 
@@ -53,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/montserrat_semibold"
                     android:textColor="@color/textAccentColor"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/tv_name"
@@ -62,7 +63,7 @@
                     android:layout_marginTop="-2dp"
                     android:fontFamily="@font/montserrat_medium"
                     android:textColor="@color/textColor"
-                    android:textSize="12sp" />
+                    android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -84,19 +85,19 @@
             android:textColor="@color/textAccentColor" />
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_news"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_semibold"
-            android:text="@string/news"
-            android:textColor="@color/textColor" />
-
-        <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_indicators"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/montserrat_semibold"
             android:text="@string/indicators"
+            android:textColor="@color/textColor" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/ti_news"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_semibold"
+            android:text="@string/news"
             android:textColor="@color/textColor" />
 
         <com.google.android.material.tabs.TabItem
@@ -112,7 +113,6 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fr_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>

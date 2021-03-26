@@ -27,8 +27,6 @@ public class StockInfoActivity extends AppCompatActivity
 
     private StockInfoPresenter stockInfoPresenter;
     private ImageView ivLogo;
-    private ImageView ivBackButton;
-    private TextView tvSymbol, tvName;
     private Bundle bundles;
 
     @Override
@@ -39,10 +37,11 @@ public class StockInfoActivity extends AppCompatActivity
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         ivLogo = toolbar.findViewById(R.id.iv_logo);
-        ivBackButton = toolbar.findViewById(R.id.back_button);
+
+        ImageView ivBackButton = toolbar.findViewById(R.id.back_button);
         ivBackButton.setOnClickListener(v -> onBackPressed());
-        tvSymbol = toolbar.findViewById(R.id.tv_symbol);
-        tvName = toolbar.findViewById(R.id.tv_name);
+        TextView tvSymbol = toolbar.findViewById(R.id.tv_symbol);
+        TextView tvName = toolbar.findViewById(R.id.tv_name);
 
         setSupportActionBar(toolbar);
 
@@ -112,11 +111,11 @@ public class StockInfoActivity extends AppCompatActivity
                 break;
 
             case 1:
-                transaction.replace(R.id.fr_container, NewsFragment.class, bundles);
+                transaction.replace(R.id.fr_container, IndicatorsFragment.class, bundles);
                 break;
 
             case 2:
-                transaction.replace(R.id.fr_container, IndicatorsFragment.class, bundles);
+                transaction.replace(R.id.fr_container, NewsFragment.class, bundles);
                 break;
 
             case 3:

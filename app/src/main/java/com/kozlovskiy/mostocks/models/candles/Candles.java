@@ -35,7 +35,6 @@ public class Candles {
     @Expose
     private List<Long> volumes = null;
 
-
     public List<Double> getClosePrices() {
         return closePrices;
     }
@@ -92,16 +91,4 @@ public class Candles {
         this.volumes = volumes;
     }
 
-    @Override
-    public String toString() {
-        return "Candles{" +
-                "closePrices=" + closePrices +
-                ", highPrices=" + highPrices +
-                ", lowPrices=" + lowPrices +
-                ", openPrices=" + openPrices +
-                ", status='" + status + '\'' +
-                ", timestamps=" + timestamps +
-                ", volumes=" + volumes +
-                '}';
-    }
 }

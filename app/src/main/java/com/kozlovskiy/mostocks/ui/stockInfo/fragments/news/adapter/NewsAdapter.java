@@ -25,25 +25,7 @@ import java.util.Locale;
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     private List<News> newsList;
-    private OnLoadNextListener onLoadNextListener;
     private final Context context;
-    private boolean isLoading, noNext;
-
-    public void endLoading() {
-        this.isLoading = false;
-    }
-
-    public void setNoNext(boolean noNext) {
-        this.noNext = noNext;
-    }
-
-    public interface OnLoadNextListener {
-        void onLoadNext();
-    }
-
-    public void setOnLoadNextListener(OnLoadNextListener listener) {
-        this.onLoadNextListener = listener;
-    }
 
     public NewsAdapter(List<News> newsList, Context context) {
         this.newsList = newsList;
@@ -61,12 +43,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull NewsAdapter.ViewHolder holder, int position) {
         News news = newsList.get(position);
-
-        if (onLoadNextListener != null && !isLoading && !noNext && holder.getAdapterPosition() == getItemCount() - 1) {
-            isLoading = true;
-            onLoadNextListener.onLoadNext();
-        }
-
         holder.tvHeadline.setText(news.getHeadline());
         holder.tvSummary.setText(news.getSummary());
 
@@ -94,7 +70,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
         String link = "<a href=\"" + news.getUrl() + "\">Read more...</a>";
 
-        holder.tvLink.setText(Html.fromHtml(link, null, null));
+        holder.tvLink.setText(Html.fromHtml(link, Html.FROM_HTML_MODE_LEGACY));
         holder.tvLink.setLinksClickable(true);
         holder.tvLink.setMovementMethod(LinkMovementMethod.getInstance());
 

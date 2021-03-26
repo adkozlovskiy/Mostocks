@@ -1,5 +1,6 @@
 package com.kozlovskiy.mostocks.models.candles;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.widget.TextView;
 
@@ -9,16 +10,19 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.utils.QuoteConverter;
 
+import static com.kozlovskiy.mostocks.utils.Converter.toCurrencyFormat;
+
+@SuppressLint("ViewConstructor")
 public class CandlesMarker extends MarkerView {
 
     public static final float MARGIN = 15f;
+    private final int xes;
     private final TextView tvOpen;
     private final TextView tvClose;
     private final TextView tvHigh;
     private final TextView tvLow;
-    private final int xes;
+
     private float position;
 
     public CandlesMarker(Context context, int layoutResource, int xes) {
@@ -32,14 +36,15 @@ public class CandlesMarker extends MarkerView {
     }
 
     @Override
-    public void refreshContent(Entry e, Highlight highlight) {
-        CandleEntry candleEntry = (CandleEntry) e;
-        position = e.getX();
-        tvOpen.setText(QuoteConverter.toCurrencyFormat(candleEntry.getOpen(), 2, 2));
-        tvClose.setText(QuoteConverter.toCurrencyFormat(candleEntry.getClose(), 2, 2));
-        tvHigh.setText(QuoteConverter.toCurrencyFormat(candleEntry.getHigh(), 2, 2));
-        tvLow.setText(QuoteConverter.toCurrencyFormat(candleEntry.getLow(), 2, 2));
-        super.refreshContent(e, highlight);
+    public void refreshContent(Entry entry, Highlight highlight) {
+        super.refreshContent(entry, highlight);
+        position = entry.getX();
+
+        CandleEntry candle = (CandleEntry) entry;
+        tvOpen.setText(toCurrencyFormat(candle.getOpen(), 2, 2));
+        tvClose.setText(toCurrencyFormat(candle.getClose(), 2, 2));
+        tvHigh.setText(toCurrencyFormat(candle.getHigh(), 2, 2));
+        tvLow.setText(toCurrencyFormat(candle.getLow(), 2, 2));
     }
 
     @Override

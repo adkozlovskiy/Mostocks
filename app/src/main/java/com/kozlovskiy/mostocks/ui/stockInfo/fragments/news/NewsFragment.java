@@ -2,7 +2,6 @@ package com.kozlovskiy.mostocks.ui.stockInfo.fragments.news;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -17,25 +16,25 @@ import com.kozlovskiy.mostocks.models.stockInfo.News;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 import com.kozlovskiy.mostocks.ui.stockInfo.fragments.news.adapter.NewsAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class NewsFragment extends Fragment implements NewsView {
 
     public static final String TAG = NewsFragment.class.getSimpleName();
-    private final List<News> newsList = new ArrayList<>();
     private NewsPresenter newsPresenter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
+    private Context context;
 
     public NewsFragment() {
         super(R.layout.fragment_news);
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        newsPresenter = new NewsPresenter(this, getContext());
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+        newsPresenter = new NewsPresenter(this, context);
     }
 
     @Override
@@ -45,15 +44,13 @@ public class NewsFragment extends Fragment implements NewsView {
         recyclerView = view.findViewById(R.id.recycler);
         progressBar = view.findViewById(R.id.progress_bar);
 
-        String ticker = getTicker();
-        Log.d(TAG, "onViewCreated: ");
-        newsPresenter.initializeNews(ticker);
+        newsPresenter.initializeNews(getSymbol());
     }
 
     @Override
     public void updateNews(List<News> newsList) {
-        LinearLayoutManager llm = new LinearLayoutManager(getContext());
-        NewsAdapter newsAdapter = new NewsAdapter(newsList, getContext());
+        LinearLayoutManager llm = new LinearLayoutManager(context);
+        NewsAdapter newsAdapter = new NewsAdapter(newsList, context);
         recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(newsAdapter);
 
@@ -63,12 +60,11 @@ public class NewsFragment extends Fragment implements NewsView {
         newsAdapter.updateNews(newsList);
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-    }
+    private String getSymbol() {
+        if (getArguments() == null) {
+            return null;
+        }
 
-    private String getTicker() {
         return getArguments().getString(StocksAdapter.KEY_SYMBOL);
     }
 }

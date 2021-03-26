@@ -22,7 +22,7 @@ import com.kozlovskiy.mostocks.models.stock.Stock;
 import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.ui.stockInfo.StockInfoActivity;
 import com.kozlovskiy.mostocks.utils.BitmapUtil;
-import com.kozlovskiy.mostocks.utils.QuoteConverter;
+import com.kozlovskiy.mostocks.utils.Converter;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -111,13 +111,13 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
                 ? context.getResources().getColor(R.color.cardColor)
                 : context.getResources().getColor(R.color.backgroundColor));
 
-        String quote = QuoteConverter.toCurrencyFormat(stock.getCurrent(), 2, 2);
+        String quote = Converter.toCurrencyFormat(stock.getCurrent(), 2, 2);
         holder.costView.setText(quote);
 
         int color = context.getResources().getColor(R.color.textColor);
         double difference = stock.getCurrent() - stock.getPrevious();
-        String changeString = QuoteConverter.toCurrencyFormat(difference, 2, 2);
-        String percentString = QuoteConverter.toDefaultFormat(difference / stock.getPrevious() * 100, 2, 2);
+        String changeString = Converter.toCurrencyFormat(difference, 2, 2);
+        String percentString = Converter.toDefaultFormat(difference / stock.getPrevious() * 100, 2, 2);
 
         if (difference > 0) {
             color = context.getResources().getColor(R.color.positiveCost);
@@ -125,7 +125,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
         } else if (difference < 0) {
             color = context.getResources().getColor(R.color.negativeCost);
-            percentString = QuoteConverter.toDefaultFormat(difference / stock.getPrevious() * -100, 2, 2);
+            percentString = Converter.toDefaultFormat(difference / stock.getPrevious() * -100, 2, 2);
 
         }
 
