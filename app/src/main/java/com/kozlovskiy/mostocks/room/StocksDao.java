@@ -20,11 +20,14 @@ public interface StocksDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void cacheStocks(List<Stock> stocks);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void addFavorite(Favorite favorite);
-
     @Update()
     void updateStocks(List<Stock> stocks);
+
+    @Query("UPDATE Stock SET current = :quote WHERE symbol = :symbol")
+    void updateStockQuote(String symbol, Double quote);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void addFavorite(Favorite favorite);
 
     @Query("SELECT * FROM Stock")
     List<Stock> getStocks();

@@ -2,6 +2,7 @@ package com.kozlovskiy.mostocks.ui.main.fragments.favorites;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -16,16 +17,22 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.models.stock.Stock;
+import com.kozlovskiy.mostocks.room.RoomDelegate;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 
 import java.lang.reflect.Type;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.kozlovskiy.mostocks.ui.splash.SplashActivity.KEY_STOCKS_INTENT;
 
 public class FavoritesFragment extends Fragment
         implements FavoritesView, StocksAdapter.ItemsCountListener {
 
+    public static final String TAG = "132";
     private FavoritesPresenter favoritesPresenter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
@@ -36,12 +43,14 @@ public class FavoritesFragment extends Fragment
     private Type type;
 
     public FavoritesFragment() {
-        super(R.layout.fragment_stocks);
+        super(R.layout.fragment_favorites);
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
+        Log.d(TAG, "onAttach: ");
         favoritesPresenter = new FavoritesPresenter(this, context);
 
         stocksAdapter = new StocksAdapter(context, true, this);

@@ -50,9 +50,18 @@ public class StockInfoActivity extends AppCompatActivity
 
         String symbol = getIntent().getStringExtra(StocksAdapter.KEY_SYMBOL);
         String name = getIntent().getStringExtra(StocksAdapter.KEY_NAME);
+
+        if (name != null && !name.isEmpty()) {
+            String nameCropped = name.length() > 28
+                    ? name.substring(0, 26).trim() + "\u2026"
+                    : name;
+
+            tvName.setText(nameCropped);
+        }
+
         initializeLogo(symbol);
         tvSymbol.setText(symbol);
-        tvName.setText(name);
+
 
         double currentCost = getIntent().getDoubleExtra(StocksAdapter.KEY_CURRENT_COST, 0);
         double previousCost = getIntent().getDoubleExtra(StocksAdapter.KEY_PREVIOUS_COST, 0);

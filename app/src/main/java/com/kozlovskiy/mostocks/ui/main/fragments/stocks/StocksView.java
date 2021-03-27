@@ -12,4 +12,5 @@ public interface StocksView {
 
     void updateStocks(List<Stock> stocks);
 
+    void stopRefreshing();
 }

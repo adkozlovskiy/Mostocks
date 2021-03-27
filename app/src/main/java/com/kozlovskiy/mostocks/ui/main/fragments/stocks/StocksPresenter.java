@@ -21,11 +21,12 @@ import io.reactivex.schedulers.Schedulers;
 
 public class StocksPresenter {
 
+    public static final String TAG = StocksPresenter.class.getSimpleName();
     private final StocksRepository stocksRepository;
     private final AlertDialog.Builder builder;
     private final StocksDao stocksDao;
     private final Context context;
-    private final List<Stock> stocks;
+    private List<Stock> stocks;
 
     private StocksView stocksView;
 
@@ -43,12 +44,13 @@ public class StocksPresenter {
 
     }
 
-    public void initializeStocks() {
+    public void initializeQuotes() {
         if (NetworkUtil.isNetworkConnectionNotGranted(context))
             buildNoNetworkDialog();
 
         if (CacheUtil.quoteCacheIsUpToDate(context)) {
-            stocksView.updateStocks(stocks);
+            stocksView.updateStocks(stocksDao.getStocks());
+            stocksView.stopRefreshing();
 
         } else {
             stocksRepository.getSymbolQuotes(stocks).subscribeOn(Schedulers.io())
@@ -56,15 +58,9 @@ public class StocksPresenter {
                     .subscribe(new DisposableSingleObserver<List<Stock>>() {
                         @Override
                         public void onSuccess(@NonNull List<Stock> stocks) {
-                            if (stocksDao.getStocks().size() == 0) {
-                                stocksDao.cacheStocks(stocks);
-                            } else {
-                                stocksDao.updateStocks(stocks);
-                            }
-
                             CacheUtil.updateQuoteUptime(context);
                             stocksView.updateStocks(stocks);
-
+                            stocksView.stopRefreshing();
                         }
 
                         @Override
@@ -85,7 +81,7 @@ public class StocksPresenter {
 
         }
 
-        builder.setPositiveButton(R.string.retry, (di, i) -> initializeStocks())
+        builder.setPositiveButton(R.string.retry, (di, i) -> initializeQuotes())
                 .setNegativeButton(R.string.cancel, (di, id) -> di.cancel());
 
         stocksView.showDialog(builder.create());
@@ -96,7 +92,7 @@ public class StocksPresenter {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.network_error)
                 .setMessage(R.string.no_network_message)
-                .setPositiveButton(R.string.retry, (di, id) -> initializeStocks())
+                .setPositiveButton(R.string.retry, (di, id) -> initializeQuotes())
                 .setNegativeButton(R.string.exit, (di, id) -> di.cancel());
 
         stocksView.showDialog(builder.create());

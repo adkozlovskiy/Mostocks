@@ -20,9 +20,9 @@
     <string name="buy">Buy</string>
     <string name="sell">Sell</string>
     <string name="neutral">Neutral</string>
-    <string name="need_to_buy">Need to buy</string>
-    <string name="need_to_sell">Need to sell</string>
-    <string name="need_to_hold">Need to hold</string>
+    <string name="need_to_buy">Buy</string>
+    <string name="need_to_sell">Sell</string>
+    <string name="need_to_hold">Hold</string>
     <string name="no_favorites">You have not favorite symbols.</string>
     <string name="ai_signals">AI Signals</string>
     <string name="add_to_favorites">Add to favorites</string>
@@ -79,4 +79,12 @@
     <string name="stocks_volatility">Stocks volatility to the market</string>
     <string name="beta">Beta</string>
     <string name="recommendation">Recommendation</string>
+    <string name="strong_sell">Strong sell</string>
+    <string name="strong_buy">Strong buy</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="high">High</string>
+    <string name="low">Low</string>
+    <string name="recommendations_by_month">Recommendations\nby month</string>
+    <string name="by_month">by month</string>
 </resources>

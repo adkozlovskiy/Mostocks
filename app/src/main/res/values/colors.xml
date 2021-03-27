@@ -10,9 +10,11 @@
     <color name="backgroundColor">#fff</color>
     <color name="negativeCost">#B22424</color>
     <color name="positiveCost">#24B25D</color>
+    <color name="strongBuyIndicatorColor">#127339</color>
     <color name="buyIndicatorColor">#24B25D</color>
     <color name="holdIndicatorColor">#F4CA2D</color>
-    <color name="sellIndicatorColor">#B22424</color>
+    <color name="sellIndicatorColor">#DD3F3F</color>
+    <color name="strongSellIndicatorColor">#B22424</color>
     <color name="colorBackgroundMarker">#141d2c</color>
     <color name="colorTextMarker">#8d95a2</color>
     <color name="colorChartButtonBackground">#F6F6F6</color>

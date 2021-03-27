@@ -15,11 +15,10 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.models.stock.Favorite;
 import com.kozlovskiy.mostocks.models.stock.Stock;
-import com.kozlovskiy.mostocks.room.StocksDao;
+import com.kozlovskiy.mostocks.room.RoomDelegate;
 import com.kozlovskiy.mostocks.ui.stockInfo.StockInfoActivity;
 import com.kozlovskiy.mostocks.utils.BitmapUtil;
 import com.kozlovskiy.mostocks.utils.Converter;
@@ -40,7 +39,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     public static final String KEY_NAME = "NAME";
 
     private final Context context;
-    private final StocksDao stocksDao;
+    private final RoomDelegate roomDelegate;
     private final boolean isFavoriteRecycler;
     private final ItemsCountListener itemsCountListener;
 
@@ -50,10 +49,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         this.context = context;
         this.isFavoriteRecycler = isFavoriteRecycler;
         this.itemsCountListener = itemsCountListener;
-        this.stocksDao = ((AppDelegate) context
-                .getApplicationContext())
-                .getDatabase()
-                .getDao();
+        this.roomDelegate = new RoomDelegate(context);
     }
 
     @NonNull
@@ -146,11 +142,13 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
 
         holder.ivStar.setOnClickListener(v -> {
             if (!stock.isFavorite()) {
-                stocksDao.addFavorite(new Favorite(stock.getSymbol()));
+                roomDelegate.addFavorite(new Favorite(stock.getSymbol()));
+
                 holder.ivStar.setImageResource(R.drawable.ic_star_gold);
 
             } else {
-                stocksDao.removeFavorite(new Favorite(stock.getSymbol()));
+                roomDelegate.removeFavorite(new Favorite(stock.getSymbol()));
+
                 if (isFavoriteRecycler) {
                     stocks.remove(stock);
                     notifyItemRemoved(holder.getAdapterPosition());
@@ -192,16 +190,12 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     }
 
     public void updateStocks(List<Stock> stocks) {
-        if (this.stocks == null || this.stocks.isEmpty())
-            this.stocks = stocks;
-
-        else this.stocks.addAll(stocks);
-
+        this.stocks = stocks;
         notifyDataSetChanged();
     }
 
     private boolean isFavorite(Stock stock) {
-        Favorite favorite = stocksDao.getFavorite(stock.getSymbol());
+        Favorite favorite = roomDelegate.getFavorite(stock.getSymbol());
         return favorite != null;
     }
 

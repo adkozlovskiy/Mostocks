@@ -50,6 +50,7 @@ public class StocksRepository {
                         if (response.body() != null) {
                             Log.d(TAG, "getStockData: stocks loaded...");
                             List<Stock> stocks = response.body().getData();
+                            stocksDao.cacheStocks(stocks);
                             emitter.onSuccess(stocks);
                         }
                     }
@@ -84,7 +85,7 @@ public class StocksRepository {
                                     updatedStocks.add(stock);
 
                                     if (updatedStocks.size() == stocks.size()) {
-                                        Log.d(TAG, "getSymbolQuotes: stocks costs loaded...");
+                                        stocksDao.updateStocks(stocks);
                                         emitter.onSuccess(updatedStocks);
                                     }
                                 }
@@ -160,7 +161,7 @@ public class StocksRepository {
     public Single<TechAnalysisResponse.TechnicalAnalysis> updateTechAnalysis(String symbol) {
         Log.d(TAG, "updateTechAnalysis: tech loading...");
         return Single.create(emitter -> FinnhubService.getInstance().getApi()
-                .getTechAnalysis(symbol, "M", FinnhubService.TOKEN)
+                .getTechAnalysis(symbol, "D", FinnhubService.TOKEN)
                 .enqueue(new Callback<TechAnalysisResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<TechAnalysisResponse> call, @NonNull Response<TechAnalysisResponse> response) {
@@ -207,7 +208,7 @@ public class StocksRepository {
                 }));
     }
 
-    public Single<Recommendation> getSymbolRecommendation(String symbol) {
+    public Single<List<Recommendation>> getSymbolRecommendation(String symbol) {
         Log.d(TAG, "getSymbolRecommendation: loading...");
         return Single.create(emitter -> FinnhubService.getInstance().getApi()
                 .getSymbolRecommendation(symbol, FinnhubService.TOKEN)
@@ -215,9 +216,9 @@ public class StocksRepository {
                     @Override
                     public void onResponse(@NonNull Call<List<Recommendation>> call, @NonNull Response<List<Recommendation>> response) {
                         if (response.body() != null) {
-                            Recommendation recommendation = response.body().get(0);
+                            List<Recommendation> recommendations = response.body();
                             // TODO: 25.03.2021 caching
-                            emitter.onSuccess(recommendation);
+                            emitter.onSuccess(recommendations);
                             Log.d(TAG, "getSymbolRecommendation: loaded");
                         }
                     }

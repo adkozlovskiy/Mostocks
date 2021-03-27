@@ -14,6 +14,7 @@ public class FavoritesPresenter {
 
     private FavoritesView favoritesView;
     private final StocksDao stocksDao;
+    private List<Stock> stocks;
 
     public FavoritesPresenter(FavoritesView favoritesView, Context context) {
         this.favoritesView = favoritesView;

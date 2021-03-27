@@ -4,14 +4,13 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.google.gson.Gson;
-import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.models.socket.SocketResponse;
-import com.kozlovskiy.mostocks.room.StocksDao;
+import com.kozlovskiy.mostocks.room.RoomDelegate;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketClient;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketConnection;
-import com.kozlovskiy.mostocks.ui.main.fragments.stocks.StocksFragment;
 
 import java.util.List;
 
@@ -19,15 +18,12 @@ public class WebSocketService extends Service implements WebSocketClient.Message
 
     public static final String TAG = WebSocketService.class.getSimpleName();
     public static final String KEY_TRADE = "trade";
-    public static final String KEY_SYMBOL = "symbol";
-    public static final String KEY_QUOTE = "quote";
 
-    private final Intent intent = new Intent(StocksFragment.BROADCAST_ACTION);
     private final IBinder binder = new QuoteBinder();
     private final Gson gson = new Gson();
 
     private WebSocketConnection webSocketConnection;
-    private StocksDao stocksDao;
+    private RoomDelegate roomDelegate;
 
     public class QuoteBinder extends Binder {
         public WebSocketService getInstance() {
@@ -37,16 +33,15 @@ public class WebSocketService extends Service implements WebSocketClient.Message
 
     @Override
     public IBinder onBind(Intent intent) {
-        stocksDao = ((AppDelegate) getApplicationContext())
-                .getDatabase()
-                .getDao();
-
+        roomDelegate = new RoomDelegate(this);
         return binder;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        webSocketConnection.closeConnection();
+        if (webSocketConnection != null)
+            webSocketConnection.closeConnection();
+
         return super.onUnbind(intent);
     }
 
@@ -63,10 +58,8 @@ public class WebSocketService extends Service implements WebSocketClient.Message
 
             if (response.getType().equals(KEY_TRADE)) {
                 SocketResponse.Data data = response.getData().get(0);
-
-                intent.putExtra(KEY_SYMBOL, data.getSymbol());
-                intent.putExtra(KEY_QUOTE, data.getQuote());
-                sendBroadcast(intent);
+                roomDelegate.updateStockQuote(data.getSymbol(), data.getQuote());
+                Log.d(TAG, "onSocketMessage: updated current quote for " + data.getSymbol() + "= " + data.getQuote());
             }
 
         } catch (Exception e) {
