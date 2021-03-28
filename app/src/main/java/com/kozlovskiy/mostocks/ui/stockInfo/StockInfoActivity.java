@@ -103,7 +103,7 @@ public class StockInfoActivity extends AppCompatActivity
                                     @Override
                                     public void onError(Exception e) {
                                         if (ivLogo != null) {
-                                            ivLogo.setImageBitmap(BitmapUtil.markSymbolOnBitmap(StockInfoActivity.this, R.drawable.blue_background, symbol.substring(0, 1)));
+                                            ivLogo.setImageBitmap(BitmapUtil.markSymbolOnBitmap(StockInfoActivity.this, R.drawable.bg, symbol.substring(0, 1)));
                                         }
                                     }
                                 });

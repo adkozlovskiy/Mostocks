@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -23,17 +22,12 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.models.stock.Stock;
-import com.kozlovskiy.mostocks.room.RoomDelegate;
 import com.kozlovskiy.mostocks.services.WebSocketService;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.observers.DisposableSingleObserver;
-import io.reactivex.schedulers.Schedulers;
 
 import static com.kozlovskiy.mostocks.ui.splash.SplashActivity.KEY_STOCKS_INTENT;
 
@@ -72,6 +66,10 @@ public class StocksFragment extends Fragment
 
     public StocksFragment() {
         super(R.layout.fragment_stocks);
+    }
+
+    public StocksPresenter getStocksPresenter() {
+        return stocksPresenter;
     }
 
     @Override
@@ -151,5 +149,9 @@ public class StocksFragment extends Fragment
     @Override
     public void stopRefreshing() {
         quoteRefresh.setRefreshing(false);
+    }
+
+    public void filter(String s) {
+        stocksPresenter.filter(s);
     }
 }

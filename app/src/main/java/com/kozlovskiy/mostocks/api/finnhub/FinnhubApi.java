@@ -15,9 +15,22 @@ import retrofit2.http.Query;
 
 public interface FinnhubApi {
 
+    /**
+     * @param symbol is stock symbol or ticker.
+     * @param token  is finnhub auth token.
+     * @return current symbol's quotes
+     */
     @GET("quote?")
     Call<Quote> getSymbolQuote(@Query("symbol") String symbol, @Query("token") String token);
 
+    /**
+     *
+     * @param symbol is stock symbol or ticker.
+     * @param from is start date.
+     * @param to is end date.
+     * @param token is auth token.
+     * @return
+     */
     @GET("company-news?")
     Call<List<News>> getCompanyNews(@Query("symbol") String symbol, @Query("from") String from, @Query("to") String to, @Query("token") String token);
 

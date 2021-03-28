@@ -2,6 +2,7 @@ package com.kozlovskiy.mostocks.ui.main.fragments.stocks;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.util.Log;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
@@ -12,6 +13,7 @@ import com.kozlovskiy.mostocks.utils.CacheUtil;
 import com.kozlovskiy.mostocks.utils.NetworkUtil;
 
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -45,11 +47,13 @@ public class StocksPresenter {
     }
 
     public void initializeQuotes() {
+        Log.d(TAG, "initializeQuotes: ");
         if (NetworkUtil.isNetworkConnectionNotGranted(context))
             buildNoNetworkDialog();
 
         if (CacheUtil.quoteCacheIsUpToDate(context)) {
-            stocksView.updateStocks(stocksDao.getStocks());
+            stocks = stocksDao.getStocks();
+            stocksView.updateStocks(stocks);
             stocksView.stopRefreshing();
 
         } else {
@@ -57,7 +61,8 @@ public class StocksPresenter {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new DisposableSingleObserver<List<Stock>>() {
                         @Override
-                        public void onSuccess(@NonNull List<Stock> stocks) {
+                        public void onSuccess(@NonNull List<Stock> s) {
+                            stocks = s;
                             CacheUtil.updateQuoteUptime(context);
                             stocksView.updateStocks(stocks);
                             stocksView.stopRefreshing();
@@ -100,5 +105,17 @@ public class StocksPresenter {
 
     public void unsubscribe() {
         stocksView = null;
+    }
+
+    public void filter(String s) {
+        Log.d(TAG, "filter: " + s);
+        List<Stock> filtered = new ArrayList<>();
+        for (Stock stock : stocks) {
+            if (stock.getSymbol().toUpperCase().startsWith(s.toUpperCase()) || stock.getName().toUpperCase().startsWith(s.toUpperCase())) {
+                filtered.add(stock);
+            }
+        }
+
+        stocksView.updateStocks(filtered);
     }
 }

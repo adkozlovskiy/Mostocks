@@ -3,7 +3,6 @@ package com.kozlovskiy.mostocks.ui.main;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +24,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
     private EditText searchEditText;
     private Bundle bundles;
     private StocksDao stocksDao;
+    private StocksFragment stocksFragment;
+    private FavoritesFragment favoritesFragment;
+    private int selectedTab = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +56,17 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
             bundles.putString(KEY_STOCKS_INTENT, json);
         }
 
+        stocksFragment = new StocksFragment();
+        favoritesFragment = new FavoritesFragment();
+
+
+        stocksFragment.setArguments(bundles);
+        favoritesFragment.setArguments(bundles);
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
-                    .add(R.id.fr_container, StocksFragment.class, bundles)
+                    .add(R.id.fr_container, stocksFragment)
                     .commit();
         }
     }
@@ -71,14 +80,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stocksDao.clearNewsCache();
-        stocksDao.nullNewsUptime();
-        Log.d(TAG, "onDestroy: ");
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
     }
 
     @Override
@@ -88,20 +89,26 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-
     }
 
     @Override
     public void afterTextChanged(Editable s) {
+        if (selectedTab == 0) {
+            stocksFragment.filter(s.toString());
+        } else {
+            favoritesFragment.filter(s.toString());
+        }
     }
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (tab.getPosition() == 1) {
-            transaction.replace(R.id.fr_container, FavoritesFragment.class, bundles);
+        selectedTab = tab.getPosition();
+
+        if (selectedTab == 1) {
+            transaction.replace(R.id.fr_container, favoritesFragment);
         } else {
-            transaction.replace(R.id.fr_container, StocksFragment.class, bundles);
+            transaction.replace(R.id.fr_container, stocksFragment);
         }
 
         transaction.commit();

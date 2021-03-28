@@ -1,6 +1,7 @@
 package com.kozlovskiy.mostocks.ui.main.fragments.favorites;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.models.stock.Favorite;
@@ -12,6 +13,7 @@ import java.util.List;
 
 public class FavoritesPresenter {
 
+    public static final String TAG = FavoritesPresenter.class.getSimpleName();
     private FavoritesView favoritesView;
     private final StocksDao stocksDao;
     private List<Stock> stocks;
@@ -26,6 +28,7 @@ public class FavoritesPresenter {
     }
 
     public void initializeFavorites(List<Stock> stocks) {
+        Log.d(TAG, "initializeFavorites: ");
         ArrayList<Stock> filteredStocks = new ArrayList<>();
         List<Favorite> favorites = stocksDao.getFavorites();
         List<String> favoritesStrings = new ArrayList<>();
@@ -40,10 +43,22 @@ public class FavoritesPresenter {
             }
         }
 
+        this.stocks = filteredStocks;
         favoritesView.updateStocks(filteredStocks);
     }
 
     public void unsubscribe() {
         favoritesView = null;
+    }
+
+    public void filter(String s) {
+        List<Stock> filtered = new ArrayList<>();
+        for (Stock stock : stocks) {
+            if (stock.getSymbol().toUpperCase().startsWith(s.toUpperCase()) || stock.getName().toUpperCase().startsWith(s.toUpperCase())) {
+                filtered.add(stock);
+            }
+        }
+
+        favoritesView.updateStocks(filtered);
     }
 }

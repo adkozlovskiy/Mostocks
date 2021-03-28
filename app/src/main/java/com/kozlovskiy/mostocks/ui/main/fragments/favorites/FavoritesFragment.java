@@ -17,15 +17,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.models.stock.Stock;
-import com.kozlovskiy.mostocks.room.RoomDelegate;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 
 import java.lang.reflect.Type;
 import java.util.List;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.observers.DisposableSingleObserver;
-import io.reactivex.schedulers.Schedulers;
 
 import static com.kozlovskiy.mostocks.ui.splash.SplashActivity.KEY_STOCKS_INTENT;
 
@@ -105,5 +100,9 @@ public class FavoritesFragment extends Fragment
     public void onZeroItems() {
         recyclerView.setVisibility(View.GONE);
         tvNoTicker.setVisibility(View.VISIBLE);
+    }
+
+    public void filter(String s) {
+        favoritesPresenter.filter(s);
     }
 }
