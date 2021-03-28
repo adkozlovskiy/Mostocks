@@ -24,9 +24,8 @@ public class SplashActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        splashPresenter.unsubscribe();
+    public void showDialog(Dialog dialog) {
+        dialog.show();
     }
 
     @Override
@@ -38,7 +37,8 @@ public class SplashActivity extends AppCompatActivity
     }
 
     @Override
-    public void showDialog(Dialog dialog) {
-        dialog.show();
+    protected void onDestroy() {
+        super.onDestroy();
+        splashPresenter.unsubscribe();
     }
 }
