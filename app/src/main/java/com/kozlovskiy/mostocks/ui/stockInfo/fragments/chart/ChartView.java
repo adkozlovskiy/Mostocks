@@ -8,9 +8,11 @@ public interface ChartView {
 
     void showUpdatedCost(String cost);
 
-    void buildCandlesChart(CandleStickChart chart);
+    void buildCandlesChart(CandleStickChart chart, int size);
 
     void showQuoteChange(String pq, int color, Drawable drawable);
 
     void showTimeStamp(long timestamp);
+
+    void hideTimeStamp();
 }

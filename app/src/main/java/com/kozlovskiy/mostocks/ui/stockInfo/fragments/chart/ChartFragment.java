@@ -3,7 +3,6 @@ package com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -29,8 +28,8 @@ import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_CURRENT_
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_PREVIOUS_COST;
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_SYMBOL;
 
-// TODO: 26.03.2021 rewrite numbers to TimeUnit.
-public class ChartFragment extends Fragment implements ChartView {
+public class ChartFragment extends Fragment
+        implements ChartView {
 
     public static final String TAG = ChartFragment.class.getSimpleName();
     public static final String HALF_HOUR_RESOLUTION = "30";
@@ -39,12 +38,13 @@ public class ChartFragment extends Fragment implements ChartView {
     public static final String WEEK_RESOLUTION = "W";
     public static final String MONTH_RESOLUTION = "M";
 
-    private final SimpleDateFormat dateFormat =
-            new SimpleDateFormat("d MMMM yyyy", Locale.US);
-    private final SimpleDateFormat monthDateFormat =
-            new SimpleDateFormat("MMMM yyyy", Locale.US);
-    private final SimpleDateFormat timeFormat =
-            new SimpleDateFormat("HH:mm", Locale.US);
+    private final SimpleDateFormat monthDateFormat = new SimpleDateFormat("MMMM yyyy", Locale.US);
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("d MMMM yyyy", Locale.US);
+    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.US);
+
+    private final List<CardView> navigationCards = new ArrayList<>(5);
+    private final Date date = new Date();
+    private long timestamp = date.getTime();
 
     private ChartPresenter chartPresenter;
     private CandleStickChart candleChart;
@@ -54,10 +54,6 @@ public class ChartFragment extends Fragment implements ChartView {
     private TextView tvTimestamp;
     private ProgressBar progressBar;
     private Context context;
-
-    private final Date date = new Date();
-    private final long timestamp = date.getTime();
-    private final List<CardView> cardViews = new ArrayList<>();
 
     private boolean candlesChartSelected = false;
     private CardView cvThirties;
@@ -82,6 +78,7 @@ public class ChartFragment extends Fragment implements ChartView {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         tvPrice = view.findViewById(R.id.tv_price);
         tvPriceChange = view.findViewById(R.id.tv_price_change);
         candleChart = view.findViewById(R.id.chart_candles);
@@ -107,34 +104,30 @@ public class ChartFragment extends Fragment implements ChartView {
 
         cvThirties = view.findViewById(R.id.cv_thirties);
         cvThirties.setOnClickListener(cardClickListener);
-        cardViews.add(cvThirties);
+        navigationCards.add(cvThirties);
 
         cvHour = view.findViewById(R.id.cv_hour);
         cvHour.setOnClickListener(cardClickListener);
-        cardViews.add(cvHour);
+        navigationCards.add(cvHour);
 
         cvDay = view.findViewById(R.id.cv_day);
         cvDay.setOnClickListener(cardClickListener);
-        cardViews.add(cvDay);
+        navigationCards.add(cvDay);
 
         cvWeek = view.findViewById(R.id.cv_week);
         cvWeek.setOnClickListener(cardClickListener);
-        cardViews.add(cvWeek);
+        navigationCards.add(cvWeek);
 
         cvMonth = view.findViewById(R.id.cv_month);
         cvMonth.setOnClickListener(cardClickListener);
-        cardViews.add(cvMonth);
+        navigationCards.add(cvMonth);
 
-        if (getArguments() != null) {
-            String symbol = getArguments().getString(KEY_SYMBOL);
+        double currentQuote = getCurrentQuote();
+        tvPrice.setText(Converter.toCurrencyFormat(currentQuote, 0, 2));
 
-            double currentCost = getArguments().getDouble(KEY_CURRENT_COST);
-            double previousCost = getArguments().getDouble(KEY_PREVIOUS_COST);
-            chartPresenter = new ChartPresenter(this, candleChart, context, symbol, previousCost);
-
-            tvPrice.setText(Converter.toCurrencyFormat(currentCost, 0, 2));
-            chartPresenter.calculateQuoteChange(currentCost, previousCost);
-        }
+        double previousQuote = getPreviousQuote();
+        chartPresenter = new ChartPresenter(this, candleChart, context, getSymbol(), previousQuote);
+        chartPresenter.calculateQuoteChange(currentQuote, previousQuote);
 
         long MILLIS_IN_SECOND = 1000;
         long MILLIS_IN_MINUTE = 60 * MILLIS_IN_SECOND;
@@ -161,7 +154,7 @@ public class ChartFragment extends Fragment implements ChartView {
     }
 
     @Override
-    public void buildCandlesChart(CandleStickChart chart) {
+    public void buildCandlesChart(CandleStickChart chart, int size) {
         candleChart.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
         chart.invalidate();
@@ -197,8 +190,18 @@ public class ChartFragment extends Fragment implements ChartView {
         }
     }
 
+    @Override
+    public void hideTimeStamp() {
+        tvTimestamp.setText("");
+        tvDatestamp.setText("");
+    }
+
     View.OnClickListener cardClickListener = v -> {
+        if (v == cvSelected)
+            return;
+
         int id = v.getId();
+
         long MILLIS_IN_SECOND = 1000;
         long MILLIS_IN_MINUTE = 60 * MILLIS_IN_SECOND;
         long MILLIS_IN_HOUR = 60 * MILLIS_IN_MINUTE;
@@ -238,6 +241,7 @@ public class ChartFragment extends Fragment implements ChartView {
     private void initializeCandles(long from, long to, String resolution) {
         progressBar.setVisibility(View.VISIBLE);
         candleChart.setVisibility(View.GONE);
+        candleChart.highlightValue(null);
         chartPresenter.initializeCandles(from, to, resolution);
     }
 
@@ -246,21 +250,34 @@ public class ChartFragment extends Fragment implements ChartView {
         cvSelected.setCardBackgroundColor(context.getResources()
                 .getColor(R.color.colorChartButtonBackgroundAccent, context.getTheme()));
 
-        tvTimestamp.setText("");
-        tvDatestamp.setText("");
-
-        for (CardView cardView : cardViews) {
+        for (CardView cardView : navigationCards) {
             if (cardView != cvSelected) {
                 cardView.setCardBackgroundColor(context.getResources()
                         .getColor(R.color.colorChartButtonBackground, context.getTheme()));
             }
         }
+
+        hideTimeStamp();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         chartPresenter.unsubscribe();
-        Log.d(TAG, "onStop: ");
+    }
+
+    private String getSymbol() {
+        return getArguments() == null ? null
+                : getArguments().getString(KEY_SYMBOL);
+    }
+
+    private Double getCurrentQuote() {
+        return getArguments() == null ? null
+                : getArguments().getDouble(KEY_CURRENT_COST);
+    }
+
+    private Double getPreviousQuote() {
+        return getArguments() == null ? null
+                : getArguments().getDouble(KEY_PREVIOUS_COST);
     }
 }

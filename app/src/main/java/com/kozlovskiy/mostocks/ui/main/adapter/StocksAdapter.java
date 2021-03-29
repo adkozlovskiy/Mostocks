@@ -77,7 +77,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
                 ? R.drawable.ic_star_gold
                 : R.drawable.ic_star_gray);
 
-        Bitmap bitmap = BitmapUtil.markSymbolOnBitmap(context,
+        Bitmap bitmap = BitmapUtil.getCompanyLogo(context,
                 R.drawable.bg, stock.getSymbol().substring(0, 1));
 
         Drawable placeholder = new BitmapDrawable(context.getResources(), bitmap);

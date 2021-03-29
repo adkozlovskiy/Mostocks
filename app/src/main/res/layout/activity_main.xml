@@ -36,7 +36,6 @@
                 android:id="@+id/tv_stocks"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat_semibold"
                 android:text="@string/stocks"
                 android:textColor="@color/textAccentColor" />
 
@@ -44,7 +43,6 @@
                 android:id="@+id/tv_favorites"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat_semibold"
                 android:text="@string/favorites"
                 android:textColor="@color/textColor" />
 

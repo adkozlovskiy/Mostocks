@@ -20,10 +20,14 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/back_button"
+            <ImageButton
+                android:id="@+id/ib_return"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:background="@color/backgroundColor"
+                android:contentDescription="@string/return_button"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
                 android:src="@drawable/back_button" />
 
             <androidx.cardview.widget.CardView
@@ -37,7 +41,8 @@
                 <ImageView
                     android:id="@+id/iv_logo"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/company_logo" />
 
             </androidx.cardview.widget.CardView>
 
@@ -80,7 +85,6 @@
             android:id="@+id/ti_chart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_semibold"
             android:text="@string/chart"
             android:textColor="@color/textAccentColor" />
 
@@ -88,7 +92,6 @@
             android:id="@+id/ti_indicators"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_semibold"
             android:text="@string/indicators"
             android:textColor="@color/textColor" />
 
@@ -96,7 +99,6 @@
             android:id="@+id/ti_news"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_semibold"
             android:text="@string/news"
             android:textColor="@color/textColor" />
 
@@ -104,7 +106,6 @@
             android:id="@+id/ti_forecasts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_semibold"
             android:text="@string/forecasts"
             android:textColor="@color/textColor" />
 

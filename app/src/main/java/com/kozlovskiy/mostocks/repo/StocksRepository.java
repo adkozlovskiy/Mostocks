@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.api.finnhub.FinnhubService;
 import com.kozlovskiy.mostocks.api.mstack.MStackService;
-import com.kozlovskiy.mostocks.models.candles.Candles;
+import com.kozlovskiy.mostocks.models.chart.Candles;
 import com.kozlovskiy.mostocks.models.stock.Quote;
 import com.kozlovskiy.mostocks.models.stock.Stock;
 import com.kozlovskiy.mostocks.models.stock.StockResponse;
@@ -40,15 +40,15 @@ public class StocksRepository {
                 .getDao();
     }
 
-    public Single<List<Stock>> getStockData() {
-        Log.d(TAG, "getStockData: stocks loading...");
+    public Single<List<Stock>> getStockSymbols() {
+        Log.d(TAG, "getStockData: stock symbols loading...");
         return Single.create(emitter -> MStackService.getInstance().getApi()
                 .getStockData("XNAS", "30", MStackService.TOKEN)
                 .enqueue(new Callback<StockResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<StockResponse> call, @NonNull Response<StockResponse> response) {
                         if (response.body() != null) {
-                            Log.d(TAG, "getStockData: stocks loaded...");
+                            Log.d(TAG, "getStockData: stock symbols loaded...");
                             List<Stock> stocks = response.body().getData();
                             stocksDao.cacheStocks(stocks);
                             emitter.onSuccess(stocks);
@@ -63,7 +63,7 @@ public class StocksRepository {
     }
 
     public Single<List<Stock>> getSymbolQuotes(List<Stock> stocks) {
-        Log.d(TAG, "getSymbolQuotes: stocks costs loading...");
+        Log.d(TAG, "getSymbolQuotes: stocks quotes loading...");
         return Single.create(emitter -> {
             List<Stock> updatedStocks = new ArrayList<>();
             for (Stock stock : stocks) {
@@ -73,7 +73,7 @@ public class StocksRepository {
                             @Override
                             public void onResponse(@NonNull Call<Quote> call, @NonNull Response<Quote> response) {
                                 if (response.body() != null) {
-                                    Log.d(TAG, "getSymbolQuotes: stocks costs loaded for " + stock.getSymbol());
+                                    Log.d(TAG, "getSymbolQuotes: stocks quotes loaded for " + stock.getSymbol());
                                     Quote quote = response.body();
                                     stock.setOpen(quote.getOpen());
                                     stock.setCurrent(quote.getCurrent());
@@ -100,30 +100,7 @@ public class StocksRepository {
         });
     }
 
-    public Single<Quote> getSymbolQuote(Stock stock) {
-        Log.d(TAG, "getSymbolQuotes: stocks costs loading...");
-        return Single.create(emitter -> {
-            FinnhubService.getInstance().getApi()
-                    .getSymbolQuote(stock.getSymbol(), FinnhubService.TOKEN)
-                    .enqueue(new Callback<Quote>() {
-                        @Override
-                        public void onResponse(@NonNull Call<Quote> call, @NonNull Response<Quote> response) {
-                            if (response.body() != null) {
-                                Log.d(TAG, "getSymbolQuotes: stocks costs loaded for " + stock.getSymbol());
-                                Quote quote = response.body(); //todo caching
-                                emitter.onSuccess(quote);
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(@NonNull Call<Quote> call, @NonNull Throwable t) {
-                            emitter.onError(t);
-                        }
-                    });
-        });
-    }
-
-    public Single<List<News>> updateNews(String symbol, String from, String to) {
+    public Single<List<News>> getCompanyNews(String symbol, String from, String to) {
         return Single.create(emitter -> {
             if (CacheUtil.newsCacheIsUpToDate(symbol, context)) {
                 emitter.onSuccess(stocksDao.getNewsBySymbol(symbol));
@@ -158,7 +135,7 @@ public class StocksRepository {
         });
     }
 
-    public Single<TechAnalysisResponse.TechnicalAnalysis> updateTechAnalysis(String symbol) {
+    public Single<TechAnalysisResponse.TechnicalAnalysis> getSymbolTechAnalysis(String symbol) {
         Log.d(TAG, "updateTechAnalysis: tech loading...");
         return Single.create(emitter -> FinnhubService.getInstance().getApi()
                 .getTechAnalysis(symbol, "D", FinnhubService.TOKEN)
@@ -232,25 +209,23 @@ public class StocksRepository {
 
     public Single<IndicatorsResponse.Indicators> getSymbolIndicators(String symbol) {
         Log.d(TAG, "getSymbolIndicators: loading...");
-        return Single.create(emitter -> {
-            FinnhubService.getInstance().getApi()
-                    .getSymbolIndicators(symbol, "all", FinnhubService.TOKEN)
-                    .enqueue(new Callback<IndicatorsResponse>() {
-                        @Override
-                        public void onResponse(@NonNull Call<IndicatorsResponse> call, @NonNull Response<IndicatorsResponse> response) {
-                            if (response.body() != null) {
-                                IndicatorsResponse indicatorsResponse = response.body();
-                                IndicatorsResponse.Indicators indicators = indicatorsResponse.getIndicators();
-                                emitter.onSuccess(indicators);
-                                Log.d(TAG, "onResponse: loaded");
-                            }
+        return Single.create(emitter -> FinnhubService.getInstance().getApi()
+                .getSymbolIndicators(symbol, "all", FinnhubService.TOKEN)
+                .enqueue(new Callback<IndicatorsResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<IndicatorsResponse> call, @NonNull Response<IndicatorsResponse> response) {
+                        if (response.body() != null) {
+                            IndicatorsResponse indicatorsResponse = response.body();
+                            IndicatorsResponse.Indicators indicators = indicatorsResponse.getIndicators();
+                            emitter.onSuccess(indicators);
+                            Log.d(TAG, "onResponse: loaded");
                         }
+                    }
 
-                        @Override
-                        public void onFailure(@NonNull Call<IndicatorsResponse> call, @NonNull Throwable t) {
-                            emitter.onError(t);
-                        }
-                    });
-        });
+                    @Override
+                    public void onFailure(@NonNull Call<IndicatorsResponse> call, @NonNull Throwable t) {
+                        emitter.onError(t);
+                    }
+                }));
     }
 }

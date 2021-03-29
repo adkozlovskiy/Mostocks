@@ -2,6 +2,7 @@ package com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
@@ -16,6 +17,7 @@ import com.kozlovskiy.mostocks.models.stockInfo.TechAnalysisResponse;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,9 +34,11 @@ public class ForecastsPresenter {
     public static final String TAG = ForecastsPresenter.class.getSimpleName();
     private final StocksRepository stocksRepository;
     private BarChart chart;
+    private Context context;
 
     public ForecastsPresenter(ForecastsView forecastsView, Context context) {
         this.forecastsView = forecastsView;
+        this.context = context;
         stocksRepository = new StocksRepository(context);
     }
 
@@ -69,10 +73,11 @@ public class ForecastsPresenter {
                     @Override
                     public void onSuccess(@NonNull List<Recommendation> r) {
                         String signal = null;
-                        int buySignals = r.get(0).getBuySignals();
-                        int sellSignals = r.get(0).getSellSignals();
-                        int strongBuySignals = r.get(0).getStrongBuySignals();
-                        int strongSellSignals = r.get(0).getStrongSellSignals();
+                        Recommendation lastRecommendation = r.get(0);
+                        int buySignals = lastRecommendation.getBuySignals();
+                        int sellSignals = lastRecommendation.getSellSignals();
+                        int strongBuySignals = lastRecommendation.getStrongBuySignals();
+                        int strongSellSignals = lastRecommendation.getStrongSellSignals();
 
                         int max = Math.max(Math.max(buySignals, sellSignals), Math.max(strongBuySignals, strongSellSignals));
 
@@ -88,10 +93,13 @@ public class ForecastsPresenter {
                         if (max == strongSellSignals)
                             signal = "ss";
 
-                        setChartData(r);
                         forecastsView.showRecommendationsResult(
-                                r.get(0).getPeriod(),
+                                lastRecommendation.getPeriod(),
                                 signal);
+
+                        r = r.subList(0, r.size() / 2);
+                        Collections.reverse(r);
+                        setChartData(r);
 
                         emitter.onComplete();
                     }
@@ -104,7 +112,7 @@ public class ForecastsPresenter {
     }
 
     public Completable initializeTechAnalysis(String symbol) {
-        return Completable.create((emitter) -> stocksRepository.updateTechAnalysis(symbol)
+        return Completable.create((emitter) -> stocksRepository.getSymbolTechAnalysis(symbol)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableSingleObserver<TechAnalysisResponse.TechnicalAnalysis>() {
@@ -154,12 +162,15 @@ public class ForecastsPresenter {
     public void setChartData(List<Recommendation> recommendations) {
         ArrayList<BarEntry> values = new ArrayList<>();
 
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < recommendations.size(); i++) {
+            Log.d(TAG, "setChartData: mopmop");
             int strongSellSignals = recommendations.get(i).getStrongSellSignals();
             int sellSignals = recommendations.get(i).getSellSignals();
             int holdSignals = recommendations.get(i).getHoldSignals();
             int buySignals = recommendations.get(i).getBuySignals();
             int strongBuySignals = recommendations.get(i).getStrongBuySignals();
+
+            int sum = strongSellSignals + sellSignals + holdSignals + buySignals + strongBuySignals;
 
             String signal = null;
             int max = Math.max(Math.max(buySignals, sellSignals), Math.max(strongBuySignals, strongSellSignals));
@@ -180,6 +191,7 @@ public class ForecastsPresenter {
             HashMap<String, String> data = new HashMap<>();
             data.put("signal", signal);
             data.put("period", recommendations.get(i).getPeriod());
+            data.put("sum", String.valueOf(sum));
             entry.setData(data);
 
             values.add(entry);
@@ -198,7 +210,8 @@ public class ForecastsPresenter {
         data.setValueTextColor(Color.WHITE);
 
         chart.setData(data);
-        chart.setFitBars(true);
+        chart.setFitBars(false);
+
         forecastsView.buildRecommendationChart(chart);
     }
 

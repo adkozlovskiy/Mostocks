@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
@@ -27,6 +28,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+
+import static com.kozlovskiy.mostocks.utils.Converter.toDefaultFormat;
+import static com.kozlovskiy.mostocks.utils.Converter.toPercentFormat;
 
 public class ForecastsFragment extends Fragment implements ForecastsView {
 
@@ -43,6 +47,7 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
     private TextView tvDateRec;
     private TextView tvSignalTech;
     private TextView tvSignalRec;
+    private TextView tvSignals;
 
     private BarChart chart;
 
@@ -70,6 +75,7 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
 
         tvSignalTech = view.findViewById(R.id.tv_signal_tech);
         tvSignalRec = view.findViewById(R.id.tv_signal_rec);
+        tvSignals = view.findViewById(R.id.tv_signals);
 
         cvRec = view.findViewById(R.id.cv_rec);
         cvTech = view.findViewById(R.id.cv_tech);
@@ -175,17 +181,55 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
         chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
+                tvSignals.setVisibility(View.VISIBLE);
                 if (e.getData() instanceof HashMap) {
+                    BarEntry bar = (BarEntry) e;
+
+                    int index = h.getStackIndex();
+                    float val = bar.getYVals()[index];
+                    String signalsCount = toDefaultFormat(val, 0, 0);
+
                     HashMap<String, String> data = (HashMap<String, String>) e.getData();
                     String period = data.getOrDefault("period", "1970-01-01");
                     String signal = data.getOrDefault("signal", "hold");
+                    String sum = data.getOrDefault("sum", "N/A");
+
+                    String percent = toPercentFormat(val / Integer.parseInt(sum) * 100, 0, 2);
+                    String res = "";
+                    switch (index) {
+                        case 0:
+                            res += getResources().getString(R.string.strong_sell_signals);
+                            break;
+
+                        case 1:
+                            res += getResources().getString(R.string.sell_signals);
+                            break;
+
+                        case 2:
+                            res += getResources().getString(R.string.hold_signals);
+                            break;
+
+                        case 3:
+                            res += getResources().getString(R.string.buy_signals);
+                            break;
+
+                        case 4:
+                            res += getResources().getString(R.string.strong_buy_signals);
+                            break;
+                    }
+
+                    String holder = signalsCount + "/" + sum + " (" + percent + ")";
+                    res += " " + holder;
+
+                    tvSignals.setText(res);
+
                     showRecommendationsResult(period, signal);
                 }
             }
 
             @Override
             public void onNothingSelected() {
-
+                tvSignals.setVisibility(View.GONE);
             }
         });
     }

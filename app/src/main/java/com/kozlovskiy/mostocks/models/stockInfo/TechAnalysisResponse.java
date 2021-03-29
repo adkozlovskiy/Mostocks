@@ -21,7 +21,7 @@ public class TechAnalysisResponse {
     public static class TechnicalAnalysis {
 
         private int id;
-        private String ticker;
+        private String symbol;
 
         public int getId() {
             return id;
@@ -31,12 +31,12 @@ public class TechAnalysisResponse {
             this.id = id;
         }
 
-        public String getTicker() {
-            return ticker;
+        public String getSymbol() {
+            return symbol;
         }
 
-        public void setTicker(String ticker) {
-            this.ticker = ticker;
+        public void setSymbol(String symbol) {
+            this.symbol = symbol;
         }
 
         @SerializedName("count")

@@ -22,7 +22,7 @@ public class Converter {
     }
 
     public static String toPercentFormat(double quote, int mid, int mad) {
-        return toDefaultFormat(quote, mid, mad) + " %";
+        return toDefaultFormat(quote, mid, mad) + "%";
     }
 
     public static String toBigCurrencyFormat(double quote, int mid, int mad) {

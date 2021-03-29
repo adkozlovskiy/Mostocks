@@ -47,6 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="4dp"
+                android:contentDescription="@string/change_the_chart_view"
                 android:src="@drawable/ic_line_chart" />
 
         </androidx.cardview.widget.CardView>

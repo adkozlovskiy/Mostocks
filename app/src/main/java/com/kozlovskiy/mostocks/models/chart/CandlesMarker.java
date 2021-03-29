@@ -1,7 +1,8 @@
-package com.kozlovskiy.mostocks.models.candles;
+package com.kozlovskiy.mostocks.models.chart;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.components.MarkerView;
@@ -16,6 +17,7 @@ import static com.kozlovskiy.mostocks.utils.Converter.toCurrencyFormat;
 @SuppressLint("ViewConstructor")
 public class CandlesMarker extends MarkerView {
 
+    public static final String TAG = CandlesMarker.class.getSimpleName();
     public static final float MARGIN = 15f;
     private final int xes;
     private final TextView tvOpen;
@@ -37,7 +39,6 @@ public class CandlesMarker extends MarkerView {
 
     @Override
     public void refreshContent(Entry entry, Highlight highlight) {
-        super.refreshContent(entry, highlight);
         position = entry.getX();
 
         CandleEntry candle = (CandleEntry) entry;
@@ -45,6 +46,8 @@ public class CandlesMarker extends MarkerView {
         tvClose.setText(toCurrencyFormat(candle.getClose(), 2, 2));
         tvHigh.setText(toCurrencyFormat(candle.getHigh(), 2, 2));
         tvLow.setText(toCurrencyFormat(candle.getLow(), 2, 2));
+
+        super.refreshContent(entry, highlight);
     }
 
     @Override

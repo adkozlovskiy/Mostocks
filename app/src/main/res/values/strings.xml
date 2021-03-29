@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Mostocks</string>
-    <string name="search_hint">Find company or ticker</string>
+    <string name="search_hint">Find company or symbol</string>
     <string name="stocks">Stocks</string>
     <string name="favorites">Favorites</string>
     <string name="retry">Retry</string>
@@ -13,9 +13,6 @@
     <string name="no_network">No network connection!</string>
     <string name="turn_on_network">Enable</string>
     <string name="cancel">Cancel</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="ipo">IPO</string>
-    <string name="mc">MC</string>
     <string name="technical_analysis">Technical analysis</string>
     <string name="buy">Buy</string>
     <string name="sell">Sell</string>
@@ -24,10 +21,8 @@
     <string name="need_to_sell">Sell</string>
     <string name="need_to_hold">Hold</string>
     <string name="no_favorites">You have not favorite symbols.</string>
-    <string name="ai_signals">AI Signals</string>
     <string name="add_to_favorites">Add to favorites</string>
-    <string name="company_logo">Company logo</string>
-    <string name="add_or_remove_favorite">Add or remove favorite ticker</string>
+    <string name="add_or_remove_favorite">Add or remove favorite symbol</string>
     <string name="news_image">News image</string>
     <string name="network_error">Network error</string>
     <string name="no_network_message">You are not connected to the internet.</string>
@@ -86,5 +81,12 @@
     <string name="high">High</string>
     <string name="low">Low</string>
     <string name="recommendations_by_month">Recommendations\nby month</string>
-    <string name="by_month">by month</string>
+    <string name="return_button">Return button</string>
+    <string name="company_logo">Company logo</string>
+    <string name="change_the_chart_view">Change the chart view</string>
+    <string name="buy_signals">Buy signals:</string>
+    <string name="sell_signals">Sell signals:</string>
+    <string name="hold_signals">Hold signals:</string>
+    <string name="strong_buy_signals">Strong buy signals:</string>
+    <string name="strong_sell_signals">Strong sell signals:</string>
 </resources>

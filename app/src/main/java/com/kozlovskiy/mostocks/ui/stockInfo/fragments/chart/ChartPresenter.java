@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import androidx.appcompat.content.res.AppCompatResources;
 
@@ -20,8 +21,8 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.gson.Gson;
 import com.kozlovskiy.mostocks.R;
-import com.kozlovskiy.mostocks.models.candles.Candles;
-import com.kozlovskiy.mostocks.models.candles.CandlesMarker;
+import com.kozlovskiy.mostocks.models.chart.Candles;
+import com.kozlovskiy.mostocks.models.chart.CandlesMarker;
 import com.kozlovskiy.mostocks.models.socket.SocketResponse;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 import com.kozlovskiy.mostocks.services.websocket.WebSocketClient;
@@ -151,6 +152,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         chart.setDoubleTapToZoomEnabled(false);
         chart.setDrawGridBackground(false);
         chart.setScaleEnabled(true);
+
         chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
@@ -162,6 +164,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
 
             @Override
             public void onNothingSelected() {
+                chartView.hideTimeStamp();
             }
         });
 
@@ -175,7 +178,6 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         rightAxis.setEnabled(false);
 
         chart.getLegend().setEnabled(false);
-        chart.resetTracking();
     }
 
     void updateCandlesData(Candles candles) {
@@ -194,7 +196,7 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
             values.add(entry);
         }
 
-        CandleDataSet set = new CandleDataSet(values, "Data Set");
+        CandleDataSet set = new CandleDataSet(values, null);
 
         set.setDrawIcons(false);
         set.setShadowColor(Color.DKGRAY);
@@ -210,6 +212,6 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
 
         CandleData data = new CandleData(set);
         chart.setData(data);
-        chartView.buildCandlesChart(chart);
+        chartView.buildCandlesChart(chart, values.size());
     }
 }

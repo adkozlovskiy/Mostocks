@@ -31,4 +31,5 @@
         android:clipToPadding="false"
         android:paddingBottom="10dp"
         android:visibility="gone" />
+
 </FrameLayout>

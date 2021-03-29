@@ -64,7 +64,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         } else holder.ivImage.setVisibility(View.GONE);
 
         Date date = new Date(news.getDatetime() * 1000);
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        SimpleDateFormat format = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
         String dateString = format.format(date);
         holder.tvDatetime.setText(dateString);
 

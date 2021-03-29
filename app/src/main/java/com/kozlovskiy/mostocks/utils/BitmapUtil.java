@@ -11,13 +11,7 @@ import android.graphics.Rect;
 
 public class BitmapUtil {
 
-    /**
-     * @param context context
-     * @param resId   background res. id
-     * @param symbol  first char of stock's symbol
-     * @return beautiful company logo :)
-     */
-    public static Bitmap markSymbolOnBitmap(Context context, int resId, String symbol) {
+    public static Bitmap getCompanyLogo(Context context, int resId, String symbol) {
         Resources resources = context.getResources();
 
         float scale = resources.getDisplayMetrics().density;

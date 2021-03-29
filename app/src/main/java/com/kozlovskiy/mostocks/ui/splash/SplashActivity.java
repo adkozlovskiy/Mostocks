@@ -20,7 +20,7 @@ public class SplashActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         splashPresenter = new SplashPresenter(this, this);
-        splashPresenter.initializeTickers();
+        splashPresenter.initializeSymbols();
     }
 
     @Override

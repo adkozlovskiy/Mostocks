@@ -17,9 +17,6 @@ public class MStackService {
                 .build();
     }
 
-    /**
-     * @return {@link MStackService} instance.
-     */
     public static MStackService getInstance() {
         if (instance == null) {
             instance = new MStackService();
@@ -28,9 +25,6 @@ public class MStackService {
         return instance;
     }
 
-    /**
-     * @return API instance.
-     */
     public MStackApi getApi() {
         return mRetrofit.create(MStackApi.class);
     }

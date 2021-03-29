@@ -38,7 +38,7 @@ public class NewsPresenter {
         calendar.add(Calendar.DAY_OF_MONTH, -30);
         String from = formatter.format(calendar.getTime());
 
-        stocksRepository.updateNews(symbol, from, to)
+        stocksRepository.getCompanyNews(symbol, from, to)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableSingleObserver<List<News>>() {

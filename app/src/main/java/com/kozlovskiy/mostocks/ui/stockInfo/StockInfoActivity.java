@@ -1,6 +1,7 @@
 package com.kozlovskiy.mostocks.ui.stockInfo;
 
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,15 +39,16 @@ public class StockInfoActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         ivLogo = toolbar.findViewById(R.id.iv_logo);
 
-        ImageView ivBackButton = toolbar.findViewById(R.id.back_button);
-        ivBackButton.setOnClickListener(v -> onBackPressed());
+        ImageButton ibReturn = toolbar.findViewById(R.id.ib_return);
+        ibReturn.setOnClickListener(v -> onBackPressed());
+
         TextView tvSymbol = toolbar.findViewById(R.id.tv_symbol);
         TextView tvName = toolbar.findViewById(R.id.tv_name);
 
         setSupportActionBar(toolbar);
 
-        TabLayout tabLayout = findViewById(R.id.tabs);
-        tabLayout.addOnTabSelectedListener(this);
+        TabLayout tabs = findViewById(R.id.tabs);
+        tabs.addOnTabSelectedListener(this);
 
         String symbol = getIntent().getStringExtra(StocksAdapter.KEY_SYMBOL);
         String name = getIntent().getStringExtra(StocksAdapter.KEY_NAME);
@@ -83,7 +85,6 @@ public class StockInfoActivity extends AppCompatActivity
         Picasso.get()
                 .load(MAIN_IMAGE_URL + symbol + ".png")
                 .networkPolicy(NetworkPolicy.OFFLINE)
-
                 .into(ivLogo, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -103,7 +104,7 @@ public class StockInfoActivity extends AppCompatActivity
                                     @Override
                                     public void onError(Exception e) {
                                         if (ivLogo != null) {
-                                            ivLogo.setImageBitmap(BitmapUtil.markSymbolOnBitmap(StockInfoActivity.this, R.drawable.bg, symbol.substring(0, 1)));
+                                            ivLogo.setImageBitmap(BitmapUtil.getCompanyLogo(StockInfoActivity.this, R.drawable.bg, symbol.substring(0, 1)));
                                         }
                                     }
                                 });

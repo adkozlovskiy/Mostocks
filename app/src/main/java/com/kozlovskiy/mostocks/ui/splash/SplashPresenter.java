@@ -30,7 +30,7 @@ public class SplashPresenter {
         this.builder = new AlertDialog.Builder(context);
     }
 
-    public void initializeTickers() {
+    public void initializeSymbols() {
         if (NetworkUtil.isNetworkConnectionNotGranted(context))
             buildNoNetworkDialog();
 
@@ -39,7 +39,7 @@ public class SplashPresenter {
 
         } else {
             StocksRepository stocksRepository = new StocksRepository(context);
-            stocksRepository.getStockData()
+            stocksRepository.getStockSymbols()
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new DisposableSingleObserver<List<Stock>>() {
@@ -69,7 +69,7 @@ public class SplashPresenter {
 
         }
 
-        builder.setPositiveButton(R.string.retry, (di, i) -> initializeTickers())
+        builder.setPositiveButton(R.string.retry, (di, i) -> initializeSymbols())
                 .setNegativeButton(R.string.cancel, (di, id) -> di.cancel());
 
         splashView.showDialog(builder.create());
@@ -79,7 +79,7 @@ public class SplashPresenter {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.network_error)
                 .setMessage(R.string.no_network_message)
-                .setPositiveButton(R.string.retry, (di, id) -> initializeTickers())
+                .setPositiveButton(R.string.retry, (di, id) -> initializeSymbols())
                 .setNegativeButton(R.string.exit, (di, id) -> di.cancel());
 
         splashView.showDialog(builder.create());
