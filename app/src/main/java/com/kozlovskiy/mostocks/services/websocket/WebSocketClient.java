@@ -36,32 +36,26 @@ public class WebSocketClient {
 
     public void openConnection() {
         Thread connectionThread = new Thread(() -> {
-            if (webSocket != null) {
+            if (webSocket != null)
                 reopenConnection();
-                Log.d(TAG, "openConnection: reopen !!!");
 
-            } else {
-                try {
-                    WebSocketFactory factory = new WebSocketFactory();
+            else try {
+                WebSocketFactory factory = new WebSocketFactory();
 
-                    SSLContext context = NaiveSSLContext.getInstance("TLS");
-                    factory.setSSLContext(context);
+                SSLContext context = NaiveSSLContext.getInstance("TLS");
+                factory.setSSLContext(context);
 
-                    webSocket = factory.createSocket(host);
-                    webSocket.addListener(new SocketListener());
-                    webSocket.connect();
+                webSocket = factory.createSocket(host);
+                webSocket.addListener(new SocketListener());
+                webSocket.connect();
 
-                } catch (WebSocketException | IOException | NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                }
+            } catch (WebSocketException | IOException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
             }
+
         });
 
         connectionThread.start();
-    }
-
-    public WebSocket getConnection() {
-        return webSocket;
     }
 
     public void reopenConnection() {
@@ -78,12 +72,10 @@ public class WebSocketClient {
     }
 
     public void subscribe(List<String> symbols) {
-        Log.d(TAG, "subscribe: ");
         for (String symbol : symbols) {
             Log.d(TAG, "subscribe: in loop");
             try {
                 webSocket.sendText("{\"type\":\"subscribe\",\"symbol\":\"" + symbol + "\"}");
-                Log.d(TAG, "subscribe: subscribed to " + symbol);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -96,8 +88,6 @@ public class WebSocketClient {
         @Override
         public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
             super.onConnected(websocket, headers);
-
-            Log.d(TAG, "onConnected: ");
             subscribe(symbols);
         }
 
@@ -116,12 +106,9 @@ public class WebSocketClient {
         public void onDisconnected(WebSocket websocket,
                                    WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
                                    boolean closedByServer) {
-            Log.i(TAG, "onDisconnected");
-
-            if (closedByServer) {
-                Log.d(TAG, "onDisconnected: reopen connection.");
+            if (closedByServer)
                 reopenConnection();
-            }
+
         }
 
         @Override

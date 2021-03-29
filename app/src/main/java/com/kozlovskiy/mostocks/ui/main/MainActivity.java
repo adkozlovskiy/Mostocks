@@ -12,10 +12,8 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.models.stock.Stock;
-import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.services.WebSocketService;
 import com.kozlovskiy.mostocks.ui.main.fragments.favorites.FavoritesFragment;
 import com.kozlovskiy.mostocks.ui.main.fragments.stocks.StocksFragment;
@@ -30,37 +28,26 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
 
     public static final String TAG = MainActivity.class.getSimpleName();
     private EditText searchEditText;
-    private Bundle bundles;
-    private StocksDao stocksDao;
     private StocksFragment stocksFragment;
     private List<Stock> stocks;
     private FavoritesFragment favoritesFragment;
     private int selectedTab = 0;
-    private Type type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        stocksDao = ((AppDelegate) getApplicationContext())
-                .getDatabase()
-                .getDao();
-
         searchEditText = findViewById(R.id.et_search);
         TabLayout navigationTabs = findViewById(R.id.tabs);
         navigationTabs.addOnTabSelectedListener(this);
 
-        StocksDao stocksDao = ((AppDelegate) getApplicationContext())
-                .getDatabase()
-                .getDao();
-
         String json = getIntent().getStringExtra(KEY_STOCKS_INTENT);
-        bundles = new Bundle();
+        Bundle bundles = new Bundle();
 
         Gson gson = new Gson();
 
-        type = new TypeToken<List<Stock>>() {
+        Type type = new TypeToken<List<Stock>>() {
         }.getType();
 
         stocks = gson.fromJson(json, type);

@@ -1,8 +1,8 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
@@ -12,10 +12,12 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.models.stockInfo.Recommendation;
 import com.kozlovskiy.mostocks.models.stockInfo.TechAnalysisResponse;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,11 +36,12 @@ public class ForecastsPresenter {
     public static final String TAG = ForecastsPresenter.class.getSimpleName();
     private final StocksRepository stocksRepository;
     private BarChart chart;
-    private final Context context;
+    private final AlertDialog.Builder builder;
+    private String symbol;
 
     public ForecastsPresenter(ForecastsView forecastsView, Context context) {
         this.forecastsView = forecastsView;
-        this.context = context;
+        this.builder = new AlertDialog.Builder(context);
         stocksRepository = new StocksRepository(context);
     }
 
@@ -112,6 +115,7 @@ public class ForecastsPresenter {
     }
 
     public Completable initializeTechAnalysis(String symbol) {
+        this.symbol = symbol;
         return Completable.create((emitter) -> stocksRepository.getSymbolTechAnalysis(symbol)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -124,7 +128,7 @@ public class ForecastsPresenter {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        e.printStackTrace();
+                        buildErrorLoadingDialog(e);
                     }
                 }));
     }
@@ -163,7 +167,6 @@ public class ForecastsPresenter {
         ArrayList<BarEntry> values = new ArrayList<>();
 
         for (int i = 0; i < recommendations.size(); i++) {
-            Log.d(TAG, "setChartData: mopmop");
             int strongSellSignals = recommendations.get(i).getStrongSellSignals();
             int sellSignals = recommendations.get(i).getSellSignals();
             int holdSignals = recommendations.get(i).getHoldSignals();
@@ -223,5 +226,21 @@ public class ForecastsPresenter {
                 Color.rgb(36, 178, 93),
                 Color.rgb(18, 115, 57)
         };
+    }
+
+    public void buildErrorLoadingDialog(Throwable e) {
+        builder.setTitle(R.string.loading_error);
+        if (e instanceof SocketTimeoutException) {
+            builder.setMessage(R.string.timed_out);
+
+        } else {
+            builder.setMessage(R.string.unknown_error);
+
+        }
+
+        builder.setPositiveButton(R.string.retry, (di, i) -> initializeRecommendation(symbol))
+                .setNegativeButton(R.string.cancel, (di, id) -> di.cancel());
+
+        forecastsView.showDialog(builder.create());
     }
 }

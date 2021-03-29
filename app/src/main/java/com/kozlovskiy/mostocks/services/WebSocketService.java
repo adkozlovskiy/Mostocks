@@ -3,7 +3,6 @@ package com.kozlovskiy.mostocks.services;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -19,7 +18,9 @@ public class WebSocketService extends Service implements WebSocketClient.Message
 
     public static final String TAG = WebSocketService.class.getSimpleName();
     public static final String KEY_TRADE = "trade";
+    public static final String ACTION_NEW_MESSAGE = WebSocketService.class.getPackage() + "NEW_MESSAGE";
 
+    private final Intent intent = new Intent(ACTION_NEW_MESSAGE);
     private final Gson gson = new Gson();
 
     private WebSocketConnection webSocketConnection;
@@ -43,7 +44,6 @@ public class WebSocketService extends Service implements WebSocketClient.Message
         webSocketConnection = new WebSocketConnection(symbols);
         webSocketConnection.setListener(this);
         webSocketConnection.openConnection();
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -62,7 +62,11 @@ public class WebSocketService extends Service implements WebSocketClient.Message
             if (response.getType().equals(KEY_TRADE)) {
                 SocketResponse.Data data = response.getData().get(0);
                 roomDelegate.updateStockQuote(data.getSymbol(), data.getQuote());
-                Log.d(TAG, "onSocketMessage: updated current quote for " + data.getSymbol() + "= " + data.getQuote());
+
+                intent.putExtra("symbol", data.getSymbol());
+                intent.putExtra("quote", data.getQuote());
+
+                sendBroadcast(intent);
             }
 
         } catch (Exception e) {

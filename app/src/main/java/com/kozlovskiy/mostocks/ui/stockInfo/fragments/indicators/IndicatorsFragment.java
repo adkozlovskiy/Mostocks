@@ -1,5 +1,6 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.indicators;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
@@ -17,13 +18,14 @@ import com.kozlovskiy.mostocks.ui.stockInfo.fragments.indicators.adapter.Indicat
 
 import java.util.List;
 
-public class IndicatorsFragment extends Fragment implements IndicatorsView {
+public class IndicatorsFragment extends Fragment
+        implements IndicatorsView {
 
     public static final String TAG = IndicatorsFragment.class.getSimpleName();
     private IndicatorsPresenter indicatorsPresenter;
-    private Context context;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
+    private Context context;
 
     public IndicatorsFragment() {
         super(R.layout.fragment_indicators);
@@ -58,6 +60,11 @@ public class IndicatorsFragment extends Fragment implements IndicatorsView {
 
         progressBar.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showDialog(Dialog dialog) {
+        dialog.show();
     }
 
     private String getSymbol() {

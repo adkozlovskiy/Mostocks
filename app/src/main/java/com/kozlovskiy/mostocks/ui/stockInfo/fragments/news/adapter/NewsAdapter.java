@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.models.stockInfo.News;
 import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -47,7 +48,10 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         holder.tvSummary.setText(news.getSummary());
 
         if (news.getImage() != null && !news.getImage().isEmpty()) {
-            Picasso.get().load(news.getImage())
+            Picasso.get()
+                    .load(news.getImage())
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .fit()
                     .placeholder(R.drawable.white)
                     .into(holder.ivImage, new Callback() {
                         @Override
@@ -57,7 +61,21 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
                         @Override
                         public void onError(Exception e) {
-                            holder.ivImage.setVisibility(View.GONE);
+                            Picasso.get()
+                                    .load(news.getImage())
+                                    .fit()
+                                    .placeholder(R.drawable.white)
+                                    .into(holder.ivImage, new Callback() {
+                                        @Override
+                                        public void onSuccess() {
+
+                                        }
+
+                                        @Override
+                                        public void onError(Exception e) {
+                                            holder.ivImage.setVisibility(View.GONE);
+                                        }
+                                    });
                         }
                     });
 

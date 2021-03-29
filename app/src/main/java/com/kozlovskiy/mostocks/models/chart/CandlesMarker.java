@@ -18,13 +18,14 @@ public class CandlesMarker extends MarkerView {
 
     public static final String TAG = CandlesMarker.class.getSimpleName();
     public static final float MARGIN = 15f;
-    private final int xes;
+
     private final TextView tvOpen;
     private final TextView tvClose;
     private final TextView tvHigh;
     private final TextView tvLow;
 
     private float position;
+    private final int xes;
 
     public CandlesMarker(Context context, int layoutResource, int xes) {
         super(context, layoutResource);

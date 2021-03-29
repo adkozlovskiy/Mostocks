@@ -1,21 +1,22 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.chart;
 
+import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
-import com.github.mikephil.charting.charts.LineChart;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.utils.Converter;
 
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import static com.kozlovskiy.mostocks.services.WebSocketService.ACTION_NEW_MESSAGE;
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_CURRENT_COST;
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_PREVIOUS_COST;
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_SYMBOL;
@@ -33,17 +35,20 @@ import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_SYMBOL;
 public class ChartFragment extends Fragment
         implements ChartView {
 
+    private final QuoteReceiver quoteReceiver = new QuoteReceiver();
+
+    public static final long HALF_HOUR_PERIOD = TimeUnit.HOURS.toMillis(90);
+    public static final long HOUR_PERIOD = TimeUnit.HOURS.toMillis(180);
+    public static final long DAY_PERIOD = TimeUnit.DAYS.toMillis(60);
+    public static final long WEEK_PERIOD = TimeUnit.DAYS.toMillis(60 * 7);
+    public static final long MONTH_PERIOD = TimeUnit.DAYS.toMillis(60 * 30);
+
     public static final String TAG = ChartFragment.class.getSimpleName();
     public static final String HALF_HOUR_RESOLUTION = "30";
-    public static final long HALF_HOUR_PERIOD = TimeUnit.HOURS.toMillis(90);
     public static final String HOUR_RESOLUTION = "60";
-    public static final long HOUR_PERIOD = TimeUnit.HOURS.toMillis(180);
     public static final String DAY_RESOLUTION = "D";
-    public static final long DAY_PERIOD = TimeUnit.DAYS.toMillis(60);
     public static final String WEEK_RESOLUTION = "W";
-    public static final long WEEK_PERIOD = TimeUnit.DAYS.toMillis(60 * 7);
     public static final String MONTH_RESOLUTION = "M";
-    public static final long MONTH_PERIOD = TimeUnit.DAYS.toMillis(60 * 30);
 
     public static final long MILLIS_IN_SECOND = 1000;
 
@@ -57,7 +62,6 @@ public class ChartFragment extends Fragment
 
     private ChartPresenter chartPresenter;
 
-    private LineChart lineChart;
     private CandleStickChart candleChart;
     private TextView tvPrice;
     private TextView tvPriceChange;
@@ -73,7 +77,7 @@ public class ChartFragment extends Fragment
     private CardView cvMonth;
     private CardView cvSelected;
 
-    private ImageView ivChartButton;
+    private double previousQuote;
 
     public ChartFragment() {
         super(R.layout.fragment_chart);
@@ -83,6 +87,8 @@ public class ChartFragment extends Fragment
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
+
+        context.registerReceiver(quoteReceiver, new IntentFilter(ACTION_NEW_MESSAGE));
     }
 
     @Override
@@ -91,14 +97,10 @@ public class ChartFragment extends Fragment
 
         tvPrice = view.findViewById(R.id.tv_price);
         tvPriceChange = view.findViewById(R.id.tv_price_change);
-        lineChart = view.findViewById(R.id.chart_lines);
         candleChart = view.findViewById(R.id.chart_candles);
         tvDatestamp = view.findViewById(R.id.tv_datestamp);
         tvTimestamp = view.findViewById(R.id.tv_timestamp);
         progressBar = view.findViewById(R.id.progress_bar);
-
-        CardView cvChartButton = view.findViewById(R.id.chart_button);
-        ivChartButton = view.findViewById(R.id.chart_icon);
 
         cvThirties = view.findViewById(R.id.cv_thirties);
         cvThirties.setOnClickListener(cardClickListener);
@@ -123,32 +125,17 @@ public class ChartFragment extends Fragment
         double currentQuote = getCurrentQuote();
         tvPrice.setText(Converter.toCurrencyFormat(currentQuote, 0, 2));
 
-        double previousQuote = getPreviousQuote();
-        chartPresenter = new ChartPresenter(this, candleChart, lineChart, context, getSymbol(), previousQuote);
+        previousQuote = getPreviousQuote();
+        chartPresenter = new ChartPresenter(this, candleChart, context, getSymbol());
         chartPresenter.calculateQuoteChange(currentQuote, previousQuote);
 
         initializeCandles((timestamp - DAY_PERIOD) / MILLIS_IN_SECOND, timestamp / MILLIS_IN_SECOND, "D");
         selectCard(cvDay);
-
-        cvChartButton.setOnClickListener(v -> {
-            if (chartPresenter.isCandlesChartSelected()) {
-                ivChartButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.ic_line_chart, context.getTheme()));
-
-
-            } else {
-                ivChartButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.ic_candles_chart, context.getTheme()));
-            }
-
-            chartPresenter.setCandlesChartSelected(!chartPresenter.isCandlesChartSelected());
-        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        chartPresenter.subscribe();
     }
 
     @Override
@@ -164,13 +151,6 @@ public class ChartFragment extends Fragment
     @Override
     public void buildCandlesChart(CandleStickChart chart, int size) {
         candleChart.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.GONE);
-        chart.invalidate();
-    }
-
-    @Override
-    public void buildLinesChart(LineChart chart, int size) {
-        lineChart.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
         chart.invalidate();
     }
@@ -209,6 +189,11 @@ public class ChartFragment extends Fragment
     public void hideTimeStamp() {
         tvTimestamp.setText("");
         tvDatestamp.setText("");
+    }
+
+    @Override
+    public void showDialog(Dialog dialog) {
+        dialog.show();
     }
 
     View.OnClickListener cardClickListener = v -> {
@@ -270,7 +255,7 @@ public class ChartFragment extends Fragment
     @Override
     public void onStop() {
         super.onStop();
-        chartPresenter.unsubscribe();
+        context.unregisterReceiver(quoteReceiver);
     }
 
     private String getSymbol() {
@@ -286,5 +271,19 @@ public class ChartFragment extends Fragment
     private Double getPreviousQuote() {
         return getArguments() == null ? null
                 : getArguments().getDouble(KEY_PREVIOUS_COST);
+    }
+
+    private final class QuoteReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String symbol = intent.getStringExtra("symbol");
+
+            if (symbol.equals(getSymbol())) {
+                double quote = intent.getDoubleExtra("quote", 0);
+                chartPresenter.calculateQuoteChange(quote, previousQuote);
+                showUpdatedCost(Converter.toCurrencyFormat(quote, 0, 2));
+            }
+        }
     }
 }

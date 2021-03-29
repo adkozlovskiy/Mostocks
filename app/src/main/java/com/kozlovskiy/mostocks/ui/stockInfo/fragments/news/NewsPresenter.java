@@ -1,11 +1,13 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.news;
 
+import android.app.AlertDialog;
 import android.content.Context;
-import android.util.Log;
 
+import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.models.stockInfo.News;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
 
+import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -22,14 +24,17 @@ public class NewsPresenter {
     private final NewsView newsView;
     private final StocksRepository stocksRepository;
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    private final AlertDialog.Builder builder;
+    private String symbol;
 
     public NewsPresenter(NewsView newsView, Context context) {
         this.newsView = newsView;
         stocksRepository = new StocksRepository(context);
+        builder = new AlertDialog.Builder(context);
     }
 
     public void initializeNews(String symbol) {
-        Log.d(TAG, "initializeNews: ");
+        this.symbol = symbol;
         Calendar calendar = Calendar.getInstance();
         String to = formatter.format(calendar.getTime());
 
@@ -50,5 +55,21 @@ public class NewsPresenter {
                         e.printStackTrace();
                     }
                 });
+    }
+
+    public void buildErrorLoadingDialog(Throwable e) {
+        builder.setTitle(R.string.loading_error);
+        if (e instanceof SocketTimeoutException) {
+            builder.setMessage(R.string.timed_out);
+
+        } else {
+            builder.setMessage(R.string.unknown_error);
+
+        }
+
+        builder.setPositiveButton(R.string.retry, (di, i) -> initializeNews(symbol))
+                .setNegativeButton(R.string.cancel, (di, id) -> di.cancel());
+
+        newsView.showDialog(builder.create());
     }
 }

@@ -1,5 +1,6 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.forecasts;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -32,13 +33,14 @@ import java.util.Locale;
 import static com.kozlovskiy.mostocks.utils.Converter.toDefaultFormat;
 import static com.kozlovskiy.mostocks.utils.Converter.toPercentFormat;
 
-public class ForecastsFragment extends Fragment implements ForecastsView {
+public class ForecastsFragment extends Fragment
+        implements ForecastsView {
 
     public static final String TAG = ForecastsFragment.class.getSimpleName();
-    private Context context;
     private ForecastsPresenter forecastsPresenter;
 
     private ProgressBar pbChart;
+    private Context context;
 
     private CardView cvTech;
     private CardView cvRec;
@@ -59,14 +61,13 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
+
         forecastsPresenter = new ForecastsPresenter(this, context);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        String symbol = getSymbol();
-
         pbChart = view.findViewById(R.id.pb_chart);
         pbChart.setVisibility(View.VISIBLE);
 
@@ -83,15 +84,13 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
         chart = view.findViewById(R.id.chart);
         forecastsPresenter.setChart(chart);
 
-        if (symbol != null) {
-            forecastsPresenter.initializeData(symbol);
-        }
+        forecastsPresenter.initializeData(getSymbol());
     }
 
     @Override
     public void showTechAnalysisResult(String signal) {
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("d MMMM yyyy", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("d MMMM yyyy HH:mm", Locale.US);
         String result = "on " + simpleDateFormat.format(date);
 
         tvDateTech.setText(result);
@@ -242,6 +241,11 @@ public class ForecastsFragment extends Fragment implements ForecastsView {
         cvRec.setVisibility(View.VISIBLE);
 
         chart.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showDialog(Dialog dialog) {
+        dialog.show();
     }
 
     private String getSymbol() {

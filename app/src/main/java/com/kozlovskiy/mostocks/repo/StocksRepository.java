@@ -30,31 +30,29 @@ import retrofit2.Response;
 
 public class StocksRepository {
 
-    private final StocksDao stocksDao;
     public static final String TAG = StocksRepository.class.getSimpleName();
-    private final Context context;
     private final RoomDelegate roomDelegate;
+    private final StocksDao stocksDao;
+    private final Context context;
 
     public StocksRepository(Context context) {
         this.context = context;
+
+        roomDelegate = new RoomDelegate(context);
         stocksDao = ((AppDelegate) context.getApplicationContext())
                 .getDatabase()
                 .getDao();
-
-        roomDelegate = new RoomDelegate(context);
     }
 
     public Single<List<Stock>> getStockSymbols() {
-        Log.d(TAG, "getStockData: stock symbols loading...");
         return Single.create(emitter -> MStackService.getInstance().getApi()
                 .getStockData("XNAS", "25", MStackService.TOKEN)
                 .enqueue(new Callback<StockResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<StockResponse> call, @NonNull Response<StockResponse> response) {
                         if (response.body() != null) {
-                            Log.d(TAG, "getStockData: stock symbols loaded...");
                             List<Stock> stocks = response.body().getData();
-                            stocksDao.cacheStocks(stocks);
+                            roomDelegate.cacheStocks(stocks);
                             emitter.onSuccess(stocks);
                         }
                     }
@@ -67,7 +65,6 @@ public class StocksRepository {
     }
 
     public Single<List<Stock>> getSymbolQuotes(List<Stock> stocks) {
-        Log.d(TAG, "getSymbolQuotes: stocks quotes loading...");
         return Single.create(emitter -> {
             List<Stock> updatedStocks = new ArrayList<>();
             for (Stock stock : stocks) {
@@ -77,7 +74,6 @@ public class StocksRepository {
                             @Override
                             public void onResponse(@NonNull Call<Quote> call, @NonNull Response<Quote> response) {
                                 if (response.body() != null) {
-                                    Log.d(TAG, "getSymbolQuotes: stocks quotes loaded for " + stock.getSymbol());
                                     Quote quote = response.body();
                                     stock.setOpen(quote.getOpen());
                                     stock.setCurrent(quote.getCurrent());
@@ -106,53 +102,47 @@ public class StocksRepository {
 
     public Single<List<News>> getCompanyNews(String symbol, String from, String to) {
         return Single.create(emitter -> {
-            if (CacheUtil.newsCacheIsUpToDate(symbol, context)) {
+            if (CacheUtil.newsCacheIsUpToDate(symbol, context))
                 emitter.onSuccess(stocksDao.getNewsBySymbol(symbol));
-                Log.d(TAG, "updateNews: from cache.");
 
-            } else {
-                Log.d(TAG, "updateNews: from network");
-                FinnhubService.getInstance().getApi()
-                        .getCompanyNews(symbol, from, to, FinnhubService.TOKEN)
-                        .enqueue(new Callback<List<News>>() {
-                            @Override
-                            public void onResponse(@NonNull Call<List<News>> call, @NonNull Response<List<News>> response) {
-                                if (response.body() != null) {
-                                    List<News> newsList = response.body();
+            else FinnhubService.getInstance().getApi()
+                    .getCompanyNews(symbol, from, to, FinnhubService.TOKEN)
+                    .enqueue(new Callback<List<News>>() {
+                        @Override
+                        public void onResponse(@NonNull Call<List<News>> call, @NonNull Response<List<News>> response) {
+                            if (response.body() != null) {
+                                List<News> newsList = response.body();
 
-                                    for (News news : newsList) {
-                                        news.setSymbol(symbol);
-                                    }
-
-                                    stocksDao.cacheNews(newsList);
-                                    CacheUtil.updateNewsUptime(symbol, context);
-                                    emitter.onSuccess(newsList);
+                                for (News news : newsList) {
+                                    news.setSymbol(symbol);
                                 }
-                            }
 
-                            @Override
-                            public void onFailure(@NonNull Call<List<News>> call, @NonNull Throwable t) {
-                                emitter.onError(t);
+                                stocksDao.cacheNews(newsList);
+                                CacheUtil.updateNewsUptime(symbol, context);
+                                emitter.onSuccess(newsList);
                             }
-                        });
-            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<List<News>> call, @NonNull Throwable t) {
+                            emitter.onError(t);
+                        }
+                    });
+
         });
     }
 
     public Single<TechAnalysisResponse.TechAnalysis> getSymbolTechAnalysis(String symbol) {
-        Log.d(TAG, "updateTechAnalysis: tech loading...");
         return Single.create(emitter -> FinnhubService.getInstance().getApi()
                 .getTechAnalysis(symbol, "5", FinnhubService.TOKEN)
                 .enqueue(new Callback<TechAnalysisResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<TechAnalysisResponse> call, @NonNull Response<TechAnalysisResponse> response) {
                         if (response.body() != null) {
-                            TechAnalysisResponse.TechAnalysis techAnalysis = response
-                                    .body()
+                            TechAnalysisResponse.TechAnalysis techAnalysis = response.body()
                                     .getTechAnalysis();
 
                             emitter.onSuccess(techAnalysis);
-                            Log.d(TAG, "updateTechAnalysis: tech loaded.");
                         }
                     }
 
@@ -164,7 +154,6 @@ public class StocksRepository {
     }
 
     public Single<Candles> getSymbolCandles(String symbol, String resolution, long from, long to) {
-        Log.d(TAG, "getSymbolCandles: loading...");
         return Single.create(emitter -> FinnhubService.getInstance().getApi()
                 .getSymbolCandles(symbol, resolution, String.valueOf(from), String.valueOf(to), FinnhubService.TOKEN)
                 .enqueue(new Callback<Candles>() {
@@ -189,65 +178,60 @@ public class StocksRepository {
     }
 
     public Single<List<Recommendation>> getSymbolRecommendation(String symbol) {
-        Log.d(TAG, "getSymbolRecommendation: loading...");
         return Single.create(emitter -> {
-            if (CacheUtil.recommendationCacheIsUpToDate(symbol, context)) {
+            if (CacheUtil.recommendationCacheIsUpToDate(symbol, context))
                 emitter.onSuccess(stocksDao.getRecommendationsBySymbol(symbol));
-            } else {
-                FinnhubService.getInstance().getApi()
-                        .getSymbolRecommendation(symbol, FinnhubService.TOKEN)
-                        .enqueue(new Callback<List<Recommendation>>() {
-                            @Override
-                            public void onResponse(@NonNull Call<List<Recommendation>> call, @NonNull Response<List<Recommendation>> response) {
-                                if (response.body() != null) {
-                                    List<Recommendation> recommendations = response.body();
 
-                                    roomDelegate.cacheRecommendations(recommendations);
-                                    CacheUtil.updateRecommendationUptime(symbol, context);
-                                    emitter.onSuccess(recommendations);
-                                    Log.d(TAG, "getSymbolRecommendation: loaded");
-                                }
-                            }
+            else FinnhubService.getInstance().getApi()
+                    .getSymbolRecommendation(symbol, FinnhubService.TOKEN)
+                    .enqueue(new Callback<List<Recommendation>>() {
+                        @Override
+                        public void onResponse(@NonNull Call<List<Recommendation>> call, @NonNull Response<List<Recommendation>> response) {
+                            if (response.body() != null) {
+                                List<Recommendation> recommendations = response.body();
 
-                            @Override
-                            public void onFailure(@NonNull Call<List<Recommendation>> call, @NonNull Throwable t) {
-                                emitter.onError(t);
+                                roomDelegate.cacheRecommendations(recommendations);
+                                CacheUtil.updateRecommendationUptime(symbol, context);
+                                emitter.onSuccess(recommendations);
+                                Log.d(TAG, "getSymbolRecommendation: loaded");
                             }
-                        });
-            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<List<Recommendation>> call, @NonNull Throwable t) {
+                            emitter.onError(t);
+                        }
+                    });
         });
     }
 
     public Single<IndicatorsResponse.Indicators> getSymbolIndicators(String symbol) {
-        Log.d(TAG, "getSymbolIndicators: loading...");
         return Single.create(emitter -> {
-            if (CacheUtil.indicatorsCacheIsUpToDate(symbol, context)) {
+            if (CacheUtil.indicatorsCacheIsUpToDate(symbol, context))
                 emitter.onSuccess(stocksDao.getIndicatorsBySymbol(symbol));
-                Log.d(TAG, "getSymbolIndicators: -- ");
-            } else {
-                Log.d(TAG, "getSymbolIndicators: ++");
-                FinnhubService.getInstance().getApi()
-                        .getSymbolIndicators(symbol, "all", FinnhubService.TOKEN)
-                        .enqueue(new Callback<IndicatorsResponse>() {
-                            @Override
-                            public void onResponse(@NonNull Call<IndicatorsResponse> call, @NonNull Response<IndicatorsResponse> response) {
-                                if (response.body() != null) {
-                                    IndicatorsResponse indicatorsResponse = response.body();
-                                    IndicatorsResponse.Indicators indicators = indicatorsResponse.getIndicators();
 
-                                    indicators.setSymbol(symbol);
-                                    roomDelegate.cacheIndicators(indicators);
-                                    CacheUtil.updateIndicatorsUptime(symbol, context);
-                                    emitter.onSuccess(indicators);
-                                }
-                            }
+            else FinnhubService.getInstance().getApi()
+                    .getSymbolIndicators(symbol, "all", FinnhubService.TOKEN)
+                    .enqueue(new Callback<IndicatorsResponse>() {
+                        @Override
+                        public void onResponse(@NonNull Call<IndicatorsResponse> call, @NonNull Response<IndicatorsResponse> response) {
+                            if (response.body() != null) {
+                                IndicatorsResponse indicatorsResponse = response.body();
+                                IndicatorsResponse.Indicators indicators = indicatorsResponse.getIndicators();
 
-                            @Override
-                            public void onFailure(@NonNull Call<IndicatorsResponse> call, @NonNull Throwable t) {
-                                emitter.onError(t);
+                                indicators.setSymbol(symbol);
+                                roomDelegate.cacheIndicators(indicators);
+                                CacheUtil.updateIndicatorsUptime(symbol, context);
+                                emitter.onSuccess(indicators);
                             }
-                        });
-            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<IndicatorsResponse> call, @NonNull Throwable t) {
+                            emitter.onError(t);
+                        }
+                    });
+
         });
     }
 }

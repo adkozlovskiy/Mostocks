@@ -38,9 +38,10 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
     public static final String KEY_SYMBOL = "SYMBOL";
     public static final String KEY_NAME = "NAME";
 
+    private final boolean isFavoriteRecycler;
+
     private final Context context;
     private final RoomDelegate roomDelegate;
-    private final boolean isFavoriteRecycler;
     private final ItemsCountListener itemsCountListener;
 
     private List<Stock> stocks;
@@ -110,7 +111,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.ViewHolder
         String quote = Converter.toCurrencyFormat(stock.getCurrent(), 2, 2);
         holder.costView.setText(quote);
 
-        int color = context.getResources().getColor(R.color.textColor);
+        int color = context.getResources().getColor(R.color.textColor, context.getTheme());
         double difference = stock.getCurrent() - stock.getPrevious();
         String changeString = Converter.toCurrencyFormat(difference, 2, 2);
         String percentString = Converter.toDefaultFormat(difference / stock.getPrevious() * 100, 2, 2);

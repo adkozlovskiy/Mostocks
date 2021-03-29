@@ -1,20 +1,19 @@
 package com.kozlovskiy.mostocks.services.websocket;
 
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.List;
 
 public class WebSocketConnection {
 
-    public static final String TAG = WebSocketConnection.class.getSimpleName();
     public static final String HOST = "wss://ws.finnhub.io?token=c0l8c7748v6orbr0u010";
-    public static final Long DELAY = 5000L;
+    public static final String TAG = WebSocketConnection.class.getSimpleName();
     private final Handler socketConnectionHandler;
+    public static final Long DELAY = 5000L;
     private final List<String> symbols;
 
-    private WebSocketClient webSocketClient;
     private WebSocketClient.MessageListener listener;
+    private WebSocketClient webSocketClient;
 
     public void setListener(WebSocketClient.MessageListener listener) {
         this.listener = listener;
@@ -26,10 +25,8 @@ public class WebSocketConnection {
     }
 
     private final Runnable checkConnectionRunnable = () -> {
-        if (webSocketClient == null) {
-            Log.d(TAG, ": hello from there!");
+        if (webSocketClient == null)
             openConnection();
-        }
 
         startCheckConnection();
     };
@@ -46,11 +43,9 @@ public class WebSocketConnection {
         try {
             webSocketClient = new WebSocketClient(listener, HOST, symbols);
             webSocketClient.openConnection();
-            Log.d(TAG, "openConnection: ");
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d(TAG, "openConnection: ");
         }
 
         startCheckConnection();

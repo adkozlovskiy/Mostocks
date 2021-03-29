@@ -2,7 +2,6 @@ package com.kozlovskiy.mostocks.ui.main.fragments.favorites;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,12 +26,12 @@ import static com.kozlovskiy.mostocks.ui.splash.SplashActivity.KEY_STOCKS_INTENT
 public class FavoritesFragment extends Fragment
         implements FavoritesView, StocksAdapter.ItemsCountListener {
 
-    public static final String TAG = "132";
+    public static final String TAG = FavoritesFragment.class.getSimpleName();
+    private LinearLayoutManager linearLayoutManager;
     private FavoritesPresenter favoritesPresenter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private TextView tvNoTicker;
-    private LinearLayoutManager linearLayoutManager;
     private StocksAdapter stocksAdapter;
     private Gson gson;
     private Type type;
@@ -46,7 +45,6 @@ public class FavoritesFragment extends Fragment
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
-        Log.d(TAG, "onAttach: ");
 
         stocksAdapter = new StocksAdapter(context, true, this);
         linearLayoutManager = new LinearLayoutManager(context);

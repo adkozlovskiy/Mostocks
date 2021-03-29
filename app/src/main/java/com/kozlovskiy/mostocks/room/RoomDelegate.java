@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.models.stock.Favorite;
+import com.kozlovskiy.mostocks.models.stock.Stock;
 import com.kozlovskiy.mostocks.models.stockInfo.IndicatorsResponse;
 import com.kozlovskiy.mostocks.models.stockInfo.Recommendation;
 
@@ -41,5 +42,9 @@ public class RoomDelegate {
 
     public void cacheRecommendations(List<Recommendation> recommendations) {
         new Thread(() -> stocksDao.cacheRecommendations(recommendations)).start();
+    }
+
+    public void cacheStocks(List<Stock> stocks) {
+        new Thread(() -> stocksDao.cacheStocks(stocks)).start();
     }
 }

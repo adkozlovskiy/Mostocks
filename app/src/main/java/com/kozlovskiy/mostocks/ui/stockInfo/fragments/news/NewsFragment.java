@@ -1,5 +1,6 @@
 package com.kozlovskiy.mostocks.ui.stockInfo.fragments.news;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
@@ -18,7 +19,8 @@ import com.kozlovskiy.mostocks.ui.stockInfo.fragments.news.adapter.NewsAdapter;
 
 import java.util.List;
 
-public class NewsFragment extends Fragment implements NewsView {
+public class NewsFragment extends Fragment
+        implements NewsView {
 
     public static final String TAG = NewsFragment.class.getSimpleName();
     private NewsPresenter newsPresenter;
@@ -58,6 +60,11 @@ public class NewsFragment extends Fragment implements NewsView {
         recyclerView.setVisibility(View.VISIBLE);
 
         newsAdapter.updateNews(newsList);
+    }
+
+    @Override
+    public void showDialog(Dialog dialog) {
+        dialog.show();
     }
 
     private String getSymbol() {

@@ -18,6 +18,6 @@
     <color name="colorBackgroundMarker">#323B4A</color>
     <color name="colorTextMarker">#8D95A2</color>
     <color name="colorChartButtonBackground">#F0F4F7</color>
-    <color name="colorChartButtonBackgroundAccent">#EBF2F8</color>
+    <color name="colorChartButtonBackgroundAccent">#DAEAF8</color>
     <color name="colorGray">#ECECEC</color>
 </resources>
