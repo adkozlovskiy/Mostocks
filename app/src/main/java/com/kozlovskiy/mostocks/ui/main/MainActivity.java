@@ -1,5 +1,6 @@
 package com.kozlovskiy.mostocks.ui.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,11 +11,18 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
+import com.kozlovskiy.mostocks.models.stock.Stock;
 import com.kozlovskiy.mostocks.room.StocksDao;
+import com.kozlovskiy.mostocks.services.WebSocketService;
 import com.kozlovskiy.mostocks.ui.main.fragments.favorites.FavoritesFragment;
 import com.kozlovskiy.mostocks.ui.main.fragments.stocks.StocksFragment;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.kozlovskiy.mostocks.ui.splash.SplashActivity.KEY_STOCKS_INTENT;
 
@@ -25,8 +33,10 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
     private Bundle bundles;
     private StocksDao stocksDao;
     private StocksFragment stocksFragment;
+    private List<Stock> stocks;
     private FavoritesFragment favoritesFragment;
     private int selectedTab = 0;
+    private Type type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,17 +58,16 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
         String json = getIntent().getStringExtra(KEY_STOCKS_INTENT);
         bundles = new Bundle();
 
-        if (json.isEmpty()) {
-            Gson gson = new Gson();
-            bundles.putString(KEY_STOCKS_INTENT, gson.toJson(stocksDao.getStocks()));
+        Gson gson = new Gson();
 
-        } else {
-            bundles.putString(KEY_STOCKS_INTENT, json);
-        }
+        type = new TypeToken<List<Stock>>() {
+        }.getType();
+
+        stocks = gson.fromJson(json, type);
+        bundles.putString(KEY_STOCKS_INTENT, json);
 
         stocksFragment = new StocksFragment();
         favoritesFragment = new FavoritesFragment();
-
 
         stocksFragment.setArguments(bundles);
         favoritesFragment.setArguments(bundles);
@@ -74,7 +83,17 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, TabL
     @Override
     protected void onResume() {
         super.onResume();
+        searchEditText.setText("");
+        searchEditText.clearFocus();
         searchEditText.addTextChangedListener(this);
+        ArrayList<String> symbols = new ArrayList<>();
+        for (Stock stock : stocks) {
+            symbols.add(stock.getSymbol());
+        }
+
+        Intent intent = new Intent(this, WebSocketService.class);
+        intent.putStringArrayListExtra("symbols", symbols);
+        startService(intent);
     }
 
     @Override

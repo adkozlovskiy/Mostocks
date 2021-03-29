@@ -41,5 +41,6 @@ public class IndicatorsPresenter {
                         e.printStackTrace();
                     }
                 });
+
     }
 }

@@ -8,19 +8,20 @@ import java.util.HashMap;
 public class TechAnalysisResponse {
 
     @SerializedName("technicalAnalysis")
-    private TechnicalAnalysis technicalAnalysis;
+    private TechAnalysis techAnalysis;
 
-    public TechnicalAnalysis getTechnicalAnalysis() {
-        return technicalAnalysis;
+    public TechAnalysis getTechAnalysis() {
+        return techAnalysis;
     }
 
-    public void setTechnicalAnalysis(TechnicalAnalysis technicalAnalysis) {
-        this.technicalAnalysis = technicalAnalysis;
+    public void setTechAnalysis(TechAnalysis techAnalysis) {
+        this.techAnalysis = techAnalysis;
     }
 
-    public static class TechnicalAnalysis {
+    public static class TechAnalysis {
 
         private int id;
+
         private String symbol;
 
         public int getId() {

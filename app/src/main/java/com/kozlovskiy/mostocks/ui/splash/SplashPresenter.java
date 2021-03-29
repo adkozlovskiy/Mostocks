@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 
 import com.google.gson.Gson;
+import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.models.stock.Stock;
 import com.kozlovskiy.mostocks.repo.StocksRepository;
+import com.kozlovskiy.mostocks.room.StocksDao;
 import com.kozlovskiy.mostocks.utils.CacheUtil;
 import com.kozlovskiy.mostocks.utils.NetworkUtil;
 
@@ -30,25 +32,19 @@ public class SplashPresenter {
         this.builder = new AlertDialog.Builder(context);
     }
 
-    public void initializeSymbols() {
+    public void initializeQuotes(List<Stock> stocks) {
         if (NetworkUtil.isNetworkConnectionNotGranted(context))
             buildNoNetworkDialog();
 
-        if (CacheUtil.getTickersCachedFlag(context)) {
-            splashView.startMainActivity("");
-
-        } else {
+        else {
             StocksRepository stocksRepository = new StocksRepository(context);
-            stocksRepository.getStockSymbols()
-                    .subscribeOn(Schedulers.computation())
+            stocksRepository.getSymbolQuotes(stocks).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new DisposableSingleObserver<List<Stock>>() {
                         @Override
-                        public void onSuccess(@NonNull List<Stock> stocks) {
+                        public void onSuccess(@NonNull List<Stock> s) {
                             Gson gson = new Gson();
                             splashView.startMainActivity(gson.toJson(stocks));
-
-                            CacheUtil.setTickersCachedFlag(context, true);
                         }
 
                         @Override
@@ -56,6 +52,36 @@ public class SplashPresenter {
                             buildErrorLoadingDialog(e);
                         }
                     });
+        }
+    }
+
+    public void initializeSymbols() {
+        if (NetworkUtil.isNetworkConnectionNotGranted(context))
+            buildNoNetworkDialog();
+
+        else {
+
+            if (CacheUtil.getTickersCachedFlag(context)) {
+                StocksDao stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
+                initializeQuotes(stocksDao.getStocks());
+
+            } else {
+                StocksRepository stocksRepository = new StocksRepository(context);
+                stocksRepository.getStockSymbols()
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableSingleObserver<List<Stock>>() {
+                            @Override
+                            public void onSuccess(@NonNull List<Stock> stocks) {
+                                initializeQuotes(stocks);
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                                buildErrorLoadingDialog(e);
+                            }
+                        });
+            }
         }
     }
 

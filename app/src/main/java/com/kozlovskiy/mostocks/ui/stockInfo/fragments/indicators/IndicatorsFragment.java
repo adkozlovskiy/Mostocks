@@ -19,6 +19,7 @@ import java.util.List;
 
 public class IndicatorsFragment extends Fragment implements IndicatorsView {
 
+    public static final String TAG = IndicatorsFragment.class.getSimpleName();
     private IndicatorsPresenter indicatorsPresenter;
     private Context context;
     private RecyclerView recyclerView;
@@ -36,17 +37,16 @@ public class IndicatorsFragment extends Fragment implements IndicatorsView {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         indicatorsPresenter = new IndicatorsPresenter(this, context, getSymbol());
+        super.onCreate(savedInstanceState);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
         progressBar = view.findViewById(R.id.progress_bar);
         recyclerView = view.findViewById(R.id.recycler);
         indicatorsPresenter.initializeIndicators();
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override

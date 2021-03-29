@@ -16,7 +16,7 @@ public class FinnhubService {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
-    
+
     public static FinnhubService getInstance() {
         if (instance == null) {
             instance = new FinnhubService();
@@ -24,7 +24,7 @@ public class FinnhubService {
 
         return instance;
     }
-    
+
     public FinnhubApi getApi() {
         return mRetrofit.create(FinnhubApi.class);
     }

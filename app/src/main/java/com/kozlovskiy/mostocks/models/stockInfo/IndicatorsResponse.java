@@ -1,5 +1,9 @@
 package com.kozlovskiy.mostocks.models.stockInfo;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -17,7 +21,15 @@ public class IndicatorsResponse {
         this.indicators = indicators;
     }
 
+    @Entity
     public static class Indicators {
+
+        @PrimaryKey(autoGenerate = true)
+        @ColumnInfo(name = "id")
+        private Integer id;
+
+        @ColumnInfo(name = "symbol")
+        private String symbol;
 
         @SerializedName("marketCapitalization")
         @Expose
@@ -94,6 +106,22 @@ public class IndicatorsResponse {
         @SerializedName("beta")
         @Expose
         private Double beta;
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
+
+        public String getSymbol() {
+            return symbol;
+        }
+
+        public void setSymbol(String symbol) {
+            this.symbol = symbol;
+        }
 
         public Double getMarketCap() {
             return marketCap;

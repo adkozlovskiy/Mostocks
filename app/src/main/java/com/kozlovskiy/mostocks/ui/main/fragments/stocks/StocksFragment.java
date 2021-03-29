@@ -1,13 +1,8 @@
 package com.kozlovskiy.mostocks.ui.main.fragments.stocks;
 
 import android.app.Dialog;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -22,11 +17,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.models.stock.Stock;
-import com.kozlovskiy.mostocks.services.WebSocketService;
 import com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.kozlovskiy.mostocks.ui.splash.SplashActivity.KEY_STOCKS_INTENT;
@@ -42,34 +35,12 @@ public class StocksFragment extends Fragment
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private LinearLayoutManager llm;
-    private List<String> symbols;
     private Context context;
     private Gson gson;
     private Type type;
-    boolean bound = false;
-
-    ServiceConnection connection = new ServiceConnection() {
-
-        public void onServiceConnected(ComponentName name, IBinder binder) {
-            WebSocketService.QuoteBinder quoteBinder = (WebSocketService.QuoteBinder) binder;
-            WebSocketService webSocketService = quoteBinder.getInstance();
-            webSocketService.bindSocket(symbols);
-            Log.d(TAG, "onServiceConnected: ");
-            bound = true;
-        }
-
-        public void onServiceDisconnected(ComponentName name) {
-            bound = false;
-            Log.d(TAG, "onServiceDisconnected: ");
-        }
-    };
 
     public StocksFragment() {
         super(R.layout.fragment_stocks);
-    }
-
-    public StocksPresenter getStocksPresenter() {
-        return stocksPresenter;
     }
 
     @Override
@@ -105,17 +76,9 @@ public class StocksFragment extends Fragment
             String json = getArguments().getString(KEY_STOCKS_INTENT);
             List<Stock> stocks = gson.fromJson(json, type);
 
-            symbols = new ArrayList<>();
-            for (Stock stock : stocks) {
-                symbols.add(stock.getSymbol());
-            }
-
             stocksPresenter = new StocksPresenter(this, context, stocks);
             stocksPresenter.initializeQuotes();
         }
-
-        Intent intent = new Intent(getContext(), WebSocketService.class);
-        context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
 
@@ -137,8 +100,6 @@ public class StocksFragment extends Fragment
     @Override
     public void onStop() {
         super.onStop();
-        context.unbindService(connection);
-        stocksPresenter.unsubscribe();
     }
 
     @Override

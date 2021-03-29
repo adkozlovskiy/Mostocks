@@ -36,6 +36,7 @@ public class FavoritesFragment extends Fragment
     private StocksAdapter stocksAdapter;
     private Gson gson;
     private Type type;
+    private Context context;
 
     public FavoritesFragment() {
         super(R.layout.fragment_favorites);
@@ -44,9 +45,8 @@ public class FavoritesFragment extends Fragment
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
+        this.context = context;
         Log.d(TAG, "onAttach: ");
-        favoritesPresenter = new FavoritesPresenter(this, context);
 
         stocksAdapter = new StocksAdapter(context, true, this);
         linearLayoutManager = new LinearLayoutManager(context);
@@ -66,13 +66,6 @@ public class FavoritesFragment extends Fragment
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(stocksAdapter);
-
-        if (getArguments() != null) {
-            String json = getArguments().getString(KEY_STOCKS_INTENT);
-
-            List<Stock> stocks = gson.fromJson(json, type);
-            favoritesPresenter.initializeFavorites(stocks);
-        }
     }
 
     @Override
@@ -93,13 +86,24 @@ public class FavoritesFragment extends Fragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        favoritesPresenter.unsubscribe();
     }
 
     @Override
     public void onZeroItems() {
         recyclerView.setVisibility(View.GONE);
         tvNoTicker.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getArguments() != null) {
+            String json = getArguments().getString(KEY_STOCKS_INTENT);
+            List<Stock> stocks = gson.fromJson(json, type);
+
+            favoritesPresenter = new FavoritesPresenter(this, context);
+            favoritesPresenter.initializeFavorites(stocks);
+        }
     }
 
     public void filter(String s) {

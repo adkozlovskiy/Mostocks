@@ -52,11 +52,15 @@
 
         </androidx.cardview.widget.CardView>
 
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart_lines"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
+
         <com.github.mikephil.charting.charts.CandleStickChart
             android:id="@+id/chart_candles"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:visibility="visible" />
+            android:layout_height="300dp" />
 
         <ProgressBar
             android:id="@+id/progress_bar"

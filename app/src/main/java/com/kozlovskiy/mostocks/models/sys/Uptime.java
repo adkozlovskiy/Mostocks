@@ -38,6 +38,9 @@ public class Uptime {
     @ColumnInfo(name = "tech_ut")
     private long techAnalysisUptime;
 
+    @ColumnInfo(name = "indicators_ut")
+    private long indicatorsUptime;
+
     @ColumnInfo(name = "rec_ut")
     private long recommendationUptime;
 
@@ -119,6 +122,14 @@ public class Uptime {
 
     public void setTechAnalysisUptime(long techAnalysisUptime) {
         this.techAnalysisUptime = techAnalysisUptime;
+    }
+
+    public long getIndicatorsUptime() {
+        return indicatorsUptime;
+    }
+
+    public void setIndicatorsUptime(long indicatorsUptime) {
+        this.indicatorsUptime = indicatorsUptime;
     }
 
     public long getRecommendationUptime() {

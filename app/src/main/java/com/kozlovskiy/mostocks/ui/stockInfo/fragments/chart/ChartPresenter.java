@@ -6,18 +6,20 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.Log;
-import android.view.MotionEvent;
 
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
-import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.gson.Gson;
 import com.kozlovskiy.mostocks.R;
@@ -42,23 +44,35 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
 
     public static final String TAG = ChartPresenter.class.getSimpleName();
     private final StocksRepository stocksRepository;
-    private final CandleStickChart chart;
+    private final CandleStickChart candlesChart;
+    private final LineChart lineChart;
     private final ChartView chartView;
     private final Context context;
     private final String symbol;
     private final double pq;
+    private boolean candlesChartSelected = false;
+
+    public void setCandlesChartSelected(boolean candlesChartSelected) {
+        this.candlesChartSelected = candlesChartSelected;
+    }
+
+    public boolean isCandlesChartSelected() {
+        return candlesChartSelected;
+    }
 
     private WebSocketConnection webSocketConnection;
 
-    public ChartPresenter(ChartView chartView, CandleStickChart chart, Context context, String symbol, double pq) {
+    public ChartPresenter(ChartView chartView, CandleStickChart candlesChart, LineChart lineChart, Context context, String symbol, double pq) {
         this.stocksRepository = new StocksRepository(context);
         this.chartView = chartView;
-        this.chart = chart;
+        this.candlesChart = candlesChart;
+        this.lineChart = lineChart;
         this.context = context;
         this.symbol = symbol;
         this.pq = pq;
 
         configureCandlesChart();
+        configureLinesChart();
     }
 
     public void subscribe() {
@@ -127,33 +141,32 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
     }
 
     public void initializeCandles(long from, long to, String resolution) {
-        Log.d(TAG, "initializeCandles: init from " + from + " to " + to);
         stocksRepository.getSymbolCandles(symbol, resolution, from, to)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableSingleObserver<Candles>() {
                     @Override
                     public void onSuccess(@NonNull Candles candles) {
-                        updateCandlesData(candles);
+                        updateLinesData(candles);
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        e.printStackTrace();
+                        e.printStackTrace(); // todo alert dialog
                     }
                 });
     }
 
     public void configureCandlesChart() {
-        chart.setBackgroundColor(Color.WHITE);
-        chart.getDescription().setEnabled(false);
-        chart.setMaxVisibleValueCount(0);
-        chart.setPinchZoom(true);
-        chart.setDoubleTapToZoomEnabled(false);
-        chart.setDrawGridBackground(false);
-        chart.setScaleEnabled(true);
+        candlesChart.setBackgroundColor(Color.WHITE);
+        candlesChart.getDescription().setEnabled(false);
+        candlesChart.setMaxVisibleValueCount(0);
+        candlesChart.setPinchZoom(true);
+        candlesChart.setDoubleTapToZoomEnabled(false);
+        candlesChart.setDrawGridBackground(false);
+        candlesChart.setScaleEnabled(true);
 
-        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+        candlesChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 if (e.getData() != null & e.getData() instanceof Long) {
@@ -168,16 +181,45 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
             }
         });
 
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setEnabled(false);
+        candlesChart.getXAxis().setEnabled(false);
+        candlesChart.getAxisLeft().setEnabled(false);
+        candlesChart.getAxisRight().setEnabled(false);
+        candlesChart.getLegend().setEnabled(false);
+    }
 
-        YAxis leftAxis = chart.getAxisLeft();
-        leftAxis.setEnabled(false);
+    public void configureLinesChart() {
+        lineChart.setBackgroundColor(Color.WHITE);
+        lineChart.getDescription().setEnabled(false);
+        lineChart.setTouchEnabled(true);
+        lineChart.setDoubleTapToZoomEnabled(false);
+        lineChart.setMaxVisibleValueCount(0);
+        lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
 
-        YAxis rightAxis = chart.getAxisRight();
-        rightAxis.setEnabled(false);
+            }
 
-        chart.getLegend().setEnabled(false);
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
+        lineChart.setDrawGridBackground(false);
+
+        lineChart.setDragEnabled(true);
+        lineChart.setScaleEnabled(true);
+        lineChart.setPinchZoom(true);
+
+        lineChart.getXAxis().setEnabled(false);
+
+        YAxis yAxis;
+        yAxis = lineChart.getAxisLeft();
+        yAxis.enableGridDashedLine(10f, 10f, 0f);
+
+        lineChart.getAxisRight().setEnabled(false);
+
+        lineChart.animateX(1500);
+        lineChart.getLegend().setEnabled(false);
     }
 
     void updateCandlesData(Candles candles) {
@@ -208,10 +250,45 @@ public class ChartPresenter implements WebSocketClient.MessageListener {
         set.setNeutralColor(Color.GRAY);
 
         CandlesMarker candlesMarker = new CandlesMarker(context, R.layout.candles_marker, values.size());
-        chart.setMarker(candlesMarker);
+        candlesChart.setMarker(candlesMarker);
 
         CandleData data = new CandleData(set);
-        chart.setData(data);
-        chartView.buildCandlesChart(chart, values.size());
+        candlesChart.setData(data);
+        chartView.buildCandlesChart(candlesChart, values.size());
+    }
+
+    void updateLinesData(Candles candles) {
+        ArrayList<Entry> values = new ArrayList<>();
+
+        for (int i = 0; i < candles.getVolumes().size(); i++) {
+            long timestamp = candles.getTimestamps().get(i);
+            double close = candles.getClosePrices().get(i);
+
+            Entry entry = new Entry(i, (float) close, null);
+            entry.setData(timestamp);
+            values.add(entry);
+        }
+
+        LineDataSet dataSet;
+        dataSet = new LineDataSet(values, null);
+        dataSet.setDrawIcons(false);
+        dataSet.setDrawCircleHole(false);
+        dataSet.setColor(Color.rgb(37, 86, 123));
+
+        dataSet.setLineWidth(1.3f);
+        dataSet.setDrawCircles(false);
+
+        dataSet.setDrawFilled(true);
+        dataSet.setFillFormatter((dataSt, dataProvider) -> lineChart.getAxisLeft().getAxisMinimum());
+
+        dataSet.setFillColor(Color.rgb(240, 244, 247));
+
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(dataSet);
+
+        LineData data = new LineData(dataSets);
+
+        lineChart.setData(data);
+        chartView.buildLinesChart(lineChart, values.size());
     }
 }

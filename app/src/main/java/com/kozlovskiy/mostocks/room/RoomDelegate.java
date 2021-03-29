@@ -4,6 +4,10 @@ import android.content.Context;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.models.stock.Favorite;
+import com.kozlovskiy.mostocks.models.stockInfo.IndicatorsResponse;
+import com.kozlovskiy.mostocks.models.stockInfo.Recommendation;
+
+import java.util.List;
 
 public class RoomDelegate {
 
@@ -29,5 +33,13 @@ public class RoomDelegate {
 
     public void updateStockQuote(String symbol, Double quote) {
         new Thread(() -> stocksDao.updateStockQuote(symbol, quote)).start();
+    }
+
+    public void cacheIndicators(IndicatorsResponse.Indicators indicators) {
+        new Thread(() -> stocksDao.cacheIndicators(indicators)).start();
+    }
+
+    public void cacheRecommendations(List<Recommendation> recommendations) {
+        new Thread(() -> stocksDao.cacheRecommendations(recommendations)).start();
     }
 }

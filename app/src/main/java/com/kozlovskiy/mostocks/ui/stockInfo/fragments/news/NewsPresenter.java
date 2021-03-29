@@ -20,12 +20,10 @@ public class NewsPresenter {
 
     public static final String TAG = NewsPresenter.class.getSimpleName();
     private final NewsView newsView;
-    private final Context context;
     private final StocksRepository stocksRepository;
-    private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     public NewsPresenter(NewsView newsView, Context context) {
-        this.context = context;
         this.newsView = newsView;
         stocksRepository = new StocksRepository(context);
     }

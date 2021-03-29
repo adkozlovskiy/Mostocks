@@ -23,8 +23,11 @@ public class CacheUtil {
     public static final String POSTFIX = "_ut";
     public static final String KEY_QUOTE_UPTIME = Quote.class.getSimpleName() + POSTFIX;
     public static final String KEY_TICKERS_CACHED = Stock.class.getSimpleName() + POSTFIX;
-    public static final long QUOTE_UPDATE_INTERVAL = 120 * 1000 * 60;
+    public static final long QUOTE_UPDATE_INTERVAL = TimeUnit.HOURS.toMillis(2);
     public static final long NEWS_UPDATE_INTERVAL = TimeUnit.DAYS.toMillis(1);
+    public static final long INDICATORS_UPDATE_INTERVAL = TimeUnit.DAYS.toMillis(7);
+    public static final long RECOMMENDATION_UPDATE_INTERVAL = TimeUnit.HOURS.toMillis(4);
+    public static final long TECH_UPDATE_INTERVAL = TimeUnit.HOURS.toMillis(4);
 
     public static void updateQuoteUptime(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_SETTINGS, MODE_PRIVATE);
@@ -80,6 +83,46 @@ public class CacheUtil {
         StocksDao stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
         long uptime = stocksDao.getNewsUptime(symbol);
         return new Date().getTime() - uptime * 1000 < NEWS_UPDATE_INTERVAL;
+    }
+
+    public static void updateIndicatorsUptime(String symbol, Context context) {
+        StocksDao stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
+
+        if (stocksDao.getUptimeSymbol(symbol) != null)
+            stocksDao.setIndicatorsUptime(symbol, new Date().getTime() / 1000);
+
+        else {
+            Uptime uptime = new Uptime();
+            uptime.setSymbol(symbol);
+            uptime.setIndicatorsUptime(new Date().getTime() / 1000);
+            stocksDao.addUptimeSymbol(uptime);
+        }
+    }
+
+    public static boolean indicatorsCacheIsUpToDate(String symbol, Context context) {
+        StocksDao stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
+        long uptime = stocksDao.getIndicatorsUptime(symbol);
+        return new Date().getTime() - uptime * 1000 < INDICATORS_UPDATE_INTERVAL;
+    }
+
+    public static void updateRecommendationUptime(String symbol, Context context) {
+        StocksDao stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
+
+        if (stocksDao.getUptimeSymbol(symbol) != null)
+            stocksDao.setRecommendationUptime(symbol, new Date().getTime() / 1000);
+
+        else {
+            Uptime uptime = new Uptime();
+            uptime.setSymbol(symbol);
+            uptime.setRecommendationUptime(new Date().getTime() / 1000);
+            stocksDao.addUptimeSymbol(uptime);
+        }
+    }
+
+    public static boolean recommendationCacheIsUpToDate(String symbol, Context context) {
+        StocksDao stocksDao = ((AppDelegate) context.getApplicationContext()).getDatabase().getDao();
+        long uptime = stocksDao.getRecommendationUptime(symbol);
+        return new Date().getTime() - uptime * 1000 < RECOMMENDATION_UPDATE_INTERVAL;
     }
 
     public static boolean getTickersCachedFlag(Context context) {

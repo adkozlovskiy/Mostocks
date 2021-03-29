@@ -1,7 +1,6 @@
 package com.kozlovskiy.mostocks.ui.main.fragments.favorites;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.kozlovskiy.mostocks.AppDelegate;
 import com.kozlovskiy.mostocks.models.stock.Favorite;
@@ -14,9 +13,13 @@ import java.util.List;
 public class FavoritesPresenter {
 
     public static final String TAG = FavoritesPresenter.class.getSimpleName();
-    private FavoritesView favoritesView;
+    private final FavoritesView favoritesView;
     private final StocksDao stocksDao;
     private List<Stock> stocks;
+
+    public void setStocks(List<Stock> stocks) {
+        this.stocks = stocks;
+    }
 
     public FavoritesPresenter(FavoritesView favoritesView, Context context) {
         this.favoritesView = favoritesView;
@@ -28,8 +31,7 @@ public class FavoritesPresenter {
     }
 
     public void initializeFavorites(List<Stock> stocks) {
-        Log.d(TAG, "initializeFavorites: ");
-        ArrayList<Stock> filteredStocks = new ArrayList<>();
+        ArrayList<Stock> favoritesStocks = new ArrayList<>();
         List<Favorite> favorites = stocksDao.getFavorites();
         List<String> favoritesStrings = new ArrayList<>();
 
@@ -39,16 +41,12 @@ public class FavoritesPresenter {
 
         for (Stock stock : stocks) {
             if (favoritesStrings.contains(stock.getSymbol())) {
-                filteredStocks.add(stock);
+                favoritesStocks.add(stock);
             }
         }
 
-        this.stocks = filteredStocks;
-        favoritesView.updateStocks(filteredStocks);
-    }
-
-    public void unsubscribe() {
-        favoritesView = null;
+        this.stocks = favoritesStocks;
+        favoritesView.updateStocks(favoritesStocks);
     }
 
     public void filter(String s) {

@@ -64,7 +64,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         } else holder.ivImage.setVisibility(View.GONE);
 
         Date date = new Date(news.getDatetime() * 1000);
-        SimpleDateFormat format = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+        SimpleDateFormat format = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
         String dateString = format.format(date);
         holder.tvDatetime.setText(dateString);
 
@@ -73,7 +73,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         holder.tvLink.setText(Html.fromHtml(link, Html.FROM_HTML_MODE_LEGACY));
         holder.tvLink.setLinksClickable(true);
         holder.tvLink.setMovementMethod(LinkMovementMethod.getInstance());
-
     }
 
     @Override

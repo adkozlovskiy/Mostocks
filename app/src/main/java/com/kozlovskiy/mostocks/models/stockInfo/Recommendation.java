@@ -1,10 +1,20 @@
 package com.kozlovskiy.mostocks.models.stockInfo;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity
 public class Recommendation {
 
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    private int id;
+
+    @ColumnInfo(name = "symbol")
     @SerializedName("symbol")
     @Expose
     private String symbol;
@@ -32,6 +42,14 @@ public class Recommendation {
     @SerializedName("strongSell")
     @Expose
     private int strongSellSignals;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getSymbol() {
         return symbol;

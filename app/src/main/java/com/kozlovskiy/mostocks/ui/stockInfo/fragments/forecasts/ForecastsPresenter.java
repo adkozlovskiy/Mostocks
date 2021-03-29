@@ -34,7 +34,7 @@ public class ForecastsPresenter {
     public static final String TAG = ForecastsPresenter.class.getSimpleName();
     private final StocksRepository stocksRepository;
     private BarChart chart;
-    private Context context;
+    private final Context context;
 
     public ForecastsPresenter(ForecastsView forecastsView, Context context) {
         this.forecastsView = forecastsView;
@@ -115,9 +115,9 @@ public class ForecastsPresenter {
         return Completable.create((emitter) -> stocksRepository.getSymbolTechAnalysis(symbol)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableSingleObserver<TechAnalysisResponse.TechnicalAnalysis>() {
+                .subscribe(new DisposableSingleObserver<TechAnalysisResponse.TechAnalysis>() {
                     @Override
-                    public void onSuccess(@NonNull TechAnalysisResponse.TechnicalAnalysis object) {
+                    public void onSuccess(@NonNull TechAnalysisResponse.TechAnalysis object) {
                         forecastsView.showTechAnalysisResult(object.getSignal());
                         emitter.onComplete();
                     }

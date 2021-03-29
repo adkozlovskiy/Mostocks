@@ -15,6 +15,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.kozlovskiy.mostocks.R;
 import com.kozlovskiy.mostocks.utils.Converter;
 
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_CURRENT_COST;
 import static com.kozlovskiy.mostocks.ui.main.adapter.StocksAdapter.KEY_PREVIOUS_COST;
@@ -33,10 +35,17 @@ public class ChartFragment extends Fragment
 
     public static final String TAG = ChartFragment.class.getSimpleName();
     public static final String HALF_HOUR_RESOLUTION = "30";
+    public static final long HALF_HOUR_PERIOD = TimeUnit.HOURS.toMillis(90);
     public static final String HOUR_RESOLUTION = "60";
+    public static final long HOUR_PERIOD = TimeUnit.HOURS.toMillis(180);
     public static final String DAY_RESOLUTION = "D";
+    public static final long DAY_PERIOD = TimeUnit.DAYS.toMillis(60);
     public static final String WEEK_RESOLUTION = "W";
+    public static final long WEEK_PERIOD = TimeUnit.DAYS.toMillis(60 * 7);
     public static final String MONTH_RESOLUTION = "M";
+    public static final long MONTH_PERIOD = TimeUnit.DAYS.toMillis(60 * 30);
+
+    public static final long MILLIS_IN_SECOND = 1000;
 
     private final SimpleDateFormat monthDateFormat = new SimpleDateFormat("MMMM yyyy", Locale.US);
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("d MMMM yyyy", Locale.US);
@@ -44,9 +53,11 @@ public class ChartFragment extends Fragment
 
     private final List<CardView> navigationCards = new ArrayList<>(5);
     private final Date date = new Date();
-    private long timestamp = date.getTime();
+    private final long timestamp = date.getTime();
 
     private ChartPresenter chartPresenter;
+
+    private LineChart lineChart;
     private CandleStickChart candleChart;
     private TextView tvPrice;
     private TextView tvPriceChange;
@@ -55,7 +66,6 @@ public class ChartFragment extends Fragment
     private ProgressBar progressBar;
     private Context context;
 
-    private boolean candlesChartSelected = false;
     private CardView cvThirties;
     private CardView cvHour;
     private CardView cvDay;
@@ -81,6 +91,7 @@ public class ChartFragment extends Fragment
 
         tvPrice = view.findViewById(R.id.tv_price);
         tvPriceChange = view.findViewById(R.id.tv_price_change);
+        lineChart = view.findViewById(R.id.chart_lines);
         candleChart = view.findViewById(R.id.chart_candles);
         tvDatestamp = view.findViewById(R.id.tv_datestamp);
         tvTimestamp = view.findViewById(R.id.tv_timestamp);
@@ -88,19 +99,6 @@ public class ChartFragment extends Fragment
 
         CardView cvChartButton = view.findViewById(R.id.chart_button);
         ivChartButton = view.findViewById(R.id.chart_icon);
-
-        cvChartButton.setOnClickListener(v -> {
-            if (candlesChartSelected) {
-                ivChartButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.ic_line_chart, context.getTheme()));
-
-            } else {
-                ivChartButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.ic_candles_chart, context.getTheme()));
-            }
-
-            candlesChartSelected = !candlesChartSelected;
-        });
 
         cvThirties = view.findViewById(R.id.cv_thirties);
         cvThirties.setOnClickListener(cardClickListener);
@@ -126,15 +124,25 @@ public class ChartFragment extends Fragment
         tvPrice.setText(Converter.toCurrencyFormat(currentQuote, 0, 2));
 
         double previousQuote = getPreviousQuote();
-        chartPresenter = new ChartPresenter(this, candleChart, context, getSymbol(), previousQuote);
+        chartPresenter = new ChartPresenter(this, candleChart, lineChart, context, getSymbol(), previousQuote);
         chartPresenter.calculateQuoteChange(currentQuote, previousQuote);
 
-        long MILLIS_IN_SECOND = 1000;
-        long MILLIS_IN_MINUTE = 60 * MILLIS_IN_SECOND;
-        long MILLIS_IN_HOUR = 60 * MILLIS_IN_MINUTE;
-
-        initializeCandles((timestamp - 60 * 24 * MILLIS_IN_HOUR) / MILLIS_IN_SECOND, timestamp / MILLIS_IN_SECOND, "D");
+        initializeCandles((timestamp - DAY_PERIOD) / MILLIS_IN_SECOND, timestamp / MILLIS_IN_SECOND, "D");
         selectCard(cvDay);
+
+        cvChartButton.setOnClickListener(v -> {
+            if (chartPresenter.isCandlesChartSelected()) {
+                ivChartButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
+                        R.drawable.ic_line_chart, context.getTheme()));
+
+
+            } else {
+                ivChartButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
+                        R.drawable.ic_candles_chart, context.getTheme()));
+            }
+
+            chartPresenter.setCandlesChartSelected(!chartPresenter.isCandlesChartSelected());
+        });
     }
 
     @Override
@@ -156,6 +164,13 @@ public class ChartFragment extends Fragment
     @Override
     public void buildCandlesChart(CandleStickChart chart, int size) {
         candleChart.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+        chart.invalidate();
+    }
+
+    @Override
+    public void buildLinesChart(LineChart chart, int size) {
+        lineChart.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
         chart.invalidate();
     }
@@ -200,42 +215,34 @@ public class ChartFragment extends Fragment
         if (v == cvSelected)
             return;
 
-        int id = v.getId();
-
-        long MILLIS_IN_SECOND = 1000;
-        long MILLIS_IN_MINUTE = 60 * MILLIS_IN_SECOND;
-        long MILLIS_IN_HOUR = 60 * MILLIS_IN_MINUTE;
-        long from = 0;
         long to = timestamp / MILLIS_IN_SECOND;
-        String resolution = null;
+        long period = HALF_HOUR_PERIOD;
+        String resolution = HALF_HOUR_RESOLUTION;
 
-        if (id == R.id.cv_thirties) {
-            selectCard(cvThirties);
-            from = 70 * MILLIS_IN_HOUR;
-            resolution = HALF_HOUR_RESOLUTION;
-
-        } else if (id == R.id.cv_hour) {
+        int id = v.getId();
+        if (id == R.id.cv_hour) {
             selectCard(cvHour);
-            from = 140 * MILLIS_IN_HOUR;
+            period = HOUR_PERIOD;
             resolution = HOUR_RESOLUTION;
 
         } else if (id == R.id.cv_day) {
             selectCard(cvDay);
-            from = 24 * MILLIS_IN_HOUR * 90;
+            period = DAY_PERIOD;
             resolution = DAY_RESOLUTION;
 
         } else if (id == R.id.cv_week) {
             selectCard(cvWeek);
-            from = 24 * MILLIS_IN_HOUR * 60 * 7;
+            period = WEEK_PERIOD;
             resolution = WEEK_RESOLUTION;
 
         } else if (id == R.id.cv_month) {
             selectCard(cvMonth);
-            from = 24 * MILLIS_IN_HOUR * 60 * 7 * 5;
+            period = MONTH_PERIOD;
             resolution = MONTH_RESOLUTION;
-        }
 
-        initializeCandles((timestamp - from) / MILLIS_IN_SECOND, to, resolution);
+        } else selectCard(cvThirties);
+
+        initializeCandles((timestamp - period) / MILLIS_IN_SECOND, to, resolution);
     };
 
     private void initializeCandles(long from, long to, String resolution) {

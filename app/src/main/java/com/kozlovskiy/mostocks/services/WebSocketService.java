@@ -2,9 +2,10 @@ package com.kozlovskiy.mostocks.services;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.kozlovskiy.mostocks.models.socket.SocketResponse;
@@ -19,36 +20,38 @@ public class WebSocketService extends Service implements WebSocketClient.Message
     public static final String TAG = WebSocketService.class.getSimpleName();
     public static final String KEY_TRADE = "trade";
 
-    private final IBinder binder = new QuoteBinder();
     private final Gson gson = new Gson();
 
     private WebSocketConnection webSocketConnection;
     private RoomDelegate roomDelegate;
 
-    public class QuoteBinder extends Binder {
-        public WebSocketService getInstance() {
-            return WebSocketService.this;
-        }
+    @Override
+    public void onCreate() {
+        roomDelegate = new RoomDelegate(this);
+        super.onCreate();
     }
 
+    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        roomDelegate = new RoomDelegate(this);
-        return binder;
+        return null;
     }
 
     @Override
-    public boolean onUnbind(Intent intent) {
-        if (webSocketConnection != null)
-            webSocketConnection.closeConnection();
-
-        return super.onUnbind(intent);
-    }
-
-    public void bindSocket(List<String> symbols) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        List<String> symbols = intent.getStringArrayListExtra("symbols");
         webSocketConnection = new WebSocketConnection(symbols);
         webSocketConnection.setListener(this);
         webSocketConnection.openConnection();
+
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (webSocketConnection != null)
+            webSocketConnection.closeConnection();
     }
 
     @Override
