@@ -163,7 +163,6 @@ public class StocksRepository {
                             Candles candles = response.body();
 
                             if (candles.getStatus().equals("ok"))
-                                // TODO: 23.03.2021 caching
                                 emitter.onSuccess(candles);
 
                             else emitter.onError(new NullPointerException());
