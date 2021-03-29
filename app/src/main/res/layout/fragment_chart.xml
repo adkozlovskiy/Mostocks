@@ -34,24 +34,6 @@
         android:layout_height="300dp"
         android:layout_marginTop="20dp">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/chart_button"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_marginStart="20dp"
-            app:cardBackgroundColor="@color/backgroundColor"
-            app:cardCornerRadius="15dp">
-
-            <ImageView
-                android:id="@+id/chart_icon"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="4dp"
-                android:contentDescription="@string/change_the_chart_view"
-                android:src="@drawable/ic_line_chart" />
-
-        </androidx.cardview.widget.CardView>
-
         <com.github.mikephil.charting.charts.CandleStickChart
             android:id="@+id/chart_candles"
             android:layout_width="match_parent"
