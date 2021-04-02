@@ -87,8 +87,6 @@ public class ChartFragment extends Fragment
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
-
-        context.registerReceiver(quoteReceiver, new IntentFilter(ACTION_NEW_MESSAGE));
     }
 
     @Override
@@ -135,6 +133,7 @@ public class ChartFragment extends Fragment
 
     @Override
     public void onResume() {
+        context.registerReceiver(quoteReceiver, new IntentFilter(ACTION_NEW_MESSAGE));
         super.onResume();
     }
 
