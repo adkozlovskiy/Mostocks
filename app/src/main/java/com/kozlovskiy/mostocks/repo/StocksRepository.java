@@ -134,7 +134,7 @@ public class StocksRepository {
 
     public Single<TechAnalysisResponse.TechAnalysis> getSymbolTechAnalysis(String symbol) {
         return Single.create(emitter -> FinnhubService.getInstance().getApi()
-                .getTechAnalysis(symbol, "5", FinnhubService.TOKEN)
+                .getTechAnalysis(symbol, "D", FinnhubService.TOKEN)
                 .enqueue(new Callback<TechAnalysisResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<TechAnalysisResponse> call, @NonNull Response<TechAnalysisResponse> response) {

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FFF</color>
-    <color name="colorPrimaryDark">#FFF</color>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#FFFFFF</color>
     <color name="colorAccent">#25567b</color>
 
     <color name="textColor">#B5B5B5</color>
     <color name="textAccentColor">#1A1A1A</color>
     <color name="cardColor">#F0F4F7</color>
-    <color name="backgroundColor">#FFF</color>
+    <color name="backgroundColor">#FFFFFF</color>
     <color name="negativeCost">#B22424</color>
     <color name="positiveCost">#24B25D</color>
     <color name="strongBuyIndicatorColor">#127339</color>
@@ -17,7 +17,7 @@
     <color name="strongSellIndicatorColor">#B22424</color>
     <color name="colorBackgroundMarker">#323B4A</color>
     <color name="colorTextMarker">#8D95A2</color>
-    <color name="colorChartButtonBackground">#F0F4F7</color>
-    <color name="colorChartButtonBackgroundAccent">#DAEAF8</color>
+    <color name="colorChartButtonBackground">#FFFFFF</color>
+    <color name="colorChartButtonBackgroundAccent">#F1F1F1</color>
     <color name="colorGray">#ECECEC</color>
 </resources>

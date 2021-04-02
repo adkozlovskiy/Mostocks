@@ -63,6 +63,7 @@ public class ForecastsPresenter {
 
             @Override
             public void onError(@NonNull Throwable e) {
+                buildErrorLoadingDialog(e);
                 e.printStackTrace();
             }
         });
@@ -75,36 +76,41 @@ public class ForecastsPresenter {
                 .subscribe(new DisposableSingleObserver<List<Recommendation>>() {
                     @Override
                     public void onSuccess(@NonNull List<Recommendation> r) {
-                        String signal = null;
-                        Recommendation lastRecommendation = r.get(0);
-                        int buySignals = lastRecommendation.getBuySignals();
-                        int sellSignals = lastRecommendation.getSellSignals();
-                        int strongBuySignals = lastRecommendation.getStrongBuySignals();
-                        int strongSellSignals = lastRecommendation.getStrongSellSignals();
+                        try {
+                            String signal = null;
+                            Recommendation lastRecommendation = r.get(0);
+                            int buySignals = lastRecommendation.getBuySignals();
+                            int sellSignals = lastRecommendation.getSellSignals();
+                            int strongBuySignals = lastRecommendation.getStrongBuySignals();
+                            int strongSellSignals = lastRecommendation.getStrongSellSignals();
 
-                        int max = Math.max(Math.max(buySignals, sellSignals), Math.max(strongBuySignals, strongSellSignals));
+                            int max = Math.max(Math.max(buySignals, sellSignals), Math.max(strongBuySignals, strongSellSignals));
 
-                        if (max == buySignals)
-                            signal = "b";
+                            if (max == buySignals)
+                                signal = "b";
 
-                        if (max == sellSignals)
-                            signal = "s";
+                            if (max == sellSignals)
+                                signal = "s";
 
-                        if (max == strongBuySignals)
-                            signal = "sb";
+                            if (max == strongBuySignals)
+                                signal = "sb";
 
-                        if (max == strongSellSignals)
-                            signal = "ss";
+                            if (max == strongSellSignals)
+                                signal = "ss";
 
-                        forecastsView.showRecommendationsResult(
-                                lastRecommendation.getPeriod(),
-                                signal);
+                            forecastsView.showRecommendationsResult(
+                                    lastRecommendation.getPeriod(),
+                                    signal);
 
-                        r = r.subList(0, r.size() / 2);
-                        Collections.reverse(r);
-                        setChartData(r);
+                            r = r.subList(0, r.size() / 2);
+                            Collections.reverse(r);
+                            setChartData(r);
 
-                        emitter.onComplete();
+                            emitter.onComplete();
+
+                        } catch (Exception e) {
+                            emitter.onError(e);
+                        }
                     }
 
                     @Override
@@ -129,6 +135,7 @@ public class ForecastsPresenter {
                     @Override
                     public void onError(@NonNull Throwable e) {
                         buildErrorLoadingDialog(e);
+                        e.printStackTrace();
                     }
                 }));
     }

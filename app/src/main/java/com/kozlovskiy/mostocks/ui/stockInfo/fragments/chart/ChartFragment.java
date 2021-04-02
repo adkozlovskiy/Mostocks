@@ -192,7 +192,11 @@ public class ChartFragment extends Fragment
 
     @Override
     public void showDialog(Dialog dialog) {
-        dialog.show();
+        try {
+            dialog.show();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     View.OnClickListener cardClickListener = v -> {
