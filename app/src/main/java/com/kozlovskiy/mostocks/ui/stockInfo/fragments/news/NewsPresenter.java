@@ -52,6 +52,7 @@ public class NewsPresenter {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
+                        buildErrorLoadingDialog(e);
                         e.printStackTrace();
                     }
                 });

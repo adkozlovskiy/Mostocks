@@ -18,6 +18,7 @@ import java.util.List;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 
 public class SplashPresenter {
@@ -25,6 +26,7 @@ public class SplashPresenter {
     private SplashView splashView;
     private final Context context;
     private final AlertDialog.Builder builder;
+    private List<Stock> stocks;
 
     public SplashPresenter(SplashView splashView, Context context) {
         this.splashView = splashView;
@@ -49,7 +51,8 @@ public class SplashPresenter {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            buildErrorLoadingDialog(e);
+                            buildErrorQuotesLoadingDialog(e);
+                            e.printStackTrace();
                         }
                     });
         }
@@ -72,20 +75,23 @@ public class SplashPresenter {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new DisposableSingleObserver<List<Stock>>() {
                             @Override
-                            public void onSuccess(@NonNull List<Stock> stocks) {
+                            public void onSuccess(@NonNull List<Stock> response) {
+                                stocks = response;
                                 initializeQuotes(stocks);
+                                CacheUtil.setTickersCachedFlag(context, true);
                             }
 
                             @Override
                             public void onError(@NonNull Throwable e) {
-                                buildErrorLoadingDialog(e);
+                                buildErrorSymbolsLoadingDialog(e);
+                                e.printStackTrace();
                             }
                         });
             }
         }
     }
 
-    public void buildErrorLoadingDialog(Throwable e) {
+    public void buildErrorSymbolsLoadingDialog(Throwable e) {
         builder.setTitle(R.string.loading_error);
         if (e instanceof SocketTimeoutException) {
             builder.setMessage(R.string.timed_out);
@@ -96,6 +102,22 @@ public class SplashPresenter {
         }
 
         builder.setPositiveButton(R.string.retry, (di, i) -> initializeSymbols())
+                .setNegativeButton(R.string.cancel, (di, id) -> di.cancel());
+
+        splashView.showDialog(builder.create());
+    }
+
+    public void buildErrorQuotesLoadingDialog(Throwable e) {
+        builder.setTitle(R.string.loading_error);
+        if (e instanceof SocketTimeoutException) {
+            builder.setMessage(R.string.timed_out);
+
+        } else {
+            builder.setMessage(R.string.unknown_error);
+
+        }
+
+        builder.setPositiveButton(R.string.retry, (di, i) -> initializeQuotes(stocks))
                 .setNegativeButton(R.string.cancel, (di, id) -> di.cancel());
 
         splashView.showDialog(builder.create());

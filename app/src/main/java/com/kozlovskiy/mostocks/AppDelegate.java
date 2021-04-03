@@ -8,6 +8,8 @@ import com.kozlovskiy.mostocks.room.StocksDatabase;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
+import io.reactivex.plugins.RxJavaPlugins;
+
 public class AppDelegate extends Application {
 
     private StocksDatabase database;
@@ -23,6 +25,8 @@ public class AppDelegate extends Application {
 
         Picasso built = builder.build();
         Picasso.setSingletonInstance(built);
+
+        RxJavaPlugins.setErrorHandler(Throwable::printStackTrace);
     }
 
     public StocksDatabase getDatabase() {
