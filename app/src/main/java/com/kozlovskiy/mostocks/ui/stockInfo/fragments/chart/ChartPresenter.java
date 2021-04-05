@@ -131,6 +131,9 @@ public class ChartPresenter {
         for (int i = 0; i < candles.getVolumes().size(); i++) {
             long timestamp = candles.getTimestamps().get(i);
 
+            if (timestamp < from)
+                continue;
+
             double high = candles.getHighPrices().get(i);
             double low = candles.getLowPrices().get(i);
 
